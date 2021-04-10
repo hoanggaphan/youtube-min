@@ -37,14 +37,8 @@ function initClient(updateSignInStatus: () => void) {
 
   gapi.client
     .init({
-      apiKey:
-        process.env.NODE_ENV === 'production'
-          ? process.env.NEXT_PUBLIC_GG_API_KEY
-          : process.env.REACT_APP_GG_API_KEY,
-      clientId:
-        process.env.NODE_ENV === 'production'
-          ? process.env.NEXT_PUBLIC_GG_CLIENT_ID
-          : process.env.REACT_APP_GG_CLIENT_ID,
+      apiKey: process.env.NEXT_PUBLIC_GG_API_KEY,
+      clientId: process.env.NEXT_PUBLIC_GG_CLIENT_ID,
       discoveryDocs: discoveryUrls,
       scope: SCOPE,
     })
@@ -66,6 +60,7 @@ function useProvideAuth() {
   // save user profile
   const [user, setUser] = React.useState<UserType | null>(null);
 
+
   /**
    * Load the API's client and auth2 modules.
    * Call the initClient function after the modules load.
@@ -73,6 +68,7 @@ function useProvideAuth() {
   React.useEffect(() => {
     gapi.load('client:auth2', () => initClient(updateSignInStatus));
   }, []);
+
 
   /**
    * Listener called when user completes auth flow.
@@ -98,10 +94,11 @@ function useProvideAuth() {
     }
   };
 
+
   const signIn = () => GoogleAuth.signIn();
   const signOut = () => GoogleAuth.signOut();
   const revokeAccess = () => GoogleAuth.disconnect();
-
+  
   return {
     user,
     isSignedIn,
