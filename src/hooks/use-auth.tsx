@@ -37,8 +37,8 @@ function initClient(updateSignInStatus: () => void) {
 
   gapi.client
     .init({
-      apiKey: process.env.NEXT_PUBLIC_GG_API_KEY,
-      clientId: process.env.NEXT_PUBLIC_GG_CLIENT_ID,
+      apiKey: process.env.GG_API_KEY,
+      clientId: process.env.GG_CLIENT_ID,
       discoveryDocs: discoveryUrls,
       scope: SCOPE,
     })
