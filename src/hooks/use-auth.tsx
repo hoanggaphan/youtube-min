@@ -26,7 +26,7 @@ export function ProvideAuth({ children }: PropsType): JSX.Element {
 export function useAuth() {
   return React.useContext(authContext);
 }
-
+console.log(process.env.REACT_APP_GG_API_KEY)
 let GoogleAuth: any;
 const SCOPE = 'https://www.googleapis.com/auth/youtube.force-ssl';
 
