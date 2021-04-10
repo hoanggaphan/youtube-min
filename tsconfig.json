@@ -20,7 +20,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react",
-    "types": ["gapi", "gapi.auth2"]
+    "types": ["gapi", "gapi.auth2", "@types/jest"]
   },
   "include": [
     "src"

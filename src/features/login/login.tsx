@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export default function Login(): JSX.Element {
+export default function Login() {
   const classes = useStyles();
   const auth = useAuth();
 
