@@ -2,8 +2,8 @@ import { useAuth } from 'hooks/use-auth';
 import React from 'react';
 
 export default function Home(): JSX.Element {
+  
   const auth = useAuth();
-
   return (
     <div>
       HOME
