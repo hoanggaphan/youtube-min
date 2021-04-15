@@ -20,7 +20,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react",
-    "types": ["gapi", "gapi.auth2", "@types/jest"]
+    "types": ["gapi", "gapi.auth2", "gapi.client.youtube", "@types/jest"]
   },
   "include": [
     "src"
