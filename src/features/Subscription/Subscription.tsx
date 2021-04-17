@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from 'app/hook';
 import { fetchSubscriptions } from 'features/Subscription/subscriptionSlice';
 import React, { useEffect, useRef, useState } from 'react';
 import ScrollMenu from 'react-horizontal-scrolling-menu';
+import { useHistory } from 'react-router';
 import Arrow from './components/Arrow';
 import SubscriptionItem from './components/SubscriptionItem';
 import {
@@ -16,38 +17,21 @@ import {
 
 const useStyles = makeStyles(() =>
   createStyles({
-    arrow: {
-      position: 'absolute',
-      '&:first-child': {
-        left: '0',
-        transform: 'translateX(-100%)',
-      },
-      '&:last-child': {
-        right: '0',
-        transform: 'translateX(100%)',
-      },
-    },
     arrowDisabled: {
       visibility: 'hidden',
       opacity: '0',
     },
     menu: {
-      marginTop: '30px',
+      marginTop: '15px',
       padding: '25px 0',
-
       position: 'relative',
-      border: '1px solid #aaa',
-      borderRight: 'none',
-      borderLeft: 'none',
     },
     menuItem: {
       outline: 'none',
-      '& img': {
-        '-webkit-user-drag': 'none',
-      },
+      userSelect: 'none',
     },
     title: {
-      marginTop: '100px',
+      marginTop: '50px',
     },
   })
 );
@@ -64,7 +48,6 @@ const SubscriptionList = (list: any) => {
     return (
       <SubscriptionItem
         key={sub.id}
-        id={sub.id}
         url={sub.snippet.thumbnails.default.url}
         text={sub.snippet.title}
       />
@@ -73,6 +56,7 @@ const SubscriptionList = (list: any) => {
 };
 
 export default function Subscription(): JSX.Element {
+  const history = useHistory();
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const menuRef = useRef<ScrollMenu>(null);
@@ -81,7 +65,7 @@ export default function Subscription(): JSX.Element {
   const subscriptions = useAppSelector(selectSubscriptions);
   const nextPageToken = useAppSelector(selectNextPageToken);
 
-  // If the new list is returned, it will resize menu width
+  // Get Menu Width, to disable dragging when Items Width < Menu Width
   useEffect(() => {
     if (menuRef && menuRef.current) {
       const { allItemsWidth, menuWidth } = menuRef.current.getWidth(
@@ -97,6 +81,9 @@ export default function Subscription(): JSX.Element {
     dispatch(fetchSubscriptions());
     // eslint-disable-next-line
   }, []);
+
+  const handleItemSelected = (key: string | number | null) =>
+    history.push(`/${key}`);
 
   const handleLazyLoad = () => {
     // nextPageToken check subscriptions list from api has ended or not
@@ -125,7 +112,6 @@ export default function Subscription(): JSX.Element {
         dragging={!!allItemsWidth && !!menuWidth && allItemsWidth > menuWidth}
         wheel={false}
         data={SubscriptionList(subscriptions)}
-        arrowClass={classes.arrow}
         menuClass={classes.menu}
         itemClass={classes.menuItem}
         arrowDisabledClass={classes.arrowDisabled}
@@ -135,6 +121,7 @@ export default function Subscription(): JSX.Element {
         hideArrows
         hideSingleArrow
         onUpdate={handleLazyLoad}
+        onSelect={handleItemSelected}
       />
     </>
   );
