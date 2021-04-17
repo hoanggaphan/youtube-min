@@ -4,9 +4,9 @@ import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import Subscription from 'features/Subscription/Subscription';
 import { useAuth } from 'hooks/use-auth';
 import React from 'react';
-import Subscription from 'features/Subscription/Subscription';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -24,15 +24,19 @@ const useStyles = makeStyles((theme: Theme) =>
     mt8: {
       marginTop: theme.spacing(8),
     },
+    mx: {
+      marginTop: theme.spacing(6),
+      marginBottom: theme.spacing(6),
+    },
   })
 );
 
 export default function Home(): JSX.Element {
   const { revokeAccess, signOut, user } = useAuth();
   const classes = useStyles();
-  
+
   return (
-    <Container maxWidth='md' className={classes.mt8}>
+    <Container maxWidth='md' className={classes.mx}>
       <Avatar alt='avatar' className={`${classes.large} ${classes.center}`}>
         {user?.firstName.charAt(0)}
       </Avatar>
