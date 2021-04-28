@@ -6,8 +6,8 @@ const useStyles = makeStyles(() =>
   createStyles({
     avatar: {
       margin: '0 10px',
-      width: '88px',
-      height: '88px',
+      width: '80px',
+      height: '80px',
 
       cursor: 'pointer',
       '-webkit-user-drag': 'none',

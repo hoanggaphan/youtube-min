@@ -8,6 +8,15 @@ import { store } from './app/store';
 import * as serviceWorker from './serviceWorker';
 
 const theme = createMuiTheme({
+  overrides: {
+    MuiCssBaseline: {
+      '@global': {
+        img: {
+          display: 'block',
+        },
+      },
+    },
+  },
   breakpoints: {
     values: {
       xs: 0,

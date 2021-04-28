@@ -1,21 +1,17 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import * as subscriptionAPI from 'api/subscriptionAPI';
 import { RootState } from 'app/store';
-import * as subscriptionAPI from './subscriptionAPI';
 
 interface SubscriptionState {
-  loading: 'idle' | 'loading' | 'failed';
-  subscriptions: {
-    items: any;
-    nextPageToken?: string;
-  };
+  loading: 'idle' | 'pending' | 'succeeded' | 'failed';
+  nextPageToken: string | undefined;
+  items: any;
 }
 
 const initialState: SubscriptionState = {
   loading: 'idle',
-  subscriptions: {
-    items: [],
-    nextPageToken: undefined,
-  },
+  nextPageToken: undefined,
+  items: [],
 };
 
 export const fetchSubscriptions = createAsyncThunk(
@@ -49,39 +45,44 @@ export const fetchNextSubscriptions = createAsyncThunk(
 const subscriptionSlice = createSlice({
   name: 'subscription',
   initialState,
-  reducers: {},
+  reducers: {
+    resetSubscription: () => initialState,
+  },
   extraReducers: (builder) => {
     builder.addCase(fetchSubscriptions.pending, (state, action) => {
-      state.loading = 'loading';
+      state.loading = 'pending';
     });
     builder.addCase(fetchSubscriptions.rejected, (state, action) => {
-      state.loading = 'idle';
+      state.loading = 'failed';
       console.error(action.payload);
     });
     builder.addCase(fetchSubscriptions.fulfilled, (state, action) => {
-      state.loading = 'idle';
-      state.subscriptions = action.payload;
+      state.loading = 'succeeded';
+      state.items = action.payload.items;
+      state.nextPageToken = action.payload.nextPageToken;
     });
 
     builder.addCase(fetchNextSubscriptions.pending, (state, action) => {
-      state.loading = 'loading';
+      state.loading = 'pending';
     });
     builder.addCase(fetchNextSubscriptions.rejected, (state, action) => {
-      state.loading = 'idle';
+      state.loading = 'failed';
       console.error(action.payload);
     });
     builder.addCase(fetchNextSubscriptions.fulfilled, (state, action) => {
-      state.loading = 'idle';
-      state.subscriptions.items.push(...action.payload.items);
-      state.subscriptions.nextPageToken = action.payload.nextPageToken;
+      state.loading = 'succeeded';
+      state.items.push(...action.payload.items);
+      state.nextPageToken = action.payload.nextPageToken;
     });
   },
 });
 
-export const selectSubscriptions = (state: RootState) =>
-  state.subscription.subscriptions.items;
+export const { resetSubscription } = subscriptionSlice.actions;
 
+export const selectLoading = (state: RootState) => state.subscription.loading;
+export const selectSubscriptions = (state: RootState) =>
+  state.subscription.items;
 export const selectNextPageToken = (state: RootState) =>
-  state.subscription.subscriptions.nextPageToken;
+  state.subscription.nextPageToken;
 
 export default subscriptionSlice.reducer;
