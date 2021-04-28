@@ -1,3 +1,7 @@
+import { resetChannel } from 'app/channelSlice';
+import { useAppDispatch } from 'app/hook';
+import { resetPlayListItems } from 'app/playListItemsSlice';
+import { resetSubscription } from 'app/subscriptionSlice';
 import React from 'react';
 
 type AuthContextType = ReturnType<typeof useProvideAuth>;
@@ -54,12 +58,13 @@ function initClient(updateSignInStatus: () => void) {
 }
 
 function useProvideAuth() {
+  const dispatch = useAppDispatch();
+
   // null is initial state _ true is sign-in _ false is sign-out.
   const [isSignedIn, setIsSignedIn] = React.useState<boolean | null>(null);
 
   // save user profile
   const [user, setUser] = React.useState<UserType | null>(null);
-
 
   /**
    * Load the API's client and auth2 modules.
@@ -68,7 +73,6 @@ function useProvideAuth() {
   React.useEffect(() => {
     gapi.load('client:auth2', () => initClient(updateSignInStatus));
   }, []);
-
 
   /**
    * Listener called when user completes auth flow.
@@ -81,12 +85,12 @@ function useProvideAuth() {
 
       const userProfile = user.getBasicProfile();
       const newUser = {
-        imgUrl: userProfile.EI,
-        id: userProfile.ER,
-        fullName: userProfile.Te,
-        lastName: userProfile.kR,
-        firstName: userProfile.oT,
-        email: userProfile.zt,
+        imgUrl: userProfile.getImageUrl(),
+        id: userProfile.getId(),
+        fullName: userProfile.getName(),
+        lastName: userProfile.getFamilyName(),
+        firstName: userProfile.getGivenName(),
+        email: userProfile.getEmail(),
       };
       setUser(newUser);
     } else {
@@ -94,16 +98,23 @@ function useProvideAuth() {
     }
   };
 
-
   const signIn = () => GoogleAuth.signIn();
   const signOut = () => GoogleAuth.signOut();
   const revokeAccess = () => GoogleAuth.disconnect();
-  
+
+  // reset all state in redux 
+  const reset = () => {
+    dispatch(resetChannel());
+    dispatch(resetPlayListItems());
+    dispatch(resetSubscription());
+  };
+
   return {
     user,
     isSignedIn,
     signIn,
     signOut,
     revokeAccess,
+    reset,
   };
 }

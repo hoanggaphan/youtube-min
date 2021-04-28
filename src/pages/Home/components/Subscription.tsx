@@ -2,18 +2,20 @@ import { createStyles, makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
+import Alert from '@material-ui/lab/Alert';
 import { useAppDispatch, useAppSelector } from 'app/hook';
-import { fetchSubscriptions } from 'features/Subscription/subscriptionSlice';
-import React, { useEffect, useRef, useState } from 'react';
-import ScrollMenu from 'react-horizontal-scrolling-menu';
-import { useHistory } from 'react-router';
-import Arrow from './components/Arrow';
-import SubscriptionItem from './components/SubscriptionItem';
 import {
   fetchNextSubscriptions,
+  fetchSubscriptions,
+  selectLoading,
   selectNextPageToken,
-  selectSubscriptions,
-} from './subscriptionSlice';
+  selectSubscriptions
+} from 'app/subscriptionSlice';
+import React from 'react';
+import ScrollMenu from 'react-horizontal-scrolling-menu';
+import { useHistory } from 'react-router';
+import Arrow from './Arrow';
+import SubscriptionItem from './SubscriptionItem';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -47,7 +49,7 @@ const SubscriptionList = (list: any) => {
   return list.map((sub: any) => {
     return (
       <SubscriptionItem
-        key={sub.id}
+        key={sub.snippet.resourceId.channelId}
         url={sub.snippet.thumbnails.default.url}
         text={sub.snippet.title}
       />
@@ -59,14 +61,15 @@ export default function Subscription(): JSX.Element {
   const history = useHistory();
   const dispatch = useAppDispatch();
   const classes = useStyles();
-  const menuRef = useRef<ScrollMenu>(null);
-  const [allItemsWidth, setAllItemsWidth] = useState<number | null>(null);
-  const [menuWidth, setMenuWidth] = useState<number | null>(null);
+  const menuRef = React.useRef<ScrollMenu>(null);
+  const [allItemsWidth, setAllItemsWidth] = React.useState<number | null>(null);
+  const [menuWidth, setMenuWidth] = React.useState<number | null>(null);
+  const loading = useAppSelector(selectLoading);
   const subscriptions = useAppSelector(selectSubscriptions);
   const nextPageToken = useAppSelector(selectNextPageToken);
 
   // Get Menu Width, to disable dragging when Items Width < Menu Width
-  useEffect(() => {
+  React.useEffect(() => {
     if (menuRef && menuRef.current) {
       const { allItemsWidth, menuWidth } = menuRef.current.getWidth(
         SubscriptionList(subscriptions)
@@ -77,13 +80,13 @@ export default function Subscription(): JSX.Element {
   }, [subscriptions]);
 
   // Initialize list for first load
-  useEffect(() => {
+  React.useEffect(() => {
     dispatch(fetchSubscriptions());
     // eslint-disable-next-line
   }, []);
 
   const handleItemSelected = (key: string | number | null) =>
-    history.push(`/${key}`);
+    history.push(`/channel/${key}`);
 
   const handleLazyLoad = () => {
     // nextPageToken check subscriptions list from api has ended or not
@@ -102,11 +105,14 @@ export default function Subscription(): JSX.Element {
     }
   };
 
-  return (
-    <>
-      <Typography align='center' variant='h2' className={classes.title}>
-        Kênh đăng ký
-      </Typography>
+  const renderMenu = () => {
+    if ((loading === 'idle' || loading === 'pending') && !subscriptions.length)
+      return 'Loading...';
+
+    if (loading === 'succeeded' && !subscriptions.length)
+      return <Alert severity='error'>Bạn chưa đăng ký bắt kỳ kênh nào!</Alert>;
+
+    return (
       <ScrollMenu
         ref={menuRef}
         dragging={!!allItemsWidth && !!menuWidth && allItemsWidth > menuWidth}
@@ -123,6 +129,15 @@ export default function Subscription(): JSX.Element {
         onUpdate={handleLazyLoad}
         onSelect={handleItemSelected}
       />
+    );
+  };
+
+  return (
+    <>
+      <Typography align='center' variant='h2' className={classes.title}>
+        Kênh đăng ký
+      </Typography>
+      {renderMenu()}
     </>
   );
 }

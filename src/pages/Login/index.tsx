@@ -1,10 +1,10 @@
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
-import Container from '@material-ui/core/Container';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import MyContainer from 'components/MyContainer';
 import { useAuth } from 'hooks/use-auth';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -20,12 +20,12 @@ export default function Login(): JSX.Element {
 
   const handleLogin = () => auth.signIn();
 
-  useEffect(() => {
+  React.useEffect(() => {
     document.title = 'Đăng nhập';
   }, []);
 
   return (
-    <Container maxWidth='md'>
+    <MyContainer>
       <Box
         height='100vh'
         display='flex'
@@ -48,6 +48,6 @@ export default function Login(): JSX.Element {
           Đăng nhập với google
         </Button>
       </Box>
-    </Container>
+    </MyContainer>
   );
 }
