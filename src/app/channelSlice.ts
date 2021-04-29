@@ -18,9 +18,13 @@ const initialState: ChannelState = {
           url: null,
         },
       },
+      publishedAt: null,
+      country: null,
+      description: null,
     },
     statistics: {
       subscriberCount: null,
+      viewCount: null,
     },
     contentDetails: {
       relatedPlaylists: {
@@ -75,5 +79,14 @@ export const selectChannel = (state: RootState) => state.channel.channel;
 export const selectChannelId = (state: RootState) => state.channel.channel.id;
 export const selectPlayListId = (state: RootState) =>
   state.channel.channel.contentDetails.relatedPlaylists.uploads;
+
+export const selectChannelDes = (state: RootState) =>
+  state.channel.channel.snippet.description;
+export const selectChannelCountry = (state: RootState) =>
+  state.channel.channel.snippet.country;
+export const selectChannelPublishAt = (state: RootState) =>
+  state.channel.channel.snippet.publishedAt;
+export const selectChannelViewCount = (state: RootState) =>
+  state.channel.channel.statistics.viewCount;
 
 export default channelSlice.reducer;
