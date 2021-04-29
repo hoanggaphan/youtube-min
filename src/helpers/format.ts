@@ -91,3 +91,12 @@ function customTemplate(this: any) {
 export function formatDuration(duration: string) {
   return moment.duration(duration).format(customTemplate, { trim: false });
 }
+
+export function formatPublishAt(date: string) {
+  const format = 'D [thg] M, YYYY';
+  return moment(date).format(format);
+}
+
+export function formatChannelViews(num: number) {
+  return Number(num).toLocaleString();
+}

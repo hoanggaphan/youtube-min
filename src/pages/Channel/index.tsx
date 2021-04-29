@@ -15,9 +15,6 @@ import React from 'react';
 import { Route, useLocation, useParams, useRouteMatch } from 'react-router';
 import { Link, Switch } from 'react-router-dom';
 import About from './components/About';
-import Channels from './components/Channels';
-import Community from './components/Community';
-import Playlists from './components/Playlists';
 import TabPanel from './components/TabPanel';
 import Videos from './components/Videos';
 
@@ -139,28 +136,9 @@ export default function Channel(): JSX.Element {
         onChange={handleChange}
         indicatorColor='primary'
         textColor='primary'
-        variant='scrollable'
-        scrollButtons='on'
+        centered
       >
         <Tab label='Video' value={url} component={Link} to={url} />
-        <Tab
-          label='Danh sách phát'
-          value={`${url}/playlists`}
-          component={Link}
-          to={`${url}/playlists`}
-        />
-        <Tab
-          label='Cộng đồng'
-          value={`${url}/community`}
-          component={Link}
-          to={`${url}/community`}
-        />
-        <Tab
-          label='Kênh'
-          value={`${url}/channels`}
-          component={Link}
-          to={`${url}/channels`}
-        />
         <Tab
           label='Giới thiệu'
           value={`${url}/about`}
@@ -176,30 +154,6 @@ export default function Channel(): JSX.Element {
           render={() => (
             <TabPanel>
               <Videos />
-            </TabPanel>
-          )}
-        />
-        <Route
-          path={`${url}/playlists`}
-          render={() => (
-            <TabPanel>
-              <Playlists />
-            </TabPanel>
-          )}
-        />
-        <Route
-          path={`${url}/community`}
-          render={() => (
-            <TabPanel>
-              <Community />
-            </TabPanel>
-          )}
-        />
-        <Route
-          path={`${url}/channels`}
-          render={() => (
-            <TabPanel>
-              <Channels />
             </TabPanel>
           )}
         />
