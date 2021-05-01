@@ -6,12 +6,14 @@ interface SubscriptionState {
   loading: 'idle' | 'pending' | 'succeeded' | 'failed';
   nextPageToken: string | undefined;
   items: any;
+  exist: any;
 }
 
 const initialState: SubscriptionState = {
   loading: 'idle',
   nextPageToken: undefined,
   items: [],
+  exist: null,
 };
 
 export const fetchSubscriptions = createAsyncThunk(
@@ -32,6 +34,48 @@ export const fetchNextSubscriptions = createAsyncThunk(
   'subscription/fetchNextList',
   async (nextPageToken: string | undefined, thunkApi) => {
     const response = await subscriptionAPI.fetchNextList(nextPageToken);
+
+    if (response.status !== 200) {
+      // Return the known error for future handling
+      return thunkApi.rejectWithValue(response.result);
+    }
+
+    return response.result;
+  }
+);
+
+export const checkSubscriptionExist = createAsyncThunk(
+  'subscription/checkExist',
+  async (channelId: string, thunkApi) => {
+    const response = await subscriptionAPI.checkSubExist(channelId);
+
+    if (response.status !== 200) {
+      // Return the known error for future handling
+      return thunkApi.rejectWithValue(response.result);
+    }
+
+    return response.result;
+  }
+);
+
+export const deleteSubscription = createAsyncThunk(
+  'subscription/delete',
+  async (id: string, thunkApi) => {
+    const response = await subscriptionAPI.deleteSub(id);
+
+    if (response.status !== 204) {
+      // Return the known error for future handling
+      return thunkApi.rejectWithValue(response.result);
+    }
+
+    return response.result;
+  }
+);
+
+export const addSubscription = createAsyncThunk(
+  'subscription/add',
+  async (channelId: string, thunkApi) => {
+    const response = await subscriptionAPI.addSub(channelId);
 
     if (response.status !== 200) {
       // Return the known error for future handling
@@ -74,6 +118,27 @@ const subscriptionSlice = createSlice({
       state.items.push(...action.payload.items);
       state.nextPageToken = action.payload.nextPageToken;
     });
+
+    builder.addCase(checkSubscriptionExist.rejected, (state, action) => {
+      console.error(action.payload);
+    });
+    builder.addCase(checkSubscriptionExist.fulfilled, (state, action) => {
+      state.exist = action.payload.items;
+    });
+
+    builder.addCase(deleteSubscription.rejected, (state, action) => {
+      console.error(action.payload);
+    });
+    builder.addCase(deleteSubscription.fulfilled, (state, action) => {
+      state.exist = [];
+    });
+
+    builder.addCase(addSubscription.rejected, (state, action) => {
+      console.error(action.payload);
+    });
+    builder.addCase(addSubscription.fulfilled, (state, action) => {
+      state.exist.push(action.payload);
+    });
   },
 });
 
@@ -84,5 +149,5 @@ export const selectSubscriptions = (state: RootState) =>
   state.subscription.items;
 export const selectNextPageToken = (state: RootState) =>
   state.subscription.nextPageToken;
-
+export const selectExist = (state: RootState) => state.subscription.exist;
 export default subscriptionSlice.reducer;

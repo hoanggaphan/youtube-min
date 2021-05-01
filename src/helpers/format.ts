@@ -1,7 +1,9 @@
 import moment from 'moment';
 import 'moment-duration-format';
 
-export function formatSubscriptionCount(num: number) {
+export function formatSubscriptionCount(num: number | string) {
+  num = Number(num);
+
   if (num === 0) return 0;
 
   const types = [
@@ -97,6 +99,6 @@ export function formatPublishAt(date: string) {
   return moment(date).format(format);
 }
 
-export function formatChannelViews(num: number) {
+export function formatChannelViews(num: number | string) {
   return Number(num).toLocaleString();
 }

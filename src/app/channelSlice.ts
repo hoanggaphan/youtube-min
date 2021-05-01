@@ -4,37 +4,60 @@ import { RootState } from 'app/store';
 
 interface ChannelState {
   loading: 'idle' | 'pending' | 'succeeded' | 'failed';
-  channel: any;
+  id: null | string;
+  snippet: {
+    title: null | string;
+    thumbnails: {
+      default: {
+        url: undefined | string;
+      };
+    };
+    publishedAt: null | string;
+    country: null | string;
+    description: null | string;
+  };
+  statistics: {
+    subscriberCount: null | string;
+    viewCount: null | string;
+  };
+  contentDetails: {
+    relatedPlaylists: {
+      uploads: null | string;
+    };
+  };
+  brandingSettings: {
+    image: {
+      bannerExternalUrl: null | string;
+    };
+  };
 }
 
 const initialState: ChannelState = {
   loading: 'idle',
-  channel: {
-    id: null,
-    snippet: {
-      title: null,
-      thumbnails: {
-        default: {
-          url: null,
-        },
-      },
-      publishedAt: null,
-      country: null,
-      description: null,
-    },
-    statistics: {
-      subscriberCount: null,
-      viewCount: null,
-    },
-    contentDetails: {
-      relatedPlaylists: {
-        uploads: null,
+  id: null,
+  snippet: {
+    title: null,
+    thumbnails: {
+      default: {
+        url: undefined,
       },
     },
-    brandingSettings: {
-      image: {
-        bannerExternalUrl: null,
-      },
+    publishedAt: null,
+    country: null,
+    description: null,
+  },
+  statistics: {
+    subscriberCount: null,
+    viewCount: null,
+  },
+  contentDetails: {
+    relatedPlaylists: {
+      uploads: null,
+    },
+  },
+  brandingSettings: {
+    image: {
+      bannerExternalUrl: null,
     },
   },
 };
@@ -47,7 +70,7 @@ export const fetchChannelById = createAsyncThunk(
     if (response.status !== 200) {
       return thunkAPI.rejectWithValue(response.result);
     }
-
+    
     return response.result;
   }
 );
@@ -68,25 +91,45 @@ const channelSlice = createSlice({
     });
     builder.addCase(fetchChannelById.fulfilled, (state, action) => {
       state.loading = 'idle';
-      state.channel = action.payload.items[0];
+      const {
+        id,
+        snippet,
+        statistics,
+        contentDetails,
+        brandingSettings,
+      } = action.payload.items[0];
+      state.id = id;
+      state.snippet = snippet;
+      state.statistics = statistics;
+      state.contentDetails = contentDetails;
+      state.brandingSettings = brandingSettings;
     });
   },
 });
 
 export const { resetChannel } = channelSlice.actions;
 
-export const selectChannel = (state: RootState) => state.channel.channel;
-export const selectChannelId = (state: RootState) => state.channel.channel.id;
+export const selectChannelId = (state: RootState) => state.channel.id;
 export const selectPlayListId = (state: RootState) =>
-  state.channel.channel.contentDetails.relatedPlaylists.uploads;
+  state.channel.contentDetails.relatedPlaylists.uploads;
 
+export const selectChannelTitle = (state: RootState) =>
+  state.channel.snippet.title;
 export const selectChannelDes = (state: RootState) =>
-  state.channel.channel.snippet.description;
+  state.channel.snippet.description;
 export const selectChannelCountry = (state: RootState) =>
-  state.channel.channel.snippet.country;
+  state.channel.snippet.country;
 export const selectChannelPublishAt = (state: RootState) =>
-  state.channel.channel.snippet.publishedAt;
+  state.channel.snippet.publishedAt;
+export const selectChannelThumbUrl = (state: RootState) =>
+  state.channel.snippet.thumbnails.default.url;
+
 export const selectChannelViewCount = (state: RootState) =>
-  state.channel.channel.statistics.viewCount;
+  state.channel.statistics.viewCount;
+export const selectChannelSubscriberCount = (state: RootState) =>
+  state.channel.statistics.subscriberCount;
+
+export const selectChannelBannerExternalUrl = (state: RootState) =>
+  state.channel.brandingSettings.image.bannerExternalUrl;
 
 export default channelSlice.reducer;
