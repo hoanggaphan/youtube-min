@@ -6,7 +6,7 @@ import {
   selectChannelCountry,
   selectChannelDes,
   selectChannelPublishAt,
-  selectChannelViewCount
+  selectChannelViewCount,
 } from 'app/channelSlice';
 import { useAppSelector } from 'app/hook';
 import { formatChannelViews, formatPublishAt } from 'helpers/format';
@@ -25,6 +25,15 @@ const useStyles = makeStyles((theme: Theme) =>
     mt12: {
       marginTop: '12px',
     },
+    grid: {
+      flexDirection: 'column',
+      flexWrap: 'nowrap',
+
+      [theme.breakpoints.up('sm')]: {
+        columnGap: '96px',
+        flexDirection: 'row',
+      },
+    },
   })
 );
 
@@ -37,8 +46,8 @@ export default function About(): JSX.Element {
 
   return (
     <Box mb='24px'>
-      <Grid container spacing={10}>
-        <Grid item xs={8}>
+      <Grid container className={classes.grid}>
+        <Grid item xs={12} sm={8}>
           {description && (
             <Box pb='32px' borderBottom='1px solid rgba(125,125,125, .2)'>
               <Typography variant='subtitle1' className={classes.subTitle}>
@@ -72,7 +81,7 @@ export default function About(): JSX.Element {
             </Box>
           )}
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} sm={4}>
           <Box py='12px' borderBottom='1px solid rgba(125,125,125, .2)'>
             <Typography variant='subtitle1' className={classes.mt12}>
               Thống kê
@@ -80,12 +89,12 @@ export default function About(): JSX.Element {
           </Box>
           <Box py='12px' borderBottom='1px solid rgba(125,125,125, .2)'>
             <Typography variant='body2'>
-              {'Đã tham gia ' + formatPublishAt(publishAt)}
+              {publishAt && 'Đã tham gia ' + formatPublishAt(publishAt)}
             </Typography>
           </Box>
           <Box py='12px' borderBottom='1px solid rgba(125,125,125, .2)'>
             <Typography variant='body2'>
-              {formatChannelViews(viewCount) + ' lượt xem'}
+              {viewCount && formatChannelViews(viewCount) + ' lượt xem'}
             </Typography>
           </Box>
         </Grid>

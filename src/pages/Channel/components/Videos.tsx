@@ -84,12 +84,12 @@ const useStyles = makeStyles((theme: Theme) =>
 export default React.memo(function Videos(): JSX.Element {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const playListId = useAppSelector(selectPlayListId);
-  const channelId = useAppSelector(selectChannelId);
+  const playListId = useAppSelector(selectPlayListId) || '';
+  const channelId = useAppSelector(selectChannelId) || '';
   const playListItems = useAppSelector(selectPlayListItems);
   const loader = React.useRef<HTMLDivElement | null>(null);
   const observer = React.useRef<any>(null);
-  
+
   const currentPlayListItems = playListItems.find(
     (item: any) => item.channelId === channelId
   );
