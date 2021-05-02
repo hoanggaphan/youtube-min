@@ -18,6 +18,11 @@ const useStyles = makeStyles((theme: Theme) =>
     center: {
       margin: '0 auto',
     },
+    name: {
+      [theme.breakpoints.down('sm')]: {
+        fontSize: '1.3rem',
+      },
+    },
     mt2: {
       marginTop: theme.spacing(2),
     },
@@ -54,10 +59,18 @@ export default function Home(): JSX.Element {
         >
           {user?.firstName?.charAt(0)}
         </Avatar>
-        <Typography align='center' variant='h3' className={classes.mt2}>
+        <Typography
+          align='center'
+          variant='h3'
+          className={`${classes.mt2} ${classes.name}`}
+        >
           {user?.fullName}
         </Typography>
-        <Typography align='center' variant='h3' className={classes.mt2}>
+        <Typography
+          align='center'
+          variant='h3'
+          className={`${classes.mt2} ${classes.name}`}
+        >
           {user?.email}
         </Typography>
 
