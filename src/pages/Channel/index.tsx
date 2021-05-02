@@ -46,13 +46,15 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     channelHeader: {
-      flexDirection: "column",
-      padding: "0",
-      
-      [theme.breakpoints.up('sm')]: {
-        flexDirection: "row",
-        padding: "15px 40px 0",
+      display: 'flex',
+      backgroundColor: 'white',
+      justifyContent: 'space-between',
+      flexDirection: 'column',
+      padding: '15px 40px 0',
 
+      [theme.breakpoints.up('sm')]: {
+        flexDirection: 'row',
+        alignItems: 'center',
       },
     },
     avatar: {
@@ -62,35 +64,35 @@ const useStyles = makeStyles((theme: Theme) =>
       marginRight: '25px',
     },
     title: {
-      fontSize: "18px",
+      fontSize: '18px',
       [theme.breakpoints.up('sm')]: {
-        fontSize: "24px",
+        fontSize: '24px',
       },
     },
     registeredBtn: {
       backgroundColor: '#ececec',
       color: 'rgb(96, 96, 96)',
-      transition: "none",
-      margin: "10px 0",
+      transition: 'none',
+      margin: '10px 0',
 
       '&:hover': {
         backgroundColor: '#ececec',
       },
 
       [theme.breakpoints.up('sm')]: {
-        margin: "0"
+        margin: '0',
       },
     },
     registerBtn: {
-      transition: "none",
-      margin: "10px 0",
+      transition: 'none',
+      margin: '10px 0',
 
       '&:hover': {
         backgroundColor: theme.palette.secondary.main,
       },
 
       [theme.breakpoints.up('sm')]: {
-        margin: "0"
+        margin: '0',
       },
     },
     tabs: {
@@ -197,19 +199,15 @@ export default function Channel(): JSX.Element {
         ></div>
       )}
 
-      <Box
-        className={classes.channelHeader}
-        bgcolor='white'
-        display='flex'
-        alignItems='center'
-        justifyContent='space-between'
-      >
+      <Box className={classes.channelHeader}>
         <Box display='flex' alignItems='center'>
           <Avatar src={thumbUrl} className={classes.avatar}>
             {title?.charAt(0)}
           </Avatar>
           <div>
-            <Typography variant='h5' className={classes.title}>{title}</Typography>
+            <Typography variant='h5' className={classes.title}>
+              {title}
+            </Typography>
             <Typography variant='body2' color='textSecondary'>
               {subscriberCount &&
                 formatSubscriptionCount(subscriberCount) + ' người đăng ký'}

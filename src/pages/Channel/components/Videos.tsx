@@ -20,28 +20,25 @@ import { Link } from 'react-router-dom';
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     grid: {
-      display: 'flex',
-      flexWrap: 'wrap',
-      margin: '0 auto',
+      display: 'grid',
+      gridTemplateColumns: "210px",
+      gap: '24px 4px',
+      justifyContent: "center",
 
-      maxWidth: '214px',
       '@media only screen and (min-width: 428px)': {
-        maxWidth: '428px',
+        gridTemplateColumns: "repeat(2, 210px)",
       },
       '@media only screen and (min-width: 642px)': {
-        maxWidth: '642px',
+        gridTemplateColumns: "repeat(3, 210px)",
       },
       '@media only screen and (min-width: 856px)': {
-        maxWidth: '856px',
+        gridTemplateColumns: "repeat(4, 210px)",
       },
       '@media only screen and (min-width: 1070px)': {
-        maxWidth: '1070px',
+        gridTemplateColumns: "repeat(5, 210px)",
       },
     },
     gridItem: {
-      width: '210px',
-      marginRight: '4px',
-      marginBottom: '24px',
       textDecoration: 'none',
       color: 'unset',
     },
@@ -75,7 +72,7 @@ const useStyles = makeStyles((theme: Theme) =>
       fontSize: '12px',
     },
     loader: {
-      margin: '0 auto',
+      margin: '24px auto 0',
       width: 'fit-content',
     },
   })

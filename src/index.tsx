@@ -1,5 +1,8 @@
 import CssBaseline from '@material-ui/core/CssBaseline';
-import { unstable_createMuiStrictModeTheme as createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import {
+  unstable_createMuiStrictModeTheme as createMuiTheme,
+  ThemeProvider,
+} from '@material-ui/core/styles';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
@@ -13,6 +16,30 @@ const theme = createMuiTheme({
       '@global': {
         img: {
           display: 'block',
+        },
+
+        body: {
+          overflowX: 'hidden',
+        },
+
+        '::-webkit-scrollbar': {
+          width: '16px',
+        },
+        '::-webkit-scrollbar-track': {
+          background: 'transparent',
+          borderRadius: '10px',
+        },
+        '::-webkit-scrollbar-thumb': {
+          background: '#888',
+          borderRadius: '10px',
+          backgroundClip: 'padding-box',
+          border: '4px solid transparent',
+          "&:hover": {
+            background: '#ccc',
+            borderRadius: '10px',
+            backgroundClip: 'padding-box',
+            border: '4px solid transparent',
+          }
         },
       },
     },
