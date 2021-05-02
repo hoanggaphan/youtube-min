@@ -1,4 +1,4 @@
-import { createStyles, makeStyles } from '@material-ui/core/styles';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
@@ -17,7 +17,7 @@ import { useHistory } from 'react-router';
 import Arrow from './Arrow';
 import SubscriptionItem from './SubscriptionItem';
 
-const useStyles = makeStyles(() =>
+const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     arrowDisabled: {
       visibility: 'hidden',
@@ -34,6 +34,11 @@ const useStyles = makeStyles(() =>
     },
     title: {
       marginTop: '50px',
+
+      [theme.breakpoints.down('sm')]: {
+        fontSize: '2.7rem',
+        marginTop: '25px',
+      },
     },
   })
 );
