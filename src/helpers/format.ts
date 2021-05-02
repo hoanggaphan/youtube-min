@@ -29,6 +29,8 @@ export function formatSubscriptionCount(num: number | string) {
 }
 
 export function formatVideoViews(num: number) {
+  num = Number(num);
+
   if (num === 0) return 0;
 
   const types = [

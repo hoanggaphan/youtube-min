@@ -70,7 +70,7 @@ export const fetchChannelById = createAsyncThunk(
     if (response.status !== 200) {
       return thunkAPI.rejectWithValue(response.result);
     }
-    
+
     return response.result;
   }
 );
@@ -86,11 +86,11 @@ const channelSlice = createSlice({
       state.loading = 'pending';
     });
     builder.addCase(fetchChannelById.rejected, (state, action) => {
-      state.loading = 'idle';
+      state.loading = 'failed';
       console.error(action.payload);
     });
     builder.addCase(fetchChannelById.fulfilled, (state, action) => {
-      state.loading = 'idle';
+      state.loading = 'succeeded';
       const {
         id,
         snippet,
@@ -108,6 +108,8 @@ const channelSlice = createSlice({
 });
 
 export const { resetChannel } = channelSlice.actions;
+
+export const selectLoading = (state: RootState) => state.channel.loading;
 
 export const selectChannelId = (state: RootState) => state.channel.id;
 export const selectPlayListId = (state: RootState) =>
@@ -130,6 +132,6 @@ export const selectChannelSubscriberCount = (state: RootState) =>
   state.channel.statistics.subscriberCount;
 
 export const selectChannelBannerExternalUrl = (state: RootState) =>
-  state.channel.brandingSettings.image.bannerExternalUrl;
+  state.channel.brandingSettings.image?.bannerExternalUrl;
 
 export default channelSlice.reducer;

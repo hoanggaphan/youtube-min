@@ -19,10 +19,10 @@ import {
 } from 'app/channelSlice';
 import { useAppDispatch, useAppSelector } from 'app/hook';
 import {
-  checkSubscriptionExist,
-  selectExist,
-  deleteSubscription,
   addSubscription,
+  checkSubscriptionExist,
+  deleteSubscription,
+  selectExist,
 } from 'app/subscriptionSlice';
 import MyContainer from 'components/MyContainer';
 import { formatSubscriptionCount } from 'helpers/format';
@@ -32,6 +32,7 @@ import { Link, Switch } from 'react-router-dom';
 import About from './components/About';
 import TabPanel from './components/TabPanel';
 import Videos from './components/Videos';
+import Skeleton from '@material-ui/lab/Skeleton';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -61,7 +62,6 @@ const useStyles = makeStyles((theme: Theme) =>
       width: '80px',
       height: '80px',
       fontSize: theme.spacing(5),
-      marginRight: '25px',
     },
     title: {
       fontSize: '18px',
@@ -190,28 +190,49 @@ export default function Channel(): JSX.Element {
 
   return (
     <MyContainer>
-      {bannerExternalUrl && (
-        <div
-          className={classes.banner}
-          style={{
-            backgroundImage: `url(${bannerExternalUrl}${urlImageCropped})`,
-          }}
-        ></div>
+      {bannerExternalUrl === null ? (
+        <Skeleton animation={false} variant='rect' className={classes.banner} />
+      ) : (
+        bannerExternalUrl && (
+          <div
+            className={classes.banner}
+            style={{
+              backgroundImage: `url(${bannerExternalUrl}${urlImageCropped})`,
+            }}
+          />
+        )
       )}
 
       <Box className={classes.channelHeader}>
         <Box display='flex' alignItems='center'>
-          <Avatar src={thumbUrl} className={classes.avatar}>
-            {title?.charAt(0)}
-          </Avatar>
+          <Box mr='25px'>
+            {title ? (
+              <Avatar src={thumbUrl} className={classes.avatar}>
+                {title.charAt(0)}
+              </Avatar>
+            ) : (
+              <Skeleton animation={false} variant='circle'>
+                <Avatar className={classes.avatar} />
+              </Skeleton>
+            )}
+          </Box>
           <div>
-            <Typography variant='h5' className={classes.title}>
-              {title}
-            </Typography>
-            <Typography variant='body2' color='textSecondary'>
-              {subscriberCount &&
-                formatSubscriptionCount(subscriberCount) + ' người đăng ký'}
-            </Typography>
+            {title ? (
+              <Typography variant='h5' className={classes.title}>
+                {title}
+              </Typography>
+            ) : (
+              <Skeleton animation={false} variant='text' width={150} />
+            )}
+            {subscriberCount === null ? (
+              <Skeleton animation={false} variant='text' width={100} />
+            ) : (
+              subscriberCount && (
+                <Typography variant='body2' color='textSecondary'>
+                  {formatSubscriptionCount(subscriberCount) + ' người đăng ký'}
+                </Typography>
+              )
+            )}
           </div>
         </Box>
         {renderBtnSub()}

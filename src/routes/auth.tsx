@@ -20,7 +20,7 @@ export function ProtectedRoute({
       {...rest}
       render={() => {
         if (isSignedIn === null) {
-          return <p>Loading</p>;
+          return <p>Loading...</p>;
         } else if (isSignedIn) {
           return path === '/' ? <Redirect to='/home' /> : <Component />;
         } else {
