@@ -9,15 +9,19 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
 import Typography from '@material-ui/core/Typography';
+import Skeleton from '@material-ui/lab/Skeleton';
 import {
   fetchChannelById,
+  resetChannel,
   selectChannelBannerExternalUrl,
   selectChannelId,
   selectChannelSubscriberCount,
   selectChannelThumbUrl,
   selectChannelTitle,
+  selectPlayListId,
 } from 'app/channelSlice';
 import { useAppDispatch, useAppSelector } from 'app/hook';
+import { fetchPlayListItems, resetPlayListItems } from 'app/playListItemsSlice';
 import {
   addSubscription,
   checkSubscriptionExist,
@@ -32,7 +36,6 @@ import { Link, Switch } from 'react-router-dom';
 import About from './components/About';
 import TabPanel from './components/TabPanel';
 import Videos from './components/Videos';
-import Skeleton from '@material-ui/lab/Skeleton';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -118,6 +121,7 @@ export default function Channel(): JSX.Element {
   const exist = useAppSelector(selectExist);
   const thumbUrl = useAppSelector(selectChannelThumbUrl);
   const channelId = useAppSelector(selectChannelId);
+  const playListId = useAppSelector(selectPlayListId);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -150,6 +154,19 @@ export default function Channel(): JSX.Element {
   React.useEffect(() => {
     dispatch(fetchChannelById(id));
     dispatch(checkSubscriptionExist(id));
+    // eslint-disable-next-line
+  }, []);
+
+  React.useEffect(() => {
+    playListId && dispatch(fetchPlayListItems(playListId));
+    // eslint-disable-next-line
+  }, [playListId]);
+
+  React.useEffect(() => {
+    return () => {
+      dispatch(resetChannel());
+      dispatch(resetPlayListItems());
+    };
     // eslint-disable-next-line
   }, []);
 
