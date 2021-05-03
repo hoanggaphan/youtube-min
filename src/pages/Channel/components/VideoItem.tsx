@@ -20,6 +20,7 @@ const useStyles = makeStyles((theme: Theme) =>
       fontWeight: 500,
       lineHeight: 1,
       margin: '8px 0',
+      paddingRight: "24px"
     },
     textEllipsis: {
       display: '-webkit-box',

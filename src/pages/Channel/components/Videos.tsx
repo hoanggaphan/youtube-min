@@ -1,11 +1,11 @@
 import Box from '@material-ui/core/Box';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import { selectChannelId, selectPlayListId } from 'app/channelSlice';
+import { selectPlayListId } from 'app/channelSlice';
 import { useAppDispatch, useAppSelector } from 'app/hook';
 import {
   fetchNextPlayListItems,
-  fetchPlayListItems,
+  selectNextPageToken,
   selectPlayListItems,
 } from 'app/playListItemsSlice';
 import React from 'react';
@@ -43,25 +43,14 @@ const useStyles = makeStyles((theme: Theme) =>
 export default React.memo(function Videos(): JSX.Element {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const playListId = useAppSelector(selectPlayListId) || '';
-  const channelId = useAppSelector(selectChannelId) || '';
+  const playListId = useAppSelector(selectPlayListId);
   const playListItems = useAppSelector(selectPlayListItems);
+  const nextPageToken = useAppSelector(selectNextPageToken);
   const loader = React.useRef<HTMLDivElement | null>(null);
   const observer = React.useRef<any>(null);
 
-  const currentPlayListItems = playListItems.find(
-    (item: any) => item.channelId === channelId
-  );
-
   React.useEffect(() => {
-    if (!playListId) return;
-    if (currentPlayListItems) return;
-    dispatch(fetchPlayListItems({ playListId, channelId }));
-    // eslint-disable-next-line
-  }, [playListId]);
-
-  React.useEffect(() => {
-    if (!currentPlayListItems?.items.length) return;
+    if (!nextPageToken || !playListId) return;
 
     const handleObserver = (entities: IntersectionObserverEntry[]) => {
       const target = entities[0];
@@ -69,8 +58,7 @@ export default React.memo(function Videos(): JSX.Element {
         dispatch(
           fetchNextPlayListItems({
             playListId,
-            channelId,
-            nextPageToken: currentPlayListItems.nextPageToken,
+            nextPageToken,
           })
         );
       }
@@ -86,23 +74,22 @@ export default React.memo(function Videos(): JSX.Element {
 
     return () => observer.current.disconnect();
     // eslint-disable-next-line
-  }, [playListItems]);
+  }, [nextPageToken, playListId]);
 
   return (
     <Box mb='24px'>
       <div className={classes.grid}>
-        {!currentPlayListItems
+        {!playListItems.length
           ? 'Loading...'
-          : currentPlayListItems.items.map((item: any) => (
+          : playListItems.map((item: any) => (
               <VideoItem key={item.id} item={item} />
             ))}
       </div>
-      {currentPlayListItems?.nextPageToken &&
-        currentPlayListItems?.items.length > 0 && (
-          <div ref={loader} className={classes.loader}>
-            <CircularProgress />
-          </div>
-        )}
+      {nextPageToken && (
+        <div ref={loader} className={classes.loader}>
+          <CircularProgress />
+        </div>
+      )}
     </Box>
   );
 });

@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, current } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as playListItemsAPI from 'api/playListItemsAPI';
 import { RootState } from 'app/store';
 
@@ -16,10 +16,7 @@ const initialState: PlayListItemsState = {
 
 export const fetchPlayListItems = createAsyncThunk(
   'playListItems/fetchList',
-  async (
-    { playListId, channelId }: { playListId: string; channelId: string },
-    thunkApi
-  ) => {
+  async (playListId: string, thunkApi) => {
     // fetch videos list
     const resPlayListItems = await playListItemsAPI.fetchListById(playListId);
     if (resPlayListItems.status !== 200) {
@@ -51,7 +48,6 @@ export const fetchPlayListItems = createAsyncThunk(
       return pItem;
     });
 
-    resPlayListItems.result.channelId = channelId;
     return resPlayListItems.result;
   }
 );
@@ -61,11 +57,9 @@ export const fetchNextPlayListItems = createAsyncThunk(
   async (
     {
       playListId,
-      channelId,
       nextPageToken,
     }: {
       playListId: string;
-      channelId: string;
       nextPageToken: string | undefined;
     },
     thunkApi
@@ -104,7 +98,6 @@ export const fetchNextPlayListItems = createAsyncThunk(
       return pItem;
     });
 
-    resPlayListItems.result.channelId = channelId;
     return resPlayListItems.result;
   }
 );
@@ -125,13 +118,8 @@ const playListItemsSlice = createSlice({
     });
     builder.addCase(fetchPlayListItems.fulfilled, (state, action) => {
       state.loading = 'succeeded';
-
-      const item = {
-        channelId: action.payload.channelId,
-        items: action.payload.items,
-        nextPageToken: action.payload.nextPageToken,
-      };
-      state.playListItems.push(item);
+      state.nextPageToken = action.payload.nextPageToken;
+      state.playListItems = action.payload.items;
     });
     builder.addCase(fetchNextPlayListItems.pending, (state, action) => {
       state.loading = 'pending';
@@ -142,19 +130,8 @@ const playListItemsSlice = createSlice({
     });
     builder.addCase(fetchNextPlayListItems.fulfilled, (state, action) => {
       state.loading = 'succeeded';
-      const currentState = current(state);
-      const playListItems = currentState.playListItems;
-      const index = playListItems.findIndex(
-        (item: any) => item.channelId === action.payload.channelId
-      );
-
-      const newItem = {
-        channelId: action.payload.channelId,
-        items: [...playListItems[index].items, ...action.payload.items],
-        nextPageToken: action.payload.nextPageToken,
-      };
-
-      state.playListItems[index] = newItem;
+      state.nextPageToken = action.payload.nextPageToken;
+      state.playListItems.push(...action.payload.items);
     });
   },
 });
@@ -164,5 +141,7 @@ export const { resetPlayListItems } = playListItemsSlice.actions;
 export const selectLoading = (state: RootState) => state.playListItems.loading;
 export const selectPlayListItems = (state: RootState) =>
   state.playListItems.playListItems;
+export const selectNextPageToken = (state: RootState) =>
+  state.playListItems.nextPageToken;
 
 export default playListItemsSlice.reducer;
