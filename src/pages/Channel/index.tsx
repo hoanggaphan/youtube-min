@@ -21,7 +21,7 @@ import {
   selectPlayListId,
 } from 'app/channelSlice';
 import { useAppDispatch, useAppSelector } from 'app/hook';
-import { fetchPlayListItems, resetPlayListItems } from 'app/playListItemsSlice';
+import { fetchPlaylistItems, resetPlayListItems } from 'app/playlistItemsSlice';
 import {
   addSubscription,
   checkSubscriptionExist,
@@ -121,7 +121,7 @@ export default function Channel(): JSX.Element {
   const exist = useAppSelector(selectExist);
   const thumbUrl = useAppSelector(selectChannelThumbUrl);
   const channelId = useAppSelector(selectChannelId);
-  const playListId = useAppSelector(selectPlayListId);
+  const playlistId = useAppSelector(selectPlayListId);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -158,9 +158,9 @@ export default function Channel(): JSX.Element {
   }, []);
 
   React.useEffect(() => {
-    playListId && dispatch(fetchPlayListItems(playListId));
+    playlistId && dispatch(fetchPlaylistItems(playlistId));
     // eslint-disable-next-line
-  }, [playListId]);
+  }, [playlistId]);
 
   React.useEffect(() => {
     return () => {

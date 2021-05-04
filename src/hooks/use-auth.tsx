@@ -1,6 +1,6 @@
 import { resetChannel } from 'app/channelSlice';
 import { useAppDispatch } from 'app/hook';
-import { resetPlayListItems } from 'app/playListItemsSlice';
+import { resetPlayListItems } from 'app/playlistItemsSlice';
 import { resetSubscription } from 'app/subscriptionSlice';
 import React from 'react';
 

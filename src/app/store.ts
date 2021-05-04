@@ -1,13 +1,13 @@
 import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit';
 import subscriptionReducer from './subscriptionSlice';
 import channelReducer from './channelSlice';
-import playListItemsReducer from './playListItemsSlice';
+import playlistItemsReducer from './playlistItemsSlice';
 
 export const store = configureStore({
   reducer: {
     subscription: subscriptionReducer,
     channel: channelReducer,
-    playListItems: playListItemsReducer,
+    playListItems: playlistItemsReducer,
   },
 });
 
