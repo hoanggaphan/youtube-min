@@ -1,36 +1,36 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import * as playListItemsAPI from 'api/playListItemsAPI';
+import * as playlistItemsAPI from 'api/playListItemsAPI';
 import { RootState } from 'app/store';
 
-interface PlayListItemsState {
+interface PlaylistItemsState {
   loading: 'idle' | 'pending' | 'succeeded' | 'failed';
   nextPageToken: string | undefined;
   playListItems: any;
 }
 
-const initialState: PlayListItemsState = {
+const initialState: PlaylistItemsState = {
   loading: 'idle',
   nextPageToken: undefined,
   playListItems: [],
 };
 
-export const fetchPlayListItems = createAsyncThunk(
+export const fetchPlaylistItems = createAsyncThunk(
   'playListItems/fetchList',
-  async (playListId: string, thunkApi) => {
+  async (playlistId: string, thunkApi) => {
     // fetch videos list
-    const resPlayListItems = await playListItemsAPI.fetchListById(playListId);
-    if (resPlayListItems.status !== 200) {
+    const resPlaylistItems = await playlistItemsAPI.fetchListById(playlistId);
+    if (resPlaylistItems.status !== 200) {
       // Return the known error for future handling
-      return thunkApi.rejectWithValue(resPlayListItems.result);
+      return thunkApi.rejectWithValue(resPlaylistItems.result);
     }
 
     // ids for call api to get videos views
-    const ids = resPlayListItems.result.items.map(
+    const ids = resPlaylistItems.result.items.map(
       (item: any) => item.snippet.resourceId.videoId
     );
 
     // fetch videos views
-    const resVideos = await playListItemsAPI.fetchVideosViews(ids);
+    const resVideos = await playlistItemsAPI.fetchVideosViews(ids);
     if (resVideos.status !== 200) {
       // Return the known error for future handling
       return thunkApi.rejectWithValue(resVideos.result);
@@ -38,7 +38,7 @@ export const fetchPlayListItems = createAsyncThunk(
 
     const videosItems = resVideos.result.items;
 
-    resPlayListItems.result.items.forEach((pItem: any) => {
+    resPlaylistItems.result.items.forEach((pItem: any) => {
       const index = videosItems.findIndex(
         (vItem: any) => vItem.id === pItem.snippet.resourceId.videoId
       );
@@ -48,39 +48,39 @@ export const fetchPlayListItems = createAsyncThunk(
       return pItem;
     });
 
-    return resPlayListItems.result;
+    return resPlaylistItems.result;
   }
 );
 
-export const fetchNextPlayListItems = createAsyncThunk(
+export const fetchNextPlaylistItems = createAsyncThunk(
   'playListItems/fetchNextList',
   async (
     {
-      playListId,
+      playlistId,
       nextPageToken,
     }: {
-      playListId: string;
+      playlistId: string;
       nextPageToken: string | undefined;
     },
     thunkApi
   ) => {
     // fetch videos list
-    const resPlayListItems = await playListItemsAPI.fetchNextListById(
-      playListId,
+    const resPlaylistItems = await playlistItemsAPI.fetchNextListById(
+      playlistId,
       nextPageToken
     );
-    if (resPlayListItems.status !== 200) {
+    if (resPlaylistItems.status !== 200) {
       // Return the known error for future handling
-      return thunkApi.rejectWithValue(resPlayListItems.result);
+      return thunkApi.rejectWithValue(resPlaylistItems.result);
     }
 
     // ids for call api to get videos views
-    const ids = resPlayListItems.result.items.map(
+    const ids = resPlaylistItems.result.items.map(
       (item: any) => item.snippet.resourceId.videoId
     );
 
     // fetch videos views
-    const resVideos = await playListItemsAPI.fetchVideosViews(ids);
+    const resVideos = await playlistItemsAPI.fetchVideosViews(ids);
     if (resVideos.status !== 200) {
       // Return the known error for future handling
       return thunkApi.rejectWithValue(resVideos.result);
@@ -88,7 +88,7 @@ export const fetchNextPlayListItems = createAsyncThunk(
 
     const videosItems = resVideos.result.items;
 
-    resPlayListItems.result.items.forEach((pItem: any) => {
+    resPlaylistItems.result.items.forEach((pItem: any) => {
       const index = videosItems.findIndex(
         (vItem: any) => vItem.id === pItem.snippet.resourceId.videoId
       );
@@ -98,37 +98,37 @@ export const fetchNextPlayListItems = createAsyncThunk(
       return pItem;
     });
 
-    return resPlayListItems.result;
+    return resPlaylistItems.result;
   }
 );
 
-const playListItemsSlice = createSlice({
+const playlistItemsSlice = createSlice({
   name: 'playListItems',
   initialState,
   reducers: {
     resetPlayListItems: () => initialState,
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchPlayListItems.pending, (state, action) => {
+    builder.addCase(fetchPlaylistItems.pending, (state, action) => {
       state.loading = 'pending';
     });
-    builder.addCase(fetchPlayListItems.rejected, (state, action) => {
+    builder.addCase(fetchPlaylistItems.rejected, (state, action) => {
       state.loading = 'failed';
       console.error(action.payload);
     });
-    builder.addCase(fetchPlayListItems.fulfilled, (state, action) => {
+    builder.addCase(fetchPlaylistItems.fulfilled, (state, action) => {
       state.loading = 'succeeded';
       state.nextPageToken = action.payload.nextPageToken;
       state.playListItems = action.payload.items;
     });
-    builder.addCase(fetchNextPlayListItems.pending, (state, action) => {
+    builder.addCase(fetchNextPlaylistItems.pending, (state, action) => {
       state.loading = 'pending';
     });
-    builder.addCase(fetchNextPlayListItems.rejected, (state, action) => {
+    builder.addCase(fetchNextPlaylistItems.rejected, (state, action) => {
       state.loading = 'failed';
       console.error(action.payload);
     });
-    builder.addCase(fetchNextPlayListItems.fulfilled, (state, action) => {
+    builder.addCase(fetchNextPlaylistItems.fulfilled, (state, action) => {
       state.loading = 'succeeded';
       state.nextPageToken = action.payload.nextPageToken;
       state.playListItems.push(...action.payload.items);
@@ -136,12 +136,12 @@ const playListItemsSlice = createSlice({
   },
 });
 
-export const { resetPlayListItems } = playListItemsSlice.actions;
+export const { resetPlayListItems } = playlistItemsSlice.actions;
 
 export const selectLoading = (state: RootState) => state.playListItems.loading;
-export const selectPlayListItems = (state: RootState) =>
+export const selectPlaylistItems = (state: RootState) =>
   state.playListItems.playListItems;
 export const selectNextPageToken = (state: RootState) =>
   state.playListItems.nextPageToken;
 
-export default playListItemsSlice.reducer;
+export default playlistItemsSlice.reducer;

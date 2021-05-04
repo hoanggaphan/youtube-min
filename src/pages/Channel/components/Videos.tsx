@@ -4,10 +4,10 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { selectPlayListId } from 'app/channelSlice';
 import { useAppDispatch, useAppSelector } from 'app/hook';
 import {
-  fetchNextPlayListItems,
+  fetchNextPlaylistItems,
   selectNextPageToken,
-  selectPlayListItems,
-} from 'app/playListItemsSlice';
+  selectPlaylistItems,
+} from 'app/playlistItemsSlice';
 import React from 'react';
 import VideoItem from './VideoItem';
 
@@ -43,21 +43,21 @@ const useStyles = makeStyles((theme: Theme) =>
 export default React.memo(function Videos(): JSX.Element {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const playListId = useAppSelector(selectPlayListId);
-  const playListItems = useAppSelector(selectPlayListItems);
+  const playlistId = useAppSelector(selectPlayListId);
+  const playListItems = useAppSelector(selectPlaylistItems);
   const nextPageToken = useAppSelector(selectNextPageToken);
   const loader = React.useRef<HTMLDivElement | null>(null);
   const observer = React.useRef<any>(null);
 
   React.useEffect(() => {
-    if (!nextPageToken || !playListId) return;
+    if (!nextPageToken || !playlistId) return;
 
     const handleObserver = (entities: IntersectionObserverEntry[]) => {
       const target = entities[0];
       if (target.isIntersecting) {
         dispatch(
-          fetchNextPlayListItems({
-            playListId,
+          fetchNextPlaylistItems({
+            playlistId,
             nextPageToken,
           })
         );
@@ -74,7 +74,7 @@ export default React.memo(function Videos(): JSX.Element {
 
     return () => observer.current.disconnect();
     // eslint-disable-next-line
-  }, [nextPageToken, playListId]);
+  }, [nextPageToken, playlistId]);
 
   return (
     <Box mb='24px'>
