@@ -6,12 +6,14 @@ interface PlaylistItemsState {
   loading: 'idle' | 'pending' | 'succeeded' | 'failed';
   nextPageToken: string | undefined;
   playListItems: any;
+  error: string | null;
 }
 
 const initialState: PlaylistItemsState = {
   loading: 'idle',
   nextPageToken: undefined,
   playListItems: [],
+  error: null,
 };
 
 export const fetchPlaylistItems = createAsyncThunk(
@@ -19,6 +21,7 @@ export const fetchPlaylistItems = createAsyncThunk(
   async (playlistId: string, thunkApi) => {
     // fetch videos list
     const resPlaylistItems = await playlistItemsAPI.fetchListById(playlistId);
+
     if (resPlaylistItems.status !== 200) {
       // Return the known error for future handling
       return thunkApi.rejectWithValue(resPlaylistItems.result);
@@ -114,7 +117,14 @@ const playlistItemsSlice = createSlice({
     });
     builder.addCase(fetchPlaylistItems.rejected, (state, action) => {
       state.loading = 'failed';
-      console.error(action.payload);
+
+      const { error }: any = action.payload;
+      if (error.code === 404 && error.errors[0].reason === 'playlistNotFound') {
+        state.error = 'Kênh này không có video nào.';
+        return;
+      }
+
+      console.error(error);
     });
     builder.addCase(fetchPlaylistItems.fulfilled, (state, action) => {
       state.loading = 'succeeded';
@@ -139,6 +149,7 @@ const playlistItemsSlice = createSlice({
 export const { resetPlayListItems } = playlistItemsSlice.actions;
 
 export const selectLoading = (state: RootState) => state.playListItems.loading;
+export const selectError = (state: RootState) => state.playListItems.error;
 export const selectPlaylistItems = (state: RootState) =>
   state.playListItems.playListItems;
 export const selectNextPageToken = (state: RootState) =>

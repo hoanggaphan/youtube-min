@@ -5,11 +5,13 @@ import { selectPlayListId } from 'app/channelSlice';
 import { useAppDispatch, useAppSelector } from 'app/hook';
 import {
   fetchNextPlaylistItems,
+  selectError,
   selectNextPageToken,
   selectPlaylistItems,
 } from 'app/playlistItemsSlice';
 import React from 'react';
 import VideoItem from './VideoItem';
+import VideoItemSkeleton from './VideoItemSkeleton';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -37,6 +39,10 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: '24px auto 0',
       width: 'fit-content',
     },
+
+    mt24: {
+      marginTop: '24px',
+    },
   })
 );
 
@@ -46,6 +52,7 @@ export default React.memo(function Videos(): JSX.Element {
   const playlistId = useAppSelector(selectPlayListId);
   const playListItems = useAppSelector(selectPlaylistItems);
   const nextPageToken = useAppSelector(selectNextPageToken);
+  const error = useAppSelector(selectError);
   const loader = React.useRef<HTMLDivElement | null>(null);
   const observer = React.useRef<any>(null);
 
@@ -53,8 +60,7 @@ export default React.memo(function Videos(): JSX.Element {
     if (!nextPageToken || !playlistId) return;
 
     const handleObserver = (entities: IntersectionObserverEntry[]) => {
-      const target = entities[0];
-      if (target.isIntersecting) {
+      if (entities[0].isIntersecting) {
         dispatch(
           fetchNextPlaylistItems({
             playlistId,
@@ -76,18 +82,30 @@ export default React.memo(function Videos(): JSX.Element {
     // eslint-disable-next-line
   }, [nextPageToken, playlistId]);
 
+  function renderList() {
+    return playListItems.map((item: any) => (
+      <VideoItem key={item.id} item={item} />
+    ));
+  }
+
+  function renderSkeletons(num: number) {
+    return [...new Array(num)].map((item, index) => (
+      <VideoItemSkeleton key={index} />
+    ));
+  }
+  console.log(1);
   return (
     <Box mb='24px'>
       <div className={classes.grid}>
-        {!playListItems.length
-          ? 'Loading...'
-          : playListItems.map((item: any) => (
-              <VideoItem key={item.id} item={item} />
-            ))}
+        {error
+          ? error
+          : !playListItems.length
+          ? renderSkeletons(10)
+          : renderList()}
       </div>
       {nextPageToken && (
         <div ref={loader} className={classes.loader}>
-          <CircularProgress />
+          <CircularProgress size={30} />
         </div>
       )}
     </Box>
