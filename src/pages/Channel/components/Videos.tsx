@@ -11,7 +11,7 @@ import {
 } from 'app/playlistItemsSlice';
 import React from 'react';
 import VideoItem from './VideoItem';
-import VideoItemSkeleton from './VideoItemSkeleton';
+import VideosSkeleton from './VideosSkeleton';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -72,7 +72,9 @@ export default React.memo(function Videos(): JSX.Element {
 
     if (observer.current) observer.current.disconnect();
 
-    observer.current = new IntersectionObserver(handleObserver);
+    observer.current = new IntersectionObserver(handleObserver, {
+      rootMargin: '0px 0px 420px 0px',
+    });
 
     if (loader.current) {
       observer.current.observe(loader.current);
@@ -88,21 +90,17 @@ export default React.memo(function Videos(): JSX.Element {
     ));
   }
 
-  function renderSkeletons(num: number) {
-    return [...new Array(num)].map((item, index) => (
-      <VideoItemSkeleton key={index} />
-    ));
-  }
-  console.log(1);
   return (
     <Box mb='24px'>
-      <div className={classes.grid}>
-        {error
-          ? error
-          : !playListItems.length
-          ? renderSkeletons(10)
-          : renderList()}
-      </div>
+      {error ? (
+        <Box textAlign='center'>{error}</Box>
+      ) : !playListItems.length ? (
+        <div className={classes.grid}>
+          <VideosSkeleton num={10} />
+        </div>
+      ) : (
+        <div className={classes.grid}>{renderList()}</div>
+      )}
       {nextPageToken && (
         <div ref={loader} className={classes.loader}>
           <CircularProgress size={30} />

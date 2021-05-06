@@ -48,7 +48,7 @@ export default function Home(): JSX.Element {
     signOut();
     reset();
   };
-
+  
   return (
     <MyContainer>
       <div className={classes.mx}>
