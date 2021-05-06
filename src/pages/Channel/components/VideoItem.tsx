@@ -8,6 +8,7 @@ import {
 } from 'helpers/format';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import LazyLoad from 'react-lazyload';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -20,7 +21,7 @@ const useStyles = makeStyles((theme: Theme) =>
       fontWeight: 500,
       lineHeight: 1,
       margin: '8px 0',
-      paddingRight: "24px"
+      paddingRight: '24px',
     },
     textEllipsis: {
       display: '-webkit-box',
@@ -54,13 +55,14 @@ export default function VideoItem({ item }: { item: any }): JSX.Element {
   return (
     <Link to={`/video/${item.id}`} key={item.id} className={classes.gridItem}>
       <Box position='relative'>
-        <img
-          src={item.snippet.thumbnails.medium.url}
-          alt={item.snippet.title}
-          width='210'
-          height='118'
-          loading='lazy'
-        />
+        <LazyLoad height={118} offset={400} once>
+          <img
+            src={item.snippet.thumbnails.medium.url}
+            alt=''
+            width='210'
+            height='118'
+          />
+        </LazyLoad>
         <Box
           bgcolor='rgb(19,16,7)'
           borderRadius='2px'
