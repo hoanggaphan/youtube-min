@@ -73,7 +73,7 @@ export default React.memo(function Videos(): JSX.Element {
     if (observer.current) observer.current.disconnect();
 
     observer.current = new IntersectionObserver(handleObserver, {
-      rootMargin: '0px 0px 420px 0px',
+      rootMargin: '0px 0px 400px 0px',
     });
 
     if (loader.current) {
