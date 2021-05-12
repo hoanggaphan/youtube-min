@@ -5,6 +5,7 @@ import { RootState } from 'app/store';
 interface ChannelState {
   loading: 'idle' | 'pending' | 'succeeded' | 'failed';
   player: null | string;
+  rating: null | string;
   snippet: {
     publishedAt: null | string;
     title: null | string;
@@ -29,6 +30,7 @@ interface ChannelState {
 const initialState: ChannelState = {
   loading: 'idle',
   player: null,
+  rating: null,
   snippet: {
     publishedAt: null,
     title: null,
@@ -51,7 +53,7 @@ const initialState: ChannelState = {
 };
 
 export const fetchVideoById = createAsyncThunk(
-  'channel/fetchVideoById',
+  'video/fetchVideoById',
   async (id: string, thunkAPI) => {
     const response = await videoAPI.fetchVideoById(id);
 
@@ -60,6 +62,36 @@ export const fetchVideoById = createAsyncThunk(
     }
 
     return response.result;
+  }
+);
+
+export const getVideoRating = createAsyncThunk(
+  'video/getRating',
+  async (id: string, thunkAPI) => {
+    const response = await videoAPI.getRating(id);
+
+    if (response.status !== 200) {
+      return thunkAPI.rejectWithValue(response.result);
+    }
+
+    return response.result;
+  }
+);
+
+export const ratingVideo = createAsyncThunk(
+  'video/rating',
+  async ({ id, type }: { id: string; type: string }, thunkAPI) => {
+    const resRating = await videoAPI.rating(id, type);
+    if (resRating.status !== 204) {
+      return thunkAPI.rejectWithValue(resRating.result);
+    }
+
+    const resGetRating = await videoAPI.getRating(id);
+    if (resRating.status !== 200) {
+      return thunkAPI.rejectWithValue(resRating.result);
+    }
+    
+    return resGetRating.result;
   }
 );
 
@@ -86,10 +118,26 @@ const videoSlice = createSlice({
       state.statistics = action.payload.items[0].statistics;
       state.liveStreamingDetails = action.payload.items[0].liveStreamingDetails;
     });
+
+    builder.addCase(getVideoRating.rejected, (state, action) => {
+      console.error(action.payload);
+    });
+    builder.addCase(getVideoRating.fulfilled, (state, action) => {
+      state.rating = action.payload.items[0].rating;
+    });
+
+    builder.addCase(ratingVideo.rejected, (state, action) => {
+      console.error(action.payload);
+    });
+    builder.addCase(ratingVideo.fulfilled, (state, action) => {
+      state.rating = action.payload.items[0].rating;
+    });
   },
 });
 
 export const selectLoading = (state: RootState) => state.video.loading;
+export const selectRating = (state: RootState) => state.video.rating;
+
 export const selectVideoTitle = (state: RootState) => state.video.snippet.title;
 export const selectLiveBroadcastContent = (state: RootState) =>
   state.video.snippet.liveBroadcastContent;
