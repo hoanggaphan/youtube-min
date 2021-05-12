@@ -53,7 +53,11 @@ export default function VideoItem({ item }: { item: any }): JSX.Element {
   const classes = useStyles();
 
   return (
-    <Link to={`/video/${item.id}`} key={item.id} className={classes.gridItem}>
+    <Link
+      to={`/video/${item.contentDetails.videoId}`}
+      key={item.id}
+      className={classes.gridItem}
+    >
       <Box position='relative'>
         <LazyLoad height={118} offset={400} once>
           <img
@@ -84,7 +88,7 @@ export default function VideoItem({ item }: { item: any }): JSX.Element {
       >
         {item.snippet.title}
       </h3>
-      <div className=''>
+      <div>
         <Typography
           className={classes.views}
           component='span'

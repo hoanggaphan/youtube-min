@@ -2,6 +2,7 @@ import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import Skeleton from '@material-ui/lab/Skeleton';
 import {
   selectChannelCountry,
   selectChannelDes,
@@ -10,19 +11,20 @@ import {
   selectLoading,
 } from 'app/channelSlice';
 import { useAppSelector } from 'app/hook';
-import { formatChannelViews, formatPublishAt } from 'helpers/format';
+import FormattedString from 'components/FormattedString';
+import { formatNumberWithDots, formatPublishAt } from 'helpers/format';
 import React from 'react';
 import { FormattedDisplayName, IntlProvider } from 'react-intl';
-import Skeleton from '@material-ui/lab/Skeleton';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
+    container: {
+      marginBottom: '24px',
+      padding: '0 24px',
+    },
     subTitle: {
       margin: '24px 0',
       color: 'black',
-    },
-    description: {
-      whiteSpace: 'pre-wrap',
     },
     mt12: {
       marginTop: '12px',
@@ -48,12 +50,12 @@ export default function About(): JSX.Element {
   const loading = useAppSelector(selectLoading);
 
   return (
-    <Box mb='24px'>
+    <div className={classes.container}>
       {loading === 'idle' || loading === 'pending' ? (
         <>
           <Skeleton animation={false} />
           <Skeleton animation={false} />
-          <Skeleton animation={false} width="60%" />
+          <Skeleton animation={false} width='60%' />
         </>
       ) : (
         <Grid container className={classes.grid}>
@@ -64,9 +66,7 @@ export default function About(): JSX.Element {
                 <Typography variant='subtitle1' className={classes.subTitle}>
                   Mô tả
                 </Typography>
-                <Typography variant='body2' className={classes.description}>
-                  {description}
-                </Typography>
+                <FormattedString str={description} />
               </Box>
             )}
 
@@ -105,12 +105,12 @@ export default function About(): JSX.Element {
             </Box>
             <Box py='12px' borderBottom='1px solid rgba(125,125,125, .2)'>
               <Typography variant='body2'>
-                {viewCount && formatChannelViews(viewCount) + ' lượt xem'}
+                {viewCount && formatNumberWithDots(viewCount) + ' lượt xem'}
               </Typography>
             </Box>
-          </Grid>{' '}
+          </Grid>
         </Grid>
       )}
-    </Box>
+    </div>
   );
 }

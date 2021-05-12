@@ -1,56 +1,73 @@
 import moment from 'moment';
 import 'moment-duration-format';
 
+const types = [
+  { value: 1e9, unit: 'T' },
+  { value: 1e6, unit: 'Tr' },
+  { value: 1e3, unit: 'N' },
+  { value: 1, unit: '' },
+];
+
 export function formatSubscriptionCount(num: number | string) {
   num = Number(num);
-
   if (num === 0) return 0;
 
-  const types = [
-    { value: 1e9, unit: 'T' },
-    { value: 1e6, unit: 'Tr' },
-    { value: 1e3, unit: 'N' },
-    { value: 1, unit: '' },
-  ];
   const index = types.findIndex((type) => num >= type.value);
 
   const decimalNum = num / types[index].value;
-  if (Number.isInteger(decimalNum)) return decimalNum + ' ' + types[index].unit;
 
   const integerNum = Math.trunc(decimalNum);
   const intNumLength = integerNum.toString().length;
 
-  if (intNumLength === 1)
-    return decimalNum.toFixed(2).replace('.', ',') + ' ' + types[index].unit;
-  if (intNumLength === 2)
-    return decimalNum.toFixed(1).replace('.', ',') + ' ' + types[index].unit;
-  if (intNumLength === 3)
-    return Math.round(decimalNum) + ' ' + types[index].unit;
+  if (intNumLength === 1) {
+    const roundedNum = Math.trunc(decimalNum * 100) / 100; // 2,899 = 2,89
+    return roundedNum.toString().replace('.', ',') + ' ' + types[index].unit;
+  }
+
+  if (intNumLength === 2) {
+    const roundedNum = Math.trunc(decimalNum * 10) / 10; // 2,89 = 2,8
+    return roundedNum.toString().replace('.', ',') + ' ' + types[index].unit;
+  }
+
+  return Math.trunc(decimalNum) + ' ' + types[index].unit;
 }
 
-export function formatVideoViews(num: number) {
+export function formatVideoViews(num: number | string) {
+  num = Number(num);
+  if (num === 0) return 0;
+
+  const index = types.findIndex((type) => num >= type.value);
+
+  const decimalNum = num / types[index].value;
+
+  const integerNum = Math.trunc(decimalNum);
+  const intNumLength = integerNum.toString().length;
+
+  if (intNumLength === 1) {
+    const roundedNum = Math.trunc(decimalNum * 10) / 10; // 2,899 = 2,8
+    return roundedNum.toString().replace('.', ',') + ' ' + types[index].unit;
+  }
+
+  return Math.trunc(decimalNum) + ' ' + types[index].unit;
+}
+
+export function formatLikeCount(num: number | string) {
   num = Number(num);
 
   if (num === 0) return 0;
 
-  const types = [
-    { value: 1e9, unit: 'T' },
-    { value: 1e6, unit: 'Tr' },
-    { value: 1e3, unit: 'N' },
-    { value: 1, unit: '' },
-  ];
   const index = types.findIndex((type) => num >= type.value);
 
   const decimalNum = num / types[index].value;
-  if (Number.isInteger(decimalNum)) return decimalNum + ' ' + types[index].unit;
-
   const integerNum = Math.trunc(decimalNum);
   const intNumLength = integerNum.toString().length;
 
-  if (intNumLength === 1)
-    return decimalNum.toFixed(1).replace('.', ',') + ' ' + types[index].unit;
-  if (intNumLength === 2 || intNumLength === 3)
-    return Math.round(decimalNum) + ' ' + types[index].unit;
+  if (intNumLength === 1) {
+    const roundedNum = Math.trunc(decimalNum * 10) / 10; // 2,85 = 2,8
+    return roundedNum.toString().replace('.', ',') + ' ' + types[index].unit;
+  }
+
+  return Math.trunc(decimalNum) + ' ' + types[index].unit;
 }
 
 moment.updateLocale('vi', {
@@ -101,6 +118,6 @@ export function formatPublishAt(date: string) {
   return moment(date).format(format);
 }
 
-export function formatChannelViews(num: number | string) {
-  return Number(num).toLocaleString();
+export function formatNumberWithDots(num: number | string) {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
