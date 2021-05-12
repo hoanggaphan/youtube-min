@@ -1,10 +1,5 @@
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
@@ -22,13 +17,9 @@ import {
 } from 'app/channelSlice';
 import { useAppDispatch, useAppSelector } from 'app/hook';
 import { fetchPlaylistItems, resetPlayListItems } from 'app/playlistItemsSlice';
-import {
-  addSubscription,
-  checkSubscriptionExist,
-  deleteSubscription,
-  selectExist,
-} from 'app/subscriptionSlice';
+import { checkSubscriptionExist, selectExist } from 'app/subscriptionSlice';
 import MyContainer from 'components/MyContainer';
+import SubscribeButton from 'components/SubscribeButton';
 import { formatSubscriptionCount } from 'helpers/format';
 import React from 'react';
 import { Route, useLocation, useParams, useRouteMatch } from 'react-router';
@@ -72,32 +63,6 @@ const useStyles = makeStyles((theme: Theme) =>
         fontSize: '24px',
       },
     },
-    registeredBtn: {
-      backgroundColor: '#ececec',
-      color: 'rgb(96, 96, 96)',
-      transition: 'none',
-      margin: '10px 0',
-
-      '&:hover': {
-        backgroundColor: '#ececec',
-      },
-
-      [theme.breakpoints.up('sm')]: {
-        margin: '0',
-      },
-    },
-    registerBtn: {
-      transition: 'none',
-      margin: '10px 0',
-
-      '&:hover': {
-        backgroundColor: theme.palette.secondary.main,
-      },
-
-      [theme.breakpoints.up('sm')]: {
-        margin: '0',
-      },
-    },
     tabs: {
       backgroundColor: 'white',
     },
@@ -114,7 +79,6 @@ export default function Channel(): JSX.Element {
   const { url } = useRouteMatch();
   const { pathname } = useLocation();
   const [value, setValue] = React.useState(pathname);
-  const [open, setOpen] = React.useState(false);
   const title = useAppSelector(selectChannelTitle);
   const subscriberCount = useAppSelector(selectChannelSubscriberCount);
   const bannerExternalUrl = useAppSelector(selectChannelBannerExternalUrl);
@@ -122,22 +86,6 @@ export default function Channel(): JSX.Element {
   const thumbUrl = useAppSelector(selectChannelThumbUrl);
   const channelId = useAppSelector(selectChannelId);
   const playlistId = useAppSelector(selectPlayListId);
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleUnsubscribe = () => {
-    dispatch(deleteSubscription(exist[0].id));
-    setOpen(false);
-  };
-  const handleSubscribe = () => {
-    channelId && dispatch(addSubscription(channelId));
-  };
 
   const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
     setValue(newValue);
@@ -173,37 +121,6 @@ export default function Channel(): JSX.Element {
   React.useEffect(() => {
     document.title = title + ' - Mini YouTube';
   }, [title]);
-
-  function renderBtnSub() {
-    if (exist === null) return;
-
-    if (exist.length > 0) {
-      return (
-        <Button
-          className={classes.registeredBtn}
-          variant='contained'
-          disableElevation
-          disableRipple
-          onClick={handleClickOpen}
-        >
-          Đã đăng ký
-        </Button>
-      );
-    }
-
-    return (
-      <Button
-        className={classes.registerBtn}
-        color='secondary'
-        variant='contained'
-        disableElevation
-        disableRipple
-        onClick={handleSubscribe}
-      >
-        Đăng ký
-      </Button>
-    );
-  }
 
   return (
     <MyContainer>
@@ -252,18 +169,15 @@ export default function Channel(): JSX.Element {
             )}
           </div>
         </Box>
-        {renderBtnSub()}
-        <Dialog open={open} onClose={handleClose}>
-          <DialogContent>
-            <DialogContentText>Hủy đăng ký {title}?</DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose}>Hủy</Button>
-            <Button onClick={handleUnsubscribe} color='primary' autoFocus>
-              Hủy đăng ký
-            </Button>
-          </DialogActions>
-        </Dialog>
+        {channelId && title && (
+          <Box my='10px'>
+            <SubscribeButton
+              exist={exist}
+              channelId={channelId}
+              channelTitle={title}
+            />
+          </Box>
+        )}
       </Box>
 
       <Tabs
