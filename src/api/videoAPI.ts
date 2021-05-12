@@ -10,3 +10,28 @@ export async function fetchVideoById(id: string) {
     return error;
   }
 }
+
+export async function getRating(id: string) {
+  try {
+    const response = await gapi.client.youtube.videos.getRating({
+      id,
+    });
+
+    return response;
+  } catch (error) {
+    return error;
+  }
+}
+
+export async function rating(id: string, type: string) {
+  try {
+    const response = await gapi.client.youtube.videos.rate({
+      id,
+      rating: type,
+    });
+
+    return response;
+  } catch (error) {
+    return error;
+  }
+}

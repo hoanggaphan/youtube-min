@@ -1,12 +1,9 @@
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
-import IconButton from '@material-ui/core/IconButton';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
-import ThumbDownIcon from '@material-ui/icons/ThumbDown';
-import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import Skeleton from '@material-ui/lab/Skeleton';
 import {
   fetchChannelById,
@@ -29,13 +26,10 @@ import {
 import FormattedString from 'components/FormattedString';
 import MyContainer from 'components/MyContainer';
 import SubscribeButton from 'components/SubscribeButton';
-import {
-  formatLikeCount,
-  formatNumberWithDots,
-  formatSubscriptionCount,
-} from 'helpers/format';
+import { formatNumberWithDots, formatSubscriptionCount } from 'helpers/format';
 import React from 'react';
 import { useParams } from 'react-router';
+import LikeDisLike from './components/LikeDisLike';
 import ViewDate from './components/ViewDate';
 
 const useStyles = makeStyles((theme: Theme) => {
@@ -191,43 +185,7 @@ export default function Video(): JSX.Element {
                 <ViewDate />
 
                 <Box position='relative'>
-                  <Box display='flex'>
-                    <Tooltip
-                      className={classes.tooltip}
-                      title={
-                        <span className={classes.tooltipText}>
-                          Tôi thích video này
-                        </span>
-                      }
-                      placement='bottom'
-                    >
-                      <div className={classes.likeContainer}>
-                        <IconButton className={classes.iconBtn}>
-                          <ThumbUpIcon />
-                        </IconButton>
-                        <span className={classes.likeCountText}>
-                          {likeCount && formatLikeCount(likeCount)}
-                        </span>
-                      </div>
-                    </Tooltip>
-                    <Tooltip
-                      title={
-                        <span className={classes.tooltipText}>
-                          Tôi không thích video này
-                        </span>
-                      }
-                      placement='bottom'
-                    >
-                      <Box ml='15px' className={classes.likeContainer}>
-                        <IconButton className={classes.iconBtn}>
-                          <ThumbDownIcon />
-                        </IconButton>
-                        <span className={classes.likeCountText}>
-                          {dislikeCount && formatLikeCount(dislikeCount)}
-                        </span>
-                      </Box>
-                    </Tooltip>
-                  </Box>
+                  <LikeDisLike />
                   <Tooltip
                     title={
                       <span className={classes.tooltipText}>
