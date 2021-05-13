@@ -11,13 +11,14 @@ import {
   selectChannelSubscriberCount,
   selectChannelThumbUrl,
   selectChannelTitle,
+  selectLoading,
 } from 'app/channelSlice';
 import { useAppDispatch, useAppSelector } from 'app/hook';
 import { checkSubscriptionExist, selectExist } from 'app/subscriptionSlice';
 import {
   fetchVideoById,
   selectChannelId,
-  selectLoading,
+  selectVideoLoading,
   selectVideoDescription,
   selectVideoDislikeCount,
   selectVideoLikeCount,
@@ -118,7 +119,8 @@ export default function Video(): JSX.Element {
   const channelTitle = useAppSelector(selectChannelTitle);
   const subscriberCount = useAppSelector(selectChannelSubscriberCount);
   const exist = useAppSelector(selectExist);
-  const loading = useAppSelector(selectLoading);
+  const videoLoading = useAppSelector(selectVideoLoading);
+  const channelLoading = useAppSelector(selectLoading);
   const [collapsed, setCollapsed] = React.useState(true);
 
   React.useEffect(() => {
@@ -144,7 +146,7 @@ export default function Video(): JSX.Element {
   return (
     <MyContainer>
       <Box p='24px'>
-        {loading === 'failed' ? (
+        {videoLoading === 'failed' ? (
           <div className={classes.iframeContainer}>
             <Box
               display='flex'
@@ -171,119 +173,177 @@ export default function Video(): JSX.Element {
           </div>
         )}
 
-        <Box p='20px 0 8px 0'>
-          {loading === 'failed' ? null : loading === 'succeeded' ? (
-            <>
-              <Typography variant='h5' className={classes.title}>
-                {videoTitle}
-              </Typography>
-              <Box
-                display='flex'
-                justifyContent='space-between'
-                alignItems='center'
-              >
-                <ViewDate />
-
-                <Box position='relative'>
-                  <LikeDisLike />
-                  <Tooltip
-                    title={
-                      <span className={classes.tooltipText}>
-                        {likeCount &&
-                          dislikeCount &&
-                          `${formatNumberWithDots(
-                            likeCount
-                          )} / ${formatNumberWithDots(dislikeCount)}`}
-                      </span>
-                    }
-                    placement='top'
-                  >
-                    <Box
-                      width='100%'
-                      pt='6px'
-                      pb='28px'
-                      position='absolute'
-                      left='0'
-                    >
-                      <Box height='2px' bgcolor='#737373'></Box>
-                    </Box>
-                  </Tooltip>
-                </Box>
-              </Box>
-            </>
-          ) : (
-            <>
-              <Skeleton width='50%' height='34px' />
-              <Box width='100%' display='flex' justifyContent='space-between'>
-                <Skeleton width='30%' height='34px' />
-
-                <Box display='flex' alignItems='center'>
-                  <Box mx='8px'>
-                    <Skeleton variant='circle' width='20px' height='20px' />
-                  </Box>
-                  <Box mx='8px'>
-                    <Skeleton variant='circle' width='20px' height='20px' />
-                  </Box>
-                  <Box mx='8px'>
-                    <Skeleton variant='circle' width='20px' height='20px' />
-                  </Box>
-                  <Box mx='8px'>
-                    <Skeleton variant='circle' width='20px' height='20px' />
-                  </Box>
-                  <Box mx='8px'>
-                    <Skeleton variant='circle' width='20px' height='20px' />
-                  </Box>
-                </Box>
-              </Box>
-            </>
-          )}
-        </Box>
-
-        <div className={classes.metaContainer}>
-          <Box
-            display='flex'
-            justifyContent='space-between'
-            alignItems='center'
-          >
-            <Box display='flex' alignItems='center'>
-              <Avatar src={avatarChannel} className={classes.avatar}>
-                {channelTitle && channelTitle.charAt(0)}
-              </Avatar>
-              <div>
-                <Typography variant='subtitle2'>{channelTitle}</Typography>
-                <Typography variant='caption'>
-                  {subscriberCount &&
-                    `${formatSubscriptionCount(subscriberCount)} người đăng ký`}
+        {videoLoading === 'failed' ? null : (
+          <Box p='20px 0 8px 0'>
+            {videoLoading === 'succeeded' ? (
+              <>
+                <Typography variant='h5' className={classes.title}>
+                  {videoTitle}
                 </Typography>
-              </div>
+                <Box
+                  display='flex'
+                  justifyContent='space-between'
+                  alignItems='center'
+                >
+                  <ViewDate />
+
+                  <Box position='relative'>
+                    <LikeDisLike />
+                    <Tooltip
+                      title={
+                        <span className={classes.tooltipText}>
+                          {likeCount &&
+                            dislikeCount &&
+                            `${formatNumberWithDots(
+                              likeCount
+                            )} / ${formatNumberWithDots(dislikeCount)}`}
+                        </span>
+                      }
+                      placement='top'
+                    >
+                      <Box
+                        width='100%'
+                        pt='6px'
+                        pb='28px'
+                        position='absolute'
+                        left='0'
+                      >
+                        <Box height='2px' bgcolor='#737373'></Box>
+                      </Box>
+                    </Tooltip>
+                  </Box>
+                </Box>
+              </>
+            ) : (
+              <>
+                <Skeleton animation={false} width='50%' height='34px' />
+                <Box width='100%' display='flex' justifyContent='space-between'>
+                  <Skeleton animation={false} width='30%' height='34px' />
+
+                  <Box display='flex' alignItems='center'>
+                    <Box mx='8px'>
+                      <Skeleton
+                        animation={false}
+                        variant='circle'
+                        width='20px'
+                        height='20px'
+                      />
+                    </Box>
+                    <Box mx='8px'>
+                      <Skeleton
+                        animation={false}
+                        variant='circle'
+                        width='20px'
+                        height='20px'
+                      />
+                    </Box>
+                    <Box mx='8px'>
+                      <Skeleton
+                        animation={false}
+                        variant='circle'
+                        width='20px'
+                        height='20px'
+                      />
+                    </Box>
+                    <Box mx='8px'>
+                      <Skeleton
+                        animation={false}
+                        variant='circle'
+                        width='20px'
+                        height='20px'
+                      />
+                    </Box>
+                    <Box mx='8px'>
+                      <Skeleton
+                        animation={false}
+                        variant='circle'
+                        width='20px'
+                        height='20px'
+                      />
+                    </Box>
+                  </Box>
+                </Box>
+              </>
+            )}
+          </Box>
+        )}
+
+        {videoLoading === 'failed' ? null : (
+          <div className={classes.metaContainer}>
+            <Box
+              display='flex'
+              justifyContent='space-between'
+              alignItems='center'
+            >
+              <Box display='flex' flex='1' alignItems='center'>
+                {videoLoading === 'succeeded' &&
+                channelLoading === 'succeeded' ? (
+                  <Avatar src={avatarChannel} className={classes.avatar}>
+                    {channelTitle && channelTitle.charAt(0)}
+                  </Avatar>
+                ) : (
+                  <Skeleton
+                    animation={false}
+                    variant='circle'
+                    className={classes.avatar}
+                  />
+                )}
+
+                {videoLoading === 'succeeded' &&
+                channelLoading === 'succeeded' ? (
+                  <div>
+                    <Typography variant='subtitle2'>
+                      {channelTitle && channelTitle}
+                    </Typography>
+                    <Typography variant='caption'>
+                      {subscriberCount &&
+                        `${formatSubscriptionCount(
+                          subscriberCount
+                        )} người đăng ký`}
+                    </Typography>
+                  </div>
+                ) : (
+                  <Box width='100%'>
+                    <Skeleton animation={false} width='50%' />
+                    <Skeleton animation={false} width='30%' />
+                  </Box>
+                )}
+              </Box>
+
+              {videoLoading === 'succeeded' &&
+              channelLoading === 'succeeded' &&
+              channelId &&
+              channelTitle ? (
+                <div>
+                  <SubscribeButton
+                    exist={exist}
+                    channelId={channelId}
+                    channelTitle={channelTitle}
+                  />
+                </div>
+              ) : (
+                <Skeleton animation={false} height='50px' width='100px' />
+              )}
             </Box>
 
-            {channelId && channelTitle && (
-              <div>
-                <SubscribeButton
-                  exist={exist}
-                  channelId={channelId}
-                  channelTitle={channelTitle}
-                />
-              </div>
-            )}
-          </Box>
+            {videoLoading === 'succeeded' && channelLoading === 'succeeded' && (
+              <Box ml='64px' mt='12px' maxWidth='615px'>
+                <div className={`${collapsed ? classes.collapsed : ''}`}>
+                  {description && <FormattedString str={description} />}
+                </div>
 
-          <Box ml='64px' mt='12px' maxWidth='615px'>
-            <div className={`${collapsed ? classes.collapsed : ''}`}>
-              {description && <FormattedString str={description} />}
-            </div>
-
-            {description && collapsed && (
-              <div
-                onClick={() => setCollapsed(false)}
-                className={classes.buttonMore}
-              >
-                Hiển thị thêm
-              </div>
+                {description && collapsed && (
+                  <div
+                    onClick={() => setCollapsed(false)}
+                    className={classes.buttonMore}
+                  >
+                    Hiển thị thêm
+                  </div>
+                )}
+              </Box>
             )}
-          </Box>
-        </div>
+          </div>
+        )}
       </Box>
     </MyContainer>
   );

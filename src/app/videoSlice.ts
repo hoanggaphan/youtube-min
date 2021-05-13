@@ -135,7 +135,7 @@ const videoSlice = createSlice({
   },
 });
 
-export const selectLoading = (state: RootState) => state.video.loading;
+export const selectVideoLoading = (state: RootState) => state.video.loading;
 export const selectRating = (state: RootState) => state.video.rating;
 
 export const selectVideoTitle = (state: RootState) => state.video.snippet.title;
