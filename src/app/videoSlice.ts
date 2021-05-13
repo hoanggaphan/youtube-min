@@ -87,10 +87,10 @@ export const ratingVideo = createAsyncThunk(
     }
 
     const resGetRating = await videoAPI.getRating(id);
-    if (resRating.status !== 200) {
-      return thunkAPI.rejectWithValue(resRating.result);
+    if (resGetRating.status !== 200) {
+      return thunkAPI.rejectWithValue(resGetRating.result);
     }
-    
+
     return resGetRating.result;
   }
 );
