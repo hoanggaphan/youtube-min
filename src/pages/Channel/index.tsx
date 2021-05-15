@@ -21,6 +21,7 @@ import { checkSubscriptionExist, selectExist } from 'app/subscriptionSlice';
 import MyContainer from 'components/MyContainer';
 import SubscribeButton from 'components/SubscribeButton';
 import { formatSubscriptionCount } from 'helpers/format';
+import { getLastWord } from 'helpers/string';
 import React from 'react';
 import { Route, useLocation, useParams, useRouteMatch } from 'react-router';
 import { Link, Switch } from 'react-router-dom';
@@ -142,7 +143,7 @@ export default function Channel(): JSX.Element {
           <Box mr='25px'>
             {title ? (
               <Avatar src={thumbUrl} className={classes.avatar}>
-                {title.charAt(0)}
+                {getLastWord(title).charAt(0)}
               </Avatar>
             ) : (
               <Skeleton animation={false} variant='circle'>

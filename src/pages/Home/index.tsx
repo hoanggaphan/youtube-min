@@ -4,6 +4,7 @@ import Button from '@material-ui/core/Button';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import MyContainer from 'components/MyContainer';
+import { getLastWord } from 'helpers/string';
 import { useAuth } from 'hooks/use-auth';
 import React from 'react';
 import Subscription from './components/Subscription';
@@ -53,11 +54,11 @@ export default function Home(): JSX.Element {
     <MyContainer>
       <div className={classes.mx}>
         <Avatar
-          src={user?.imgUrl}
+          // src={user?.imgUrl}
           alt='avatar'
           className={`${classes.large} ${classes.center}`}
         >
-          {user?.firstName?.charAt(0)}
+          {user && user.firstName && getLastWord(user.firstName).charAt(0)}
         </Avatar>
         <Typography
           align='center'
