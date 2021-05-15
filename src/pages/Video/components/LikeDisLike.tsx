@@ -58,7 +58,7 @@ export default React.memo(function LikeDisLike(): JSX.Element {
   }, []);
 
   return (
-    <Box display='flex'>
+    <Box display='flex' minWidth="135px">
       <Tooltip
         className={classes.tooltip}
         title={<span className={classes.tooltipText}>Tôi thích video này</span>}

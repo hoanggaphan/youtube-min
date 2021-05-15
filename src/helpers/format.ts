@@ -92,6 +92,8 @@ moment.updateLocale('vi', {
 });
 
 // Set new thresholds
+moment.relativeTimeThreshold('s', 60);
+moment.relativeTimeThreshold('m', 60);
 moment.relativeTimeThreshold('h', 24);
 moment.relativeTimeThreshold('d', 7);
 moment.relativeTimeThreshold('w', 5); // enables weeks

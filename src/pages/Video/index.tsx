@@ -28,8 +28,10 @@ import FormattedString from 'components/FormattedString';
 import MyContainer from 'components/MyContainer';
 import SubscribeButton from 'components/SubscribeButton';
 import { formatNumberWithDots, formatSubscriptionCount } from 'helpers/format';
+import { getLastWord } from 'helpers/string';
 import React from 'react';
 import { useParams } from 'react-router';
+import Comments from './components/Comments';
 import LikeDisLike from './components/LikeDisLike';
 import ViewDate from './components/ViewDate';
 
@@ -279,7 +281,7 @@ export default function Video(): JSX.Element {
                 {videoLoading === 'succeeded' &&
                 channelLoading === 'succeeded' ? (
                   <Avatar src={avatarChannel} className={classes.avatar}>
-                    {channelTitle && channelTitle.charAt(0)}
+                    {channelTitle && getLastWord(channelTitle).charAt(0)}
                   </Avatar>
                 ) : (
                   <Skeleton
@@ -344,6 +346,8 @@ export default function Video(): JSX.Element {
             )}
           </div>
         )}
+
+        <Comments />
       </Box>
     </MyContainer>
   );

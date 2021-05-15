@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as playlistItemsAPI from 'api/playListItemsAPI';
+import * as videoAPI from 'api/videoAPI';
 import { RootState } from 'app/store';
 
 interface PlaylistItemsState {
@@ -33,7 +34,7 @@ export const fetchPlaylistItems = createAsyncThunk(
     );
 
     // fetch videos views
-    const resVideos = await playlistItemsAPI.fetchVideosViews(ids);
+    const resVideos = await videoAPI.fetchVideosViews(ids);
     if (resVideos.status !== 200) {
       // Return the known error for future handling
       return thunkApi.rejectWithValue(resVideos.result);
@@ -83,7 +84,7 @@ export const fetchNextPlaylistItems = createAsyncThunk(
     );
 
     // fetch videos views
-    const resVideos = await playlistItemsAPI.fetchVideosViews(ids);
+    const resVideos = await videoAPI.fetchVideosViews(ids);
     if (resVideos.status !== 200) {
       // Return the known error for future handling
       return thunkApi.rejectWithValue(resVideos.result);

@@ -5,8 +5,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 function addHtmlTags(str: string) {
-  const regexLinks =
-    /(http|ftp|https):(\/){2}([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?/g;
+  const regexLinks = /(http|https):\/\/[a-zA-Z0-9\-.]+\.[a-zA-Z]{2,3}(\/\S*)?/g;
   const links = str.match(regexLinks);
   links?.forEach((link) => {
     str = str.replace(

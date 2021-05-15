@@ -29,16 +29,3 @@ export async function fetchNextListById(
     return error;
   }
 }
-
-export async function fetchVideosViews(ids: string[]) {
-  try {
-    const response = await gapi.client.youtube.videos.list({
-      part: ['contentDetails', 'statistics'],
-      id: ids,
-    });
-    
-    return response;
-  } catch (error) {
-    return error;
-  }
-}
