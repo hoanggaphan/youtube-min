@@ -16,7 +16,7 @@ function App() {
           <ProtectedRoute exact path='/' component={Login} />
           <ProtectedRoute path='/home' component={Home} />
           <ProtectedRoute path='/channel/:id' component={Channel} />
-          <ProtectedRoute path='/video/:id' component={Video} />
+          <ProtectedRoute path='/video' component={Video} />
           <Route path='*' component={PageNotFound} />
         </Switch>
       </Router>

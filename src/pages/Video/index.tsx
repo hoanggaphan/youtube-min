@@ -18,10 +18,10 @@ import { checkSubscriptionExist, selectExist } from 'app/subscriptionSlice';
 import {
   fetchVideoById,
   selectChannelId,
-  selectVideoLoading,
   selectVideoDescription,
   selectVideoDislikeCount,
   selectVideoLikeCount,
+  selectVideoLoading,
   selectVideoTitle,
 } from 'app/videoSlice';
 import FormattedString from 'components/FormattedString';
@@ -29,8 +29,10 @@ import MyContainer from 'components/MyContainer';
 import SubscribeButton from 'components/SubscribeButton';
 import { formatNumberWithDots, formatSubscriptionCount } from 'helpers/format';
 import { getLastWord } from 'helpers/string';
+import useIframeAPI from 'hooks/useIframeAPI';
+import useQuery from 'hooks/useQuery';
 import React from 'react';
-import { useParams } from 'react-router';
+import { Redirect } from 'react-router';
 import Comments from './components/Comments';
 import LikeDisLike from './components/LikeDisLike';
 import ViewDate from './components/ViewDate';
@@ -58,24 +60,8 @@ const useStyles = makeStyles((theme: Theme) => {
       width: '100%',
       height: '100%',
     },
-    superTitle: {
-      marginRight: '3px',
-      textDecoration: 'none',
-      color: '#065fd4',
-    },
     title: {
       fontSize: '18px',
-    },
-    iconBtn: {
-      padding: '5px',
-    },
-    likeContainer: {
-      display: 'flex',
-      alignItems: 'center',
-      cursor: 'pointer',
-    },
-    likeCountText: {
-      fontWeight: 500,
     },
     tooltip: {
       margin: '0',
@@ -111,7 +97,9 @@ const useStyles = makeStyles((theme: Theme) => {
 export default function Video(): JSX.Element {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const { id } = useParams<{ id: string }>();
+  const query = useQuery();
+  const id = query.get('v') || '';
+  const start = query.get('t') || '';
   const videoTitle = useAppSelector(selectVideoTitle);
   const likeCount = useAppSelector(selectVideoLikeCount);
   const dislikeCount = useAppSelector(selectVideoDislikeCount);
@@ -123,7 +111,9 @@ export default function Video(): JSX.Element {
   const exist = useAppSelector(selectExist);
   const videoLoading = useAppSelector(selectVideoLoading);
   const channelLoading = useAppSelector(selectLoading);
-  const [collapsed, setCollapsed] = React.useState(true);
+  const { player } = useIframeAPI('ytb-player');
+  const collapsedRef = React.useRef<HTMLDivElement>(null);
+  const [more, setMore] = React.useState(false);
 
   React.useEffect(() => {
     dispatch(fetchVideoById(id));
@@ -145,6 +135,34 @@ export default function Video(): JSX.Element {
     document.title = videoTitle + ' - Mini YouTube';
   }, [videoTitle]);
 
+  if (!id) {
+    return <Redirect to='/home' />;
+  }
+
+  const renderClasses = () => {
+    if (
+      collapsedRef.current &&
+      collapsedRef.current.clientHeight > 60 &&
+      !more
+    ) {
+      return classes.collapsed;
+    }
+
+    return '';
+  };
+
+  const renderBtnMore = () => {
+    if (collapsedRef.current && collapsedRef.current.clientHeight > 60) {
+      return (
+        <div onClick={() => setMore(true)} className={classes.buttonMore}>
+          Hiển thị thêm
+        </div>
+      );
+    }
+
+    return null;
+  };
+  console.log(1);
   return (
     <MyContainer>
       <Box p='24px'>
@@ -164,14 +182,17 @@ export default function Video(): JSX.Element {
           </div>
         ) : (
           <div className={classes.iframeContainer}>
-            {/* <iframe
+            <iframe
+              id='ytb-player'
               className={classes.iframe}
               title='Youtube video player'
-              src={`https://www.youtube.com/embed/${id}?autoplay=1`}
+              src={`https://www.youtube.com/embed/${id}?enablejsapi=1&autoplay=1${
+                start && '&start=' + start
+              }`}
               allow='autoplay'
               frameBorder='0'
               allowFullScreen
-            /> */}
+            />
           </div>
         )}
 
@@ -270,7 +291,7 @@ export default function Video(): JSX.Element {
           </Box>
         )}
 
-        {videoLoading === 'failed' ? null : (
+        {videoLoading === 'succeeded' && (
           <div className={classes.metaContainer}>
             <Box
               display='flex'
@@ -278,8 +299,7 @@ export default function Video(): JSX.Element {
               alignItems='center'
             >
               <Box display='flex' flex='1' alignItems='center'>
-                {videoLoading === 'succeeded' &&
-                channelLoading === 'succeeded' ? (
+                {channelLoading === 'succeeded' ? (
                   <Avatar src={avatarChannel} className={classes.avatar}>
                     {channelTitle && getLastWord(channelTitle).charAt(0)}
                   </Avatar>
@@ -291,8 +311,7 @@ export default function Video(): JSX.Element {
                   />
                 )}
 
-                {videoLoading === 'succeeded' &&
-                channelLoading === 'succeeded' ? (
+                {channelLoading === 'succeeded' ? (
                   <div>
                     <Typography variant='subtitle2'>
                       {channelTitle && channelTitle}
@@ -312,10 +331,7 @@ export default function Video(): JSX.Element {
                 )}
               </Box>
 
-              {videoLoading === 'succeeded' &&
-              channelLoading === 'succeeded' &&
-              channelId &&
-              channelTitle ? (
+              {channelLoading === 'succeeded' && channelId && channelTitle ? (
                 <div>
                   <SubscribeButton
                     exist={exist}
@@ -328,26 +344,19 @@ export default function Video(): JSX.Element {
               )}
             </Box>
 
-            {videoLoading === 'succeeded' && channelLoading === 'succeeded' && (
+            {description && channelLoading === 'succeeded' && (
               <Box ml='64px' mt='12px' maxWidth='615px'>
-                <div className={`${collapsed ? classes.collapsed : ''}`}>
-                  {description && <FormattedString str={description} />}
+                <div className={renderClasses()} ref={collapsedRef}>
+                  <FormattedString str={description} player={player} />
                 </div>
 
-                {description && collapsed && (
-                  <div
-                    onClick={() => setCollapsed(false)}
-                    className={classes.buttonMore}
-                  >
-                    Hiển thị thêm
-                  </div>
-                )}
+                {renderBtnMore()}
               </Box>
             )}
           </div>
         )}
 
-        <Comments />
+        {videoLoading === 'succeeded' && <Comments id={id} />}
       </Box>
     </MyContainer>
   );

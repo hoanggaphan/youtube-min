@@ -1,40 +1,70 @@
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import parse, { HTMLReactParserOptions } from 'html-react-parser';
+import { formatHHMMSStoSeconds } from 'helpers/format';
+import parse from 'html-react-parser';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-function addHtmlTags(str: string) {
-  const regexLinks = /(http|https):\/\/[a-zA-Z0-9\-.]+\.[a-zA-Z]{2,3}(\/\S*)?/g;
-  const links = str.match(regexLinks);
-  links?.forEach((link) => {
+function addHtmlTags(str: string, player?: any) {
+  const regexUrl =
+    /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/g;
+  const regexHashTag =
+    /#[A-Za-z0-9ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\-._]+/g;
+
+  if (player) {
+    const regexTime =
+      /\s([01]?\d|2[0-3]):([0-5]\d):([0-5]\d)\s|\s([0-5]?\d):([0-5]\d)\s/g;
     str = str.replace(
-      link,
-      `<a href=${link} spellcheck="false" rel="noopener noreferrer nofollow" target="_blank">${link}</a>`
+      regexTime,
+      (time) =>
+        `<a component="Time" data-time=${formatHHMMSStoSeconds(
+          time
+        )}>${time}</a>`
     );
-  });
+  }
 
-  const regexTags = /#\S+/g;
-  const tags = str.match(regexTags);
-  tags?.forEach((tag) => {
-    const reg = new RegExp(`${tag}\\b`, 'g');
-    str = str.replace(reg, `<a component="Link" >${tag}</a>`);
-  });
-
-  return str;
+  return str
+    .replace(
+      regexUrl,
+      (url) =>
+        `<a class='link' href=${url} spellcheck="false" rel="noopener noreferrer nofollow" target="_blank">${url}</a>`
+    )
+    .replace(regexHashTag, (hashTag) => `<a component="Link" >${hashTag}</a>`);
 }
 
-const options: HTMLReactParserOptions = {
-  replace: (domNode: any) => {
-    const { attribs, children } = domNode;
-    if (attribs && attribs.component === 'Link') {
-      return <Link to='/home'>{children[0].data}</Link>;
-    }
-  },
+const playTimeControl = (player: any, time: any) => {
+  player.seekTo(time);
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
 };
 
-function stringToReactHandler(str: string) {
-  return parse(addHtmlTags(str), options);
+function stringToReact(str: string, player?: any) {
+  return parse(addHtmlTags(str, player), {
+    replace: (domNode: any) => {
+      const { attribs, children } = domNode;
+
+      if (attribs && attribs.component === 'Link') {
+        return (
+          <Link className='link' to='/home'>
+            {children[0].data}
+          </Link>
+        );
+      }
+
+      if (attribs && attribs.component === 'Time') {
+        return (
+          <span
+            className='link'
+            onClick={() => playTimeControl(player, attribs['data-time'])}
+          >
+            {children[0].data}
+          </span>
+        );
+      }
+    },
+  });
 }
 
 const useStyles = makeStyles((theme: Theme) => {
@@ -43,20 +73,27 @@ const useStyles = makeStyles((theme: Theme) => {
       whiteSpace: 'pre-wrap',
       wordBreak: 'break-word',
 
-      '& a': {
+      '& .link': {
         textDecoration: 'none',
+        cursor: 'pointer',
         color: 'rgb(6, 95, 212)',
       },
     },
   });
 });
 
-export default function FormattedString({ str }: { str: string }): JSX.Element {
+export default React.memo(function FormattedString({
+  str,
+  player,
+}: {
+  str: string;
+  player?: any;
+}): JSX.Element {
   const classes = useStyles();
 
   return (
     <Typography variant='body2' className={classes.description}>
-      {stringToReactHandler(str)}
+      {stringToReact(str, player)}
     </Typography>
   );
-}
+});
