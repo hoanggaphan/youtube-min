@@ -7,14 +7,14 @@ import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import { useAppDispatch, useAppSelector } from 'app/hook';
 import {
   getVideoRating,
+  ratingVideo,
+  selectRating,
   selectVideoDislikeCount,
   selectVideoLikeCount,
-  selectRating,
-  ratingVideo,
 } from 'app/videoSlice';
 import { formatLikeCount } from 'helpers/format';
+import useQuery from 'hooks/useQuery';
 import React from 'react';
-import { useParams } from 'react-router';
 
 const useStyles = makeStyles((theme: Theme) => {
   return createStyles({
@@ -40,7 +40,8 @@ const useStyles = makeStyles((theme: Theme) => {
 
 export default React.memo(function LikeDisLike(): JSX.Element {
   const classes = useStyles();
-  const { id } = useParams<{ id: string }>();
+  const query = useQuery();
+  const id = query.get('v') || '';
   const dispatch = useAppDispatch();
   const likeCount = useAppSelector(selectVideoLikeCount);
   const dislikeCount = useAppSelector(selectVideoDislikeCount);
@@ -58,7 +59,7 @@ export default React.memo(function LikeDisLike(): JSX.Element {
   }, []);
 
   return (
-    <Box display='flex' minWidth="135px">
+    <Box display='flex' minWidth='135px'>
       <Tooltip
         className={classes.tooltip}
         title={<span className={classes.tooltipText}>Tôi thích video này</span>}

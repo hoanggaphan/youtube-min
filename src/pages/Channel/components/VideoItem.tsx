@@ -54,7 +54,7 @@ export default function VideoItem({ item }: { item: any }): JSX.Element {
 
   return (
     <Link
-      to={`/video/${item.contentDetails.videoId}`}
+      to={`/video?v=${item.contentDetails.videoId}`}
       key={item.id}
       className={classes.gridItem}
     >
