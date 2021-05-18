@@ -6,7 +6,13 @@ import { formatDateView } from 'helpers/format';
 import { getLastWord } from 'helpers/string';
 import React from 'react';
 
-export default function CommentItem({ item }: { item: any }): JSX.Element {
+export default function CommentItem({
+  item,
+  player,
+}: {
+  item: any;
+  player?: any;
+}): JSX.Element {
   return (
     <Box display='flex' mb='16px'>
       <Box mr='16px'>
@@ -32,6 +38,7 @@ export default function CommentItem({ item }: { item: any }): JSX.Element {
         </Box>
         <FormattedString
           str={item.snippet.topLevelComment.snippet.textDisplay}
+          player={player}
         />
       </Box>
     </Box>

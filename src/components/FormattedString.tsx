@@ -4,23 +4,23 @@ import { formatHHMMSStoSeconds } from 'helpers/format';
 import parse from 'html-react-parser';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import XRegExp from 'xregexp';
+
+const regexUrl = XRegExp(
+  `https?:\\/\\/(www\\.)?[-\\p{L}\\p{N}@:%._+~#=]{1,256}\\.[\\p{L}\\p{N}]{1,10}\\b([-\\p{L}\\p{N}()@:%_+.~#?&//=]*)`,
+  'g'
+);
+const regexHashTag = XRegExp('#[-\\p{L}\\p{N}@:%._+~#=]*', 'g');
+const regexTime =
+  /\b([01]?\d|2[0-3]):([0-5]\d):([0-5]\d)\b|\b([0-5]?\d):([0-5]\d)\b/g;
 
 function addHtmlTags(str: string, player?: any) {
-  const regexUrl =
-    /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/g;
-  const regexHashTag =
-    /#[A-Za-z0-9ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\-._]+/g;
-
   if (player) {
-    const regexTime =
-      /\s([01]?\d|2[0-3]):([0-5]\d):([0-5]\d)\s|\s([0-5]?\d):([0-5]\d)\s/g;
-    str = str.replace(
-      regexTime,
-      (time) =>
-        `<a component="Time" data-time=${formatHHMMSStoSeconds(
-          time
-        )}>${time}</a>`
-    );
+    str = str.replace(regexTime, (time) => {
+      return `<a component="Time" data-time=${formatHHMMSStoSeconds(
+        time
+      )}>${time}</a>`;
+    });
   }
 
   return str
@@ -33,6 +33,10 @@ function addHtmlTags(str: string, player?: any) {
 }
 
 const playTimeControl = (player: any, time: any) => {
+  if (!player || !time) {
+    return;
+  }
+
   player.seekTo(time);
   window.scrollTo({
     top: 0,

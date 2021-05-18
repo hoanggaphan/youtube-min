@@ -27,7 +27,8 @@
     "react-scripts": "4.0.3",
     "react-slick": "^0.28.1",
     "swr": "^0.5.6",
-    "typescript": "~3.8.2"
+    "typescript": "~3.8.2",
+    "xregexp": "^5.0.2"
   },
   "scripts": {
     "start": "react-scripts start",
