@@ -162,7 +162,7 @@ export default function Video(): JSX.Element {
 
     return null;
   };
-  console.log(1);
+  
   return (
     <MyContainer>
       <Box p='24px'>
@@ -356,7 +356,7 @@ export default function Video(): JSX.Element {
           </div>
         )}
 
-        {videoLoading === 'succeeded' && <Comments id={id} />}
+        {videoLoading === 'succeeded' && <Comments id={id} player={player} />}
       </Box>
     </MyContainer>
   );

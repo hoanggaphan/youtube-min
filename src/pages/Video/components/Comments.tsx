@@ -32,7 +32,13 @@ const useStyles = makeStyles((theme: Theme) => {
   });
 });
 
-export default React.memo(function Comments({ id }: { id: string }) {
+export default React.memo(function Comments({
+  id,
+  player,
+}: {
+  id: string;
+  player?: any;
+}) {
   const classes = useStyles();
   const { data, error } = useSWRInfinite(
     (pageIndex, previousPageData) => {
@@ -78,7 +84,7 @@ export default React.memo(function Comments({ id }: { id: string }) {
   return (
     <Box mt='24px'>
       {data[0].items?.map((item: any) => (
-        <CommentItem key={item.id} item={item} />
+        <CommentItem key={item.id} item={item} player={player} />
       ))}
     </Box>
   );
