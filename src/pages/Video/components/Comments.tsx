@@ -82,7 +82,7 @@ export default React.memo(function Comments({
     );
 
   return (
-    <Box mt='24px'>
+    <Box mt='24px' maxWidth='805px'>
       {data[0].items?.map((item: any) => (
         <CommentItem key={item.id} item={item} player={player} />
       ))}
