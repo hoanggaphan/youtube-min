@@ -84,7 +84,9 @@ const useStyles = makeStyles((theme: Theme) => {
       overflowY: 'hidden',
     },
     buttonMore: {
+      display: 'inline-block',
       marginTop: '8px',
+
       textTransform: 'uppercase',
       fontSize: '14px',
       fontWeight: 500,
@@ -162,7 +164,7 @@ export default function Video(): JSX.Element {
 
     return null;
   };
-  
+
   return (
     <MyContainer>
       <Box p='24px'>
