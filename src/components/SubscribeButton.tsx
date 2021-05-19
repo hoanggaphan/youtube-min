@@ -44,7 +44,7 @@ export default function SubscribeButton({
   const [open, setOpen] = React.useState(false);
   const dispatch = useAppDispatch();
 
-  const handleClickOpen = () => {
+  const handleOpen = () => {
     setOpen(true);
   };
 
@@ -56,6 +56,7 @@ export default function SubscribeButton({
     dispatch(deleteSubscription(exist[0].id));
     setOpen(false);
   };
+
   const handleSubscribe = () => {
     dispatch(addSubscription(channelId));
   };
@@ -70,7 +71,7 @@ export default function SubscribeButton({
           variant='contained'
           disableElevation
           disableRipple
-          onClick={handleClickOpen}
+          onClick={handleOpen}
         >
           Đã đăng ký
         </Button>
