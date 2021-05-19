@@ -11,7 +11,7 @@ import {
   selectChannelSubscriberCount,
   selectChannelThumbUrl,
   selectChannelTitle,
-  selectLoading,
+  selectLoading
 } from 'app/channelSlice';
 import { useAppDispatch, useAppSelector } from 'app/hook';
 import { checkSubscriptionExist, selectExist } from 'app/subscriptionSlice';
@@ -22,7 +22,7 @@ import {
   selectVideoDislikeCount,
   selectVideoLikeCount,
   selectVideoLoading,
-  selectVideoTitle,
+  selectVideoTitle
 } from 'app/videoSlice';
 import FormattedString from 'components/FormattedString';
 import MyContainer from 'components/MyContainer';
@@ -33,6 +33,7 @@ import useIframeAPI from 'hooks/useIframeAPI';
 import useQuery from 'hooks/useQuery';
 import React from 'react';
 import { Redirect } from 'react-router';
+import Collapsed from './components/Collapsed';
 import Comments from './components/Comments';
 import LikeDisLike from './components/LikeDisLike';
 import ViewDate from './components/ViewDate';
@@ -79,20 +80,6 @@ const useStyles = makeStyles((theme: Theme) => {
       height: '48px',
       marginRight: '16px',
     },
-    collapsed: {
-      maxHeight: '60px',
-      overflowY: 'hidden',
-    },
-    buttonMore: {
-      display: 'inline-block',
-      marginTop: '8px',
-
-      textTransform: 'uppercase',
-      fontSize: '14px',
-      fontWeight: 500,
-      color: theme.palette.grey[700],
-      cursor: 'pointer',
-    },
   });
 });
 
@@ -114,8 +101,6 @@ export default function Video(): JSX.Element {
   const videoLoading = useAppSelector(selectVideoLoading);
   const channelLoading = useAppSelector(selectLoading);
   const { player } = useIframeAPI('ytb-player');
-  const collapsedRef = React.useRef<HTMLDivElement>(null);
-  const [more, setMore] = React.useState(false);
 
   React.useEffect(() => {
     dispatch(fetchVideoById(id));
@@ -140,30 +125,6 @@ export default function Video(): JSX.Element {
   if (!id) {
     return <Redirect to='/home' />;
   }
-
-  const renderClasses = () => {
-    if (
-      collapsedRef.current &&
-      collapsedRef.current.clientHeight > 60 &&
-      !more
-    ) {
-      return classes.collapsed;
-    }
-
-    return '';
-  };
-
-  const renderBtnMore = () => {
-    if (collapsedRef.current && collapsedRef.current.clientHeight > 60) {
-      return (
-        <div onClick={() => setMore(true)} className={classes.buttonMore}>
-          Hiển thị thêm
-        </div>
-      );
-    }
-
-    return null;
-  };
 
   return (
     <MyContainer>
@@ -348,11 +309,9 @@ export default function Video(): JSX.Element {
 
             {description && channelLoading === 'succeeded' && (
               <Box ml='64px' mt='12px' maxWidth='615px'>
-                <div className={renderClasses()} ref={collapsedRef}>
+                <Collapsed height={60}>
                   <FormattedString str={description} player={player} />
-                </div>
-
-                {renderBtnMore()}
+                </Collapsed>
               </Box>
             )}
           </div>
