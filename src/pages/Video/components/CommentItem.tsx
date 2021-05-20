@@ -1,33 +1,32 @@
-import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
-import Link from '@material-ui/core/Link';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import FormattedString from 'components/FormattedString';
-import { formatDateView } from 'helpers/format';
-import { getLastWord } from 'helpers/string';
 import React from 'react';
-import Collapsed from './Collapsed';
+import CommentCard from './CommentCard';
 
 const useStyles = makeStyles((theme: Theme) => {
   return createStyles({
-    btnMore: {
-      fontSize: '14px',
-      fontWeight: 'bold',
-      color: theme.palette.grey[700],
+    textMore: {
+      marginLeft: '15px',
+      color: theme.palette.primary.main,
+      cursor: 'pointer',
+    },
+    arrowUp: {
+      width: 0,
+      height: 0,
+      borderLeft: '5px solid transparent',
+      borderRight: '5px solid transparent',
+      borderBottom: `5px solid ${theme.palette.primary.main}`,
+    },
+    arrowDown: {
+      width: 0,
+      height: 0,
+      borderLeft: '5px solid transparent',
+      borderRight: '5px solid transparent',
+      borderTop: `5px solid ${theme.palette.primary.main}`,
     },
   });
 });
-
-const StyledBtn = ({ text }: { text: string }) => {
-  const classes = useStyles();
-
-  return (
-    <Link className={classes.btnMore} component='button' color='inherit'>
-      {text}
-    </Link>
-  );
-};
 
 export default function CommentItem({
   item,
@@ -36,43 +35,57 @@ export default function CommentItem({
   item: any;
   player?: any;
 }): JSX.Element {
+  const classes = useStyles();
+  const [toggle, setToggle] = React.useState(false);
+
+  const handleShow = () => {
+    setToggle(!toggle);
+  };
+
   return (
-    <Box display='flex' mb='16px'>
-      <Box mr='16px'>
-        <Avatar
-          id='avatar'
-          src={item.snippet.topLevelComment.snippet.authorProfileImageUrl}
-        >
-          {getLastWord(
-            item.snippet.topLevelComment.snippet.authorDisplayName
-          ).charAt(0)}
-        </Avatar>
-      </Box>
-
-      <Box>
-        <Box display='flex'>
-          <Typography variant='subtitle2' component='span'>
-            {item.snippet.topLevelComment.snippet.authorDisplayName}
-          </Typography>
-          <Box ml='5px'>
-            <Typography variant='caption'>
-              {formatDateView(item.snippet.topLevelComment.snippet.publishedAt)}
-            </Typography>
-          </Box>
+    <Box mb='16px'>
+      <CommentCard item={item} player={player} />
+      {item.replies?.comments.length > 0 && (
+        <Box ml='56px'>
+          {!toggle ? (
+            <Box
+              onClick={handleShow}
+              width='fit-content'
+              display='flex'
+              alignItems='center'
+              pb='10px'
+            >
+              <div className={classes.arrowDown}></div>
+              <Typography variant='subtitle2' className={classes.textMore}>
+                Xem câu trả lời
+              </Typography>
+            </Box>
+          ) : (
+            <>
+              <Box
+                onClick={handleShow}
+                width='fit-content'
+                display='flex'
+                alignItems='center'
+                pb='10px'
+              >
+                <div className={classes.arrowUp}></div>
+                <Typography variant='subtitle2' className={classes.textMore}>
+                  Ẩn phản hồi
+                </Typography>
+              </Box>
+              {item.replies.comments.map((rep: any) => (
+                <CommentCard
+                  key={item.id}
+                  item={rep}
+                  player={player}
+                  size={24}
+                />
+              ))}
+            </>
+          )}
         </Box>
-
-        <Collapsed
-          height={80}
-          BtnEx={<StyledBtn text='Đọc thêm' />}
-          BtnCol={<StyledBtn text='Ản bớt' />}
-          showBtnCol
-        >
-          <FormattedString
-            str={item.snippet.topLevelComment.snippet.textDisplay}
-            player={player}
-          />
-        </Collapsed>
-      </Box>
+      )}
     </Box>
   );
 }
