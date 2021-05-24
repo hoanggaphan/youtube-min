@@ -49,16 +49,16 @@ export default function Home(): JSX.Element {
     signOut();
     reset();
   };
-  
+
   return (
     <MyContainer>
       <div className={classes.mx}>
         <Avatar
-          // src={user?.imgUrl}
+          src={user?.imgUrl}
           alt='avatar'
           className={`${classes.large} ${classes.center}`}
         >
-          {user && user.firstName && getLastWord(user.firstName).charAt(0)}
+          {user && getLastWord(user.firstName).charAt(0)}
         </Avatar>
         <Typography
           align='center'

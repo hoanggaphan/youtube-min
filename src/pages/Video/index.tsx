@@ -11,7 +11,7 @@ import {
   selectChannelSubscriberCount,
   selectChannelThumbUrl,
   selectChannelTitle,
-  selectLoading
+  selectLoading,
 } from 'app/channelSlice';
 import { useAppDispatch, useAppSelector } from 'app/hook';
 import { checkSubscriptionExist, selectExist } from 'app/subscriptionSlice';
@@ -22,7 +22,7 @@ import {
   selectVideoDislikeCount,
   selectVideoLikeCount,
   selectVideoLoading,
-  selectVideoTitle
+  selectVideoTitle,
 } from 'app/videoSlice';
 import FormattedString from 'components/FormattedString';
 import MyContainer from 'components/MyContainer';
@@ -87,7 +87,7 @@ export default function Video(): JSX.Element {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const query = useQuery();
-  const id = query.get('v') || '';
+  const videoId = query.get('v') || '';
   const start = query.get('t') || '';
   const videoTitle = useAppSelector(selectVideoTitle);
   const likeCount = useAppSelector(selectVideoLikeCount);
@@ -103,7 +103,7 @@ export default function Video(): JSX.Element {
   const { player } = useIframeAPI('ytb-player');
 
   React.useEffect(() => {
-    dispatch(fetchVideoById(id));
+    dispatch(fetchVideoById(videoId));
     return () => {
       dispatch(resetChannel());
     };
@@ -122,7 +122,7 @@ export default function Video(): JSX.Element {
     document.title = videoTitle + ' - Mini YouTube';
   }, [videoTitle]);
 
-  if (!id) {
+  if (!videoId) {
     return <Redirect to='/home' />;
   }
 
@@ -149,7 +149,7 @@ export default function Video(): JSX.Element {
               id='ytb-player'
               className={classes.iframe}
               title='Youtube video player'
-              src={`https://www.youtube.com/embed/${id}?enablejsapi=1&autoplay=1${
+              src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1${
                 start && '&start=' + start
               }`}
               allow='autoplay'
@@ -317,7 +317,9 @@ export default function Video(): JSX.Element {
           </div>
         )}
 
-        {videoLoading === 'succeeded' && <Comments id={id} player={player} />}
+        {videoLoading === 'succeeded' && channelId && (
+          <Comments videoId={videoId} channelId={channelId} player={player} />
+        )}
       </Box>
     </MyContainer>
   );

@@ -59,7 +59,6 @@ export default function About(): JSX.Element {
         </>
       ) : (
         <Grid container className={classes.grid}>
-          {' '}
           <Grid item xs={12} sm={8}>
             {description && (
               <Box pb='32px' borderBottom='1px solid rgba(125,125,125, .2)'>
