@@ -32,7 +32,7 @@ export default function CommentItem({
   item,
   player,
 }: {
-  item: any;
+  item: gapi.client.youtube.CommentThread;
   player?: any;
 }): JSX.Element {
   const classes = useStyles();
@@ -45,7 +45,7 @@ export default function CommentItem({
   return (
     <Box mb='16px'>
       <CommentCard item={item} player={player} />
-      {item.replies?.comments.length > 0 && (
+      {item.replies && (
         <Box ml='56px'>
           {!toggle ? (
             <Box
@@ -74,7 +74,7 @@ export default function CommentItem({
                   Ẩn phản hồi
                 </Typography>
               </Box>
-              {item.replies.comments.map((rep: any) => (
+              {item.replies.comments!.map((rep: any) => (
                 <CommentCard
                   key={item.id}
                   item={rep}

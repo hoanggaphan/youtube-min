@@ -3,21 +3,8 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import * as commentAPI from 'api/commentAPI';
 import React from 'react';
-import { useSWRInfinite } from 'swr';
 import CommentItem from './CommentItem';
-
-const fetcher = async (videoId: string) => {
-  const res = await commentAPI.fetchListByVideoId(videoId);
-
-  if (res.status !== 200) {
-    const error: any = new Error('An error occurred while fetching the data.');
-    error.info = res.result.error;
-    error.status = res.status;
-    throw error;
-  }
-
-  return res.result;
-};
+import VideoCommentPost from './VideoCommentPost';
 
 const useStyles = makeStyles((theme: Theme) => {
   return createStyles({
@@ -33,23 +20,41 @@ const useStyles = makeStyles((theme: Theme) => {
 });
 
 export default React.memo(function Comments({
-  id,
+  videoId,
+  channelId,
   player,
 }: {
-  id: string;
+  videoId: string;
+  channelId: string;
   player?: any;
 }) {
   const classes = useStyles();
-  const { data, error } = useSWRInfinite(
-    (pageIndex, previousPageData) => {
-      if (previousPageData && !previousPageData.items.length) return null; // reached the end
-      return `/comment?page=${pageIndex}`; // SWR key
-    },
-    () => fetcher(id),
-    {
-      shouldRetryOnError: false,
-    }
+  const [data, setData] = React.useState<gapi.client.youtube.CommentThread[]>(
+    []
   );
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [error, setError] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    async function fetcher() {
+      try {
+        const res = await commentAPI.fetchListByVideoId(videoId);
+        const items = res.result.items!;
+        setData(items);
+        setIsLoading(false);
+      } catch (error) {
+        const errorObj: any = new Error(
+          'An error occurred while fetching the data.'
+        );
+        errorObj.info = error.result.error;
+        errorObj.status = error.status;
+        setError(errorObj);
+      }
+    }
+
+    fetcher();
+    // eslint-disable-next-line
+  }, []);
 
   if (error) {
     if (
@@ -58,7 +63,7 @@ export default React.memo(function Comments({
     ) {
       return (
         <Box mt='24px' textAlign='center'>
-          Tính năng bình luận đã bị tắt.{' '}
+          Tính năng bình luận đã bị tắt.
           <a
             className={classes.link}
             href='https://support.google.com/youtube/answer/9706180?hl=vi'
@@ -66,7 +71,7 @@ export default React.memo(function Comments({
             rel='noopener noreferrer nofollow'
           >
             Tìm hiểu thêm
-          </a>{' '}
+          </a>
         </Box>
       );
     }
@@ -74,7 +79,31 @@ export default React.memo(function Comments({
     return <>{error.message}</>;
   }
 
-  if (!data)
+  const handlePostComment = async (text: string) => {
+    try {
+      const { result: newComment } = await commentAPI.insertByVideoId(
+        videoId,
+        text
+      );
+      const newData = [...data];
+      const firstComment = data[0];
+
+      if (
+        firstComment.snippet?.topLevelComment?.snippet?.authorChannelId
+          ?.value === channelId
+      ) {
+        newData.splice(1, 0, newComment);
+      } else {
+        newData.unshift(newComment);
+      }
+
+      setData(newData);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  if (isLoading)
     return (
       <div className={classes.loader}>
         <CircularProgress size={30} color='inherit' />
@@ -82,8 +111,9 @@ export default React.memo(function Comments({
     );
 
   return (
-    <Box mt='24px' maxWidth='805px'>
-      {data[0].items?.map((item: any) => (
+    <Box maxWidth='805px'>
+      <VideoCommentPost onPostComment={handlePostComment} />
+      {data.map((item: gapi.client.youtube.CommentThread) => (
         <CommentItem key={item.id} item={item} player={player} />
       ))}
     </Box>
