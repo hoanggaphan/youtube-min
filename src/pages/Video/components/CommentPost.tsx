@@ -7,6 +7,7 @@ import { getLastWord } from 'helpers/string';
 import { useAuth } from 'hooks/use-auth';
 import React from 'react';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import CommentHeader from './CommentHeader';
 
 const useStyles = makeStyles((theme: Theme) => {
   return createStyles({
@@ -80,68 +81,65 @@ export default function CommentPost({
   };
 
   return (
-    <>
+    <Box mt='24px' mb='32px'>
+      <CommentHeader />
       {adding ? (
-        <Box mt='24px' mb='32px'>
-          <div className={classes.loader}>
-            <CircularProgress size={30} color='inherit' />
-          </div>
-        </Box>
+        <div className={classes.loader}>
+          <CircularProgress size={30} color='inherit' />
+        </div>
       ) : (
-        <Box mt='24px' mb='32px'>
-          <Box display='flex'>
-            <Box mr='16px'>
-              <Avatar src={user?.imgUrl}>
-                {user && getLastWord(user.firstName).charAt(0)}
-              </Avatar>
-            </Box>
+        <Box display='flex'>
+          <Box mr='16px'>
+            <Avatar src={user?.imgUrl}>
+              {user && getLastWord(user.firstName).charAt(0)}
+            </Avatar>
+          </Box>
 
-            <Box width='100%'>
-              <Input
-                value={value}
-                onChange={handleChange}
-                onFocus={handleFocus}
-                className={classes.input}
-                placeholder='Bình luẩn công khai...'
-                multiline
-                fullWidth
-              />
+          <Box width='100%'>
+            <Input
+              value={value}
+              onChange={handleChange}
+              onFocus={handleFocus}
+              className={classes.input}
+              placeholder='Bình luẩn công khai...'
+              multiline
+              fullWidth
+            />
 
-              {show && (
-                <Box
-                  mt='8px'
-                  display='flex'
-                  justifyContent='flex-end'
-                  alignItems='center'
-                >
-                  <Box mr='7px'>
-                    <Button
-                      onClick={handleHide}
-                      className={classes.btnText}
-                      disableElevation
-                      disableRipple
-                    >
-                      Hủy
-                    </Button>
-                  </Box>
-
+            {show && (
+              <Box
+                mt='8px'
+                display='flex'
+                justifyContent='flex-end'
+                alignItems='center'
+              >
+                <Box mr='7px'>
                   <Button
-                    onClick={handleClick}
-                    disabled={value ? false : true}
-                    className={classes.btnPrimary}
-                    color='primary'
-                    variant='contained'
+                    onClick={handleHide}
+                    className={classes.btnText}
                     disableElevation
                     disableRipple
                   >
-                    Bình luận
+                    Hủy
                   </Button>
                 </Box>
-              )}
-            </Box>
+
+                <Button
+                  onClick={handleClick}
+                  disabled={value ? false : true}
+                  className={classes.btnPrimary}
+                  color='primary'
+                  variant='contained'
+                  disableElevation
+                  disableRipple
+                >
+                  Bình luận
+                </Button>
+              </Box>
+            )}
           </Box>
         </Box>
       )}
-    </>
+    </Box>
   );
 }
