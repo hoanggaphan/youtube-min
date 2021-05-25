@@ -4,7 +4,7 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import * as commentAPI from 'api/commentAPI';
 import React from 'react';
 import CommentItem from './CommentItem';
-import VideoCommentPost from './VideoCommentPost';
+import CommentPost from './CommentPost';
 
 const useStyles = makeStyles((theme: Theme) => {
   return createStyles({
@@ -36,12 +36,15 @@ export default React.memo(function Comments({
   const [error, setError] = React.useState<any>(null);
 
   React.useEffect(() => {
+    let isMounted = true;
     async function fetcher() {
       try {
         const res = await commentAPI.fetchListByVideoId(videoId);
         const items = res.result.items!;
-        setData(items);
-        setIsLoading(false);
+        if (isMounted) {
+          setData(items);
+          setIsLoading(false);
+        }
       } catch (error) {
         const errorObj: any = new Error(
           'An error occurred while fetching the data.'
@@ -53,6 +56,10 @@ export default React.memo(function Comments({
     }
 
     fetcher();
+
+    return () => {
+      isMounted = false;
+    };
     // eslint-disable-next-line
   }, []);
 
@@ -112,7 +119,7 @@ export default React.memo(function Comments({
 
   return (
     <Box maxWidth='805px'>
-      <VideoCommentPost onPostComment={handlePostComment} />
+      <CommentPost onPostComment={handlePostComment} />
       {data.map((item: gapi.client.youtube.CommentThread) => (
         <CommentItem key={item.id} item={item} player={player} />
       ))}
