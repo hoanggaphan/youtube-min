@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme: Theme) => {
   });
 });
 
-export default function VideoCommentPost({
+export default function CommentPost({
   onPostComment,
 }: {
   onPostComment: (text: string) => void;
