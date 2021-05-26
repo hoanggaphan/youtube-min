@@ -3,6 +3,7 @@ import subscriptionReducer from './subscriptionSlice';
 import channelReducer from './channelSlice';
 import playlistItemsReducer from './playlistItemsSlice';
 import videoReducer from './videoSlice';
+import commentReducer from './commentSlice';
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     channel: channelReducer,
     playListItems: playlistItemsReducer,
     video: videoReducer,
+    comment: commentReducer,
   },
 });
 
