@@ -3,75 +3,24 @@ import * as channelAPI from 'api/channelAPI';
 import { RootState } from 'app/store';
 
 interface ChannelState {
-  loading: 'idle' | 'pending' | 'succeeded' | 'failed';
-  id: null | string;
-  snippet: {
-    title: null | string;
-    thumbnails: {
-      default: {
-        url: undefined | string;
-      };
-    };
-    publishedAt: null | string;
-    country: null | string;
-    description: null | string;
-  };
-  statistics: {
-    subscriberCount: null | string;
-    viewCount: null | string;
-  };
-  contentDetails: {
-    relatedPlaylists: {
-      uploads: null | string;
-    };
-  };
-  brandingSettings: {
-    image: {
-      bannerExternalUrl: null | string;
-    };
-  };
+  data: null | gapi.client.youtube.Channel;
 }
 
 const initialState: ChannelState = {
-  loading: 'idle',
-  id: null,
-  snippet: {
-    title: null,
-    thumbnails: {
-      default: {
-        url: undefined,
-      },
-    },
-    publishedAt: null,
-    country: null,
-    description: null,
-  },
-  statistics: {
-    subscriberCount: null,
-    viewCount: null,
-  },
-  contentDetails: {
-    relatedPlaylists: {
-      uploads: null,
-    },
-  },
-  brandingSettings: {
-    image: {
-      bannerExternalUrl: null,
-    },
-  },
+  data: null,
 };
 
 export const fetchChannelById = createAsyncThunk(
   'channel/fetchChannelById',
-  async (id: string, thunkAPI) => {
-    const response = await channelAPI.fetchChannelById(id);
-
-    if (response.status !== 200) {
-      return thunkAPI.rejectWithValue(response.result);
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await channelAPI.fetchChannelById(id);
+      return response.result;
+    } catch (error) {
+      // All errors will be handled at component
+      error.result.error.message = 'An error occurred while fetching channel';
+      return rejectWithValue(error.result.error);
     }
-
-    return response.result;
   }
 );
 
@@ -82,56 +31,37 @@ const channelSlice = createSlice({
     resetChannel: () => initialState,
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchChannelById.pending, (state, action) => {
-      state.loading = 'pending';
-    });
-    builder.addCase(fetchChannelById.rejected, (state, action) => {
-      state.loading = 'failed';
-      console.error(action.payload);
-    });
-    builder.addCase(fetchChannelById.fulfilled, (state, action) => {
-      state.loading = 'succeeded';
-      const {
-        id,
-        snippet,
-        statistics,
-        contentDetails,
-        brandingSettings,
-      } = action.payload.items[0];
-      state.id = id;
-      state.snippet = snippet;
-      state.statistics = statistics;
-      state.contentDetails = contentDetails;
-      state.brandingSettings = brandingSettings;
+    builder.addCase(fetchChannelById.fulfilled, (state, { payload }) => {
+      state.data = payload.items![0];
     });
   },
 });
 
 export const { resetChannel } = channelSlice.actions;
 
-export const selectLoading = (state: RootState) => state.channel.loading;
+export const selectData = (state: RootState) => state.channel.data;
 
-export const selectChannelId = (state: RootState) => state.channel.id;
+export const selectChannelId = (state: RootState) => state.channel.data?.id;
 export const selectPlayListId = (state: RootState) =>
-  state.channel.contentDetails.relatedPlaylists.uploads;
+  state.channel.data?.contentDetails?.relatedPlaylists?.uploads;
 
 export const selectChannelTitle = (state: RootState) =>
-  state.channel.snippet.title;
+  state.channel.data?.snippet?.title;
 export const selectChannelDes = (state: RootState) =>
-  state.channel.snippet.description;
+  state.channel.data?.snippet?.description;
 export const selectChannelCountry = (state: RootState) =>
-  state.channel.snippet.country;
+  state.channel.data?.snippet?.country;
 export const selectChannelPublishAt = (state: RootState) =>
-  state.channel.snippet.publishedAt;
+  state.channel.data?.snippet?.publishedAt;
 export const selectChannelThumbUrl = (state: RootState) =>
-  state.channel.snippet.thumbnails.default.url;
+  state.channel.data?.snippet?.thumbnails?.default?.url;
 
 export const selectChannelViewCount = (state: RootState) =>
-  state.channel.statistics.viewCount;
+  state.channel.data?.statistics?.viewCount;
 export const selectChannelSubscriberCount = (state: RootState) =>
-  state.channel.statistics.subscriberCount;
+  state.channel.data?.statistics?.subscriberCount;
 
 export const selectChannelBannerExternalUrl = (state: RootState) =>
-  state.channel.brandingSettings.image?.bannerExternalUrl;
+  state.channel.data?.brandingSettings?.image?.bannerExternalUrl;
 
 export default channelSlice.reducer;

@@ -5,6 +5,7 @@ import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
 import Typography from '@material-ui/core/Typography';
 import Skeleton from '@material-ui/lab/Skeleton';
+import { unwrapResult } from '@reduxjs/toolkit';
 import {
   fetchChannelById,
   resetChannel,
@@ -87,6 +88,7 @@ export default function Channel(): JSX.Element {
   const thumbUrl = useAppSelector(selectChannelThumbUrl);
   const channelId = useAppSelector(selectChannelId);
   const playlistId = useAppSelector(selectPlayListId);
+  const [errors, setErrors] = React.useState<any>([]);
 
   const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
     setValue(newValue);
@@ -101,8 +103,12 @@ export default function Channel(): JSX.Element {
   }, [pathname]);
 
   React.useEffect(() => {
-    dispatch(fetchChannelById(id));
-    dispatch(checkSubscriptionExist(id));
+    dispatch(fetchChannelById(id))
+      .then(unwrapResult)
+      .catch((error) => setErrors((prevState: any) => [...prevState, error]));
+    dispatch(checkSubscriptionExist(id))
+      .then(unwrapResult)
+      .catch((error) => setErrors((prevState: any) => [...prevState, error]));
     // eslint-disable-next-line
   }, []);
 
@@ -123,19 +129,27 @@ export default function Channel(): JSX.Element {
     document.title = title + ' - Mini YouTube';
   }, [title]);
 
+  if (errors.length) {
+    return (
+      <>
+        {errors.map((err: any, index: number) => (
+          <MyContainer key={index}>{err.message}</MyContainer>
+        ))}
+      </>
+    );
+  }
+
   return (
     <MyContainer>
-      {bannerExternalUrl === null ? (
+      {!bannerExternalUrl ? (
         <Skeleton animation={false} variant='rect' className={classes.banner} />
       ) : (
-        bannerExternalUrl && (
-          <div
-            className={classes.banner}
-            style={{
-              backgroundImage: `url(${bannerExternalUrl}${urlImageCropped})`,
-            }}
-          />
-        )
+        <div
+          className={classes.banner}
+          style={{
+            backgroundImage: `url(${bannerExternalUrl}${urlImageCropped})`,
+          }}
+        />
       )}
 
       <Box className={classes.channelHeader}>
@@ -159,14 +173,12 @@ export default function Channel(): JSX.Element {
             ) : (
               <Skeleton animation={false} variant='text' width={150} />
             )}
-            {subscriberCount === null ? (
+            {!subscriberCount ? (
               <Skeleton animation={false} variant='text' width={100} />
             ) : (
-              subscriberCount && (
-                <Typography variant='body2' color='textSecondary'>
-                  {formatSubscriptionCount(subscriberCount) + ' người đăng ký'}
-                </Typography>
-              )
+              <Typography variant='body2' color='textSecondary'>
+                {formatSubscriptionCount(subscriberCount) + ' người đăng ký'}
+              </Typography>
             )}
           </div>
         </Box>
