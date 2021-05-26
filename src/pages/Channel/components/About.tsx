@@ -8,7 +8,7 @@ import {
   selectChannelDes,
   selectChannelPublishAt,
   selectChannelViewCount,
-  selectLoading,
+  selectData,
 } from 'app/channelSlice';
 import { useAppSelector } from 'app/hook';
 import FormattedString from 'components/FormattedString';
@@ -47,11 +47,11 @@ export default function About(): JSX.Element {
   const country = useAppSelector(selectChannelCountry);
   const publishAt = useAppSelector(selectChannelPublishAt);
   const viewCount = useAppSelector(selectChannelViewCount);
-  const loading = useAppSelector(selectLoading);
+  const data = useAppSelector(selectData);
 
   return (
     <div className={classes.container}>
-      {loading === 'idle' || loading === 'pending' ? (
+      {!data ? (
         <>
           <Skeleton animation={false} />
           <Skeleton animation={false} />

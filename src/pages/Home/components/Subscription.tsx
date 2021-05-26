@@ -3,11 +3,11 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
+import { unwrapResult } from '@reduxjs/toolkit';
 import { useAppDispatch, useAppSelector } from 'app/hook';
 import {
   fetchNextSubscriptions,
   fetchSubscriptions,
-  selectLoading,
   selectNextPageToken,
   selectSubscriptions,
 } from 'app/subscriptionSlice';
@@ -69,9 +69,10 @@ export default React.memo(function Subscription(): JSX.Element {
   const menuRef = React.useRef<ScrollMenu>(null);
   const [allItemsWidth, setAllItemsWidth] = React.useState<number | null>(null);
   const [menuWidth, setMenuWidth] = React.useState<number | null>(null);
-  const loading = useAppSelector(selectLoading);
   const subscriptions = useAppSelector(selectSubscriptions);
   const nextPageToken = useAppSelector(selectNextPageToken);
+  const [error, setError] = React.useState<any>();
+  const [isLoadingMore, setIsLoadingMore] = React.useState(false);
 
   // Get Menu Width, to disable dragging when Items Width < Menu Width
   React.useEffect(() => {
@@ -86,7 +87,9 @@ export default React.memo(function Subscription(): JSX.Element {
 
   // Initialize list for first load
   React.useEffect(() => {
-    dispatch(fetchSubscriptions());
+    dispatch(fetchSubscriptions())
+      .then(unwrapResult)
+      .catch((error) => setError(error));
     // eslint-disable-next-line
   }, []);
 
@@ -94,7 +97,7 @@ export default React.memo(function Subscription(): JSX.Element {
     history.push(`/channel/${key}`);
 
   const handleLazyLoad = () => {
-    if (loading === 'pending') return;
+    if (!subscriptions || isLoadingMore) return;
 
     // nextPageToken check subscriptions list from api has ended or not
     if (nextPageToken && menuRef.current) {
@@ -107,23 +110,39 @@ export default React.memo(function Subscription(): JSX.Element {
 
       // if 25-rd visible, it will fetch data
       if (last_item_will_be_visible_soon) {
-        dispatch(fetchNextSubscriptions(nextPageToken));
+        setIsLoadingMore(true);
+        dispatch(fetchNextSubscriptions(nextPageToken))
+          .then(unwrapResult)
+          .catch((error) => alert(error.message))
+          .finally(() => {
+            setIsLoadingMore(false);
+          });
       }
     }
   };
+
+  if (error) {
+    return (
+      <>
+        <Typography align='center' variant='h2' className={classes.title}>
+          Kênh đăng ký
+        </Typography>
+        {error.message}
+      </>
+    );
+  }
 
   return (
     <>
       <Typography align='center' variant='h2' className={classes.title}>
         Kênh đăng ký
       </Typography>
-      {loading === 'succeeded' && !subscriptions.length ? (
+      {!subscriptions ? (
+        <SubscriptionSkeleton num={10} />
+      ) : !subscriptions.length ? (
         <Box textAlign='center' pt='24px'>
           Bạn chưa đăng ký bắt kỳ kênh nào!
         </Box>
-      ) : (loading === 'idle' || loading === 'pending') &&
-        !subscriptions.length ? (
-        <SubscriptionSkeleton num={10} />
       ) : (
         <ScrollMenu
           ref={menuRef}

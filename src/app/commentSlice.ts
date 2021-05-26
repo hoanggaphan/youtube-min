@@ -4,12 +4,10 @@ import { RootState } from 'app/store';
 
 interface commentState {
   data: null | gapi.client.youtube.CommentThread[];
-  error: any;
 }
 
 const initialState: commentState = {
   data: null,
-  error: null,
 };
 
 export const fetchCommentList = createAsyncThunk(
@@ -21,7 +19,7 @@ export const fetchCommentList = createAsyncThunk(
       return data;
     } catch (error) {
       // All errors will be handled at component
-      error.result.error.message = 'An error occurred while fetching the data';
+      error.result.error.message = 'An error occurred while fetching comment';
       return rejectWithValue(error.result.error);
     }
   }
@@ -42,7 +40,7 @@ export const insertComment = createAsyncThunk(
       return { channelId, data: res.result };
     } catch (error) {
       // All errors will be handled at component
-      error.result.error.message = 'An error occurred while inserting the data';
+      error.result.error.message = 'An error occurred while inserting comment';
       return rejectWithValue(error.result.error);
     }
   }
@@ -76,6 +74,5 @@ const commentSlice = createSlice({
 export const { resetComment } = commentSlice.actions;
 
 export const selectComments = (state: RootState) => state.comment.data;
-export const selectError = (state: RootState) => state.comment.error;
 
 export default commentSlice.reducer;

@@ -4,6 +4,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { unwrapResult } from '@reduxjs/toolkit';
 import { useAppDispatch } from 'app/hook';
 import { addSubscription, deleteSubscription } from 'app/subscriptionSlice';
 import React from 'react';
@@ -17,7 +18,7 @@ type SubscribeButtonProps = {
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     registeredBtn: {
-      width: "100%",
+      width: '100%',
       backgroundColor: '#ececec',
       color: 'rgb(96, 96, 96)',
       transition: 'none',
@@ -26,7 +27,7 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     registerBtn: {
-      width: "100%",
+      width: '100%',
       transition: 'none',
       '&:hover': {
         backgroundColor: theme.palette.secondary.main,
@@ -53,19 +54,23 @@ export default function SubscribeButton({
   };
 
   const handleUnsubscribe = () => {
-    dispatch(deleteSubscription(exist[0].id));
+    dispatch(deleteSubscription(exist[0].id))
+      .then(unwrapResult)
+      .catch((error) => alert(error.message));
     setOpen(false);
   };
 
   const handleSubscribe = () => {
-    dispatch(addSubscription(channelId));
+    dispatch(addSubscription(channelId))
+      .then(unwrapResult)
+      .catch((error) => alert(error.message));
   };
 
   if (exist === null) return <></>;
 
   return (
     <>
-      {exist.length > 0 ? (
+      {exist?.length > 0 ? (
         <Button
           className={classes.registeredBtn}
           variant='contained'

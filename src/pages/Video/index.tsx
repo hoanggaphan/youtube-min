@@ -5,13 +5,14 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import Skeleton from '@material-ui/lab/Skeleton';
+import { unwrapResult } from '@reduxjs/toolkit';
 import {
   fetchChannelById,
   resetChannel,
   selectChannelSubscriberCount,
   selectChannelThumbUrl,
   selectChannelTitle,
-  selectLoading,
+  selectData,
 } from 'app/channelSlice';
 import { useAppDispatch, useAppSelector } from 'app/hook';
 import { checkSubscriptionExist, selectExist } from 'app/subscriptionSlice';
@@ -99,11 +100,14 @@ export default function Video(): JSX.Element {
   const subscriberCount = useAppSelector(selectChannelSubscriberCount);
   const exist = useAppSelector(selectExist);
   const videoLoading = useAppSelector(selectVideoLoading);
-  const channelLoading = useAppSelector(selectLoading);
+  const data = useAppSelector(selectData);
   const { player } = useIframeAPI('ytb-player');
+  const [errors, setErrors] = React.useState<any>([]);
 
   React.useEffect(() => {
-    dispatch(fetchVideoById(videoId));
+    dispatch(fetchVideoById(videoId))
+      .then(unwrapResult)
+      .catch((error) => setErrors((prevState: any) => [...prevState, error]));
     return () => {
       dispatch(resetChannel());
     };
@@ -113,8 +117,12 @@ export default function Video(): JSX.Element {
   React.useEffect(() => {
     if (!channelId) return;
 
-    dispatch(fetchChannelById(channelId));
-    dispatch(checkSubscriptionExist(channelId));
+    dispatch(fetchChannelById(channelId))
+      .then(unwrapResult)
+      .catch((error) => setErrors((prevState: any) => [...prevState, error]));
+    dispatch(checkSubscriptionExist(channelId))
+      .then(unwrapResult)
+      .catch((error) => setErrors((prevState: any) => [...prevState, error]));
     // eslint-disable-next-line
   }, [channelId]);
 
@@ -124,6 +132,16 @@ export default function Video(): JSX.Element {
 
   if (!videoId) {
     return <Redirect to='/home' />;
+  }
+
+  if (errors.length) {
+    return (
+      <>
+        {errors.map((err: any, index: number) => (
+          <MyContainer key={index}>{err.message}</MyContainer>
+        ))}
+      </>
+    );
   }
 
   return (
@@ -262,19 +280,24 @@ export default function Video(): JSX.Element {
               alignItems='center'
             >
               <Box display='flex' flex='1' alignItems='center'>
-                {channelLoading === 'succeeded' ? (
-                  <Avatar src={avatarChannel} className={classes.avatar}>
-                    {channelTitle && getLastWord(channelTitle).charAt(0)}
-                  </Avatar>
-                ) : (
+                {!data ? (
                   <Skeleton
                     animation={false}
                     variant='circle'
                     className={classes.avatar}
                   />
+                ) : (
+                  <Avatar src={avatarChannel} className={classes.avatar}>
+                    {channelTitle && getLastWord(channelTitle).charAt(0)}
+                  </Avatar>
                 )}
 
-                {channelLoading === 'succeeded' ? (
+                {!data ? (
+                  <Box width='100%'>
+                    <Skeleton animation={false} width='50%' />
+                    <Skeleton animation={false} width='30%' />
+                  </Box>
+                ) : (
                   <div>
                     <Typography variant='subtitle2'>
                       {channelTitle && channelTitle}
@@ -286,15 +309,10 @@ export default function Video(): JSX.Element {
                         )} người đăng ký`}
                     </Typography>
                   </div>
-                ) : (
-                  <Box width='100%'>
-                    <Skeleton animation={false} width='50%' />
-                    <Skeleton animation={false} width='30%' />
-                  </Box>
                 )}
               </Box>
 
-              {channelLoading === 'succeeded' && channelId && channelTitle ? (
+              {channelId && channelTitle ? (
                 <div>
                   <SubscribeButton
                     exist={exist}
@@ -307,7 +325,7 @@ export default function Video(): JSX.Element {
               )}
             </Box>
 
-            {description && channelLoading === 'succeeded' && (
+            {data && description && (
               <Box ml='64px' mt='12px' maxWidth='615px'>
                 <Collapsed height={60}>
                   <FormattedString str={description} player={player} />

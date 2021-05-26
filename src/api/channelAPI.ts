@@ -1,12 +1,6 @@
-export async function fetchChannelById(id: string) {
-  try {
-    const response = await gapi.client.youtube.channels.list({
-      part: ['snippet, contentDetails, statistics, brandingSettings'],
-      id,
-    });
-
-    return response;
-  } catch (error) {
-    return error;
-  }
+export function fetchChannelById(id: string) {
+  return gapi.client.youtube.channels.list({
+    part: ['snippet, contentDetails, statistics, brandingSettings'],
+    id,
+  });
 }
