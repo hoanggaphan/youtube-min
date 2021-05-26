@@ -8,6 +8,10 @@ import { useAuth } from 'hooks/use-auth';
 import React from 'react';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import CommentHeader from './CommentHeader';
+import ReactDOM from 'react-dom';
+import { useAppDispatch } from 'app/hook';
+import { insertComment } from 'app/commentSlice';
+import { unwrapResult } from '@reduxjs/toolkit';
 
 const useStyles = makeStyles((theme: Theme) => {
   return createStyles({
@@ -42,15 +46,18 @@ const useStyles = makeStyles((theme: Theme) => {
 });
 
 export default function CommentPost({
-  onPostComment,
+  videoId,
+  channelId,
 }: {
-  onPostComment: (text: string) => void;
+  videoId: string;
+  channelId: string;
 }) {
   const classes = useStyles();
   const { user } = useAuth();
   const [show, setShow] = React.useState(false);
   const [value, setValue] = React.useState('');
   const [adding, setAdding] = React.useState(false);
+  const dispatch = useAppDispatch();
 
   const handleChange = (
     e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -61,11 +68,17 @@ export default function CommentPost({
   const handleClick = async () => {
     try {
       setAdding(true);
-      await onPostComment(value);
+      await dispatch(insertComment({ videoId, channelId, text: value })).then(
+        unwrapResult
+      );
+    } catch (err) {
+      alert(err.message);
     } finally {
-      setValue('');
-      setShow(false);
-      setAdding(false);
+      ReactDOM.unstable_batchedUpdates(() => {
+        setValue('');
+        setShow(false);
+        setAdding(false);
+      });
     }
   };
 

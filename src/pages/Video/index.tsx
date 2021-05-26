@@ -145,7 +145,7 @@ export default function Video(): JSX.Element {
           </div>
         ) : (
           <div className={classes.iframeContainer}>
-            <iframe
+            {/* <iframe
               id='ytb-player'
               className={classes.iframe}
               title='Youtube video player'
@@ -155,7 +155,7 @@ export default function Video(): JSX.Element {
               allow='autoplay'
               frameBorder='0'
               allowFullScreen
-            />
+            /> */}
           </div>
         )}
 
