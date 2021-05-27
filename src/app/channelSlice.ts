@@ -3,10 +3,12 @@ import * as channelAPI from 'api/channelAPI';
 import { RootState } from 'app/store';
 
 interface ChannelState {
+  isFetching: 'pending' | 'succeed' | 'failed';
   data: null | gapi.client.youtube.Channel;
 }
 
 const initialState: ChannelState = {
+  isFetching: 'pending',
   data: null,
 };
 
@@ -32,6 +34,7 @@ const channelSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(fetchChannelById.fulfilled, (state, { payload }) => {
+      state.isFetching = 'succeed';
       state.data = payload.items![0];
     });
   },
@@ -39,29 +42,8 @@ const channelSlice = createSlice({
 
 export const { resetChannel } = channelSlice.actions;
 
-export const selectData = (state: RootState) => state.channel.data;
-
-export const selectChannelId = (state: RootState) => state.channel.data?.id;
-export const selectPlayListId = (state: RootState) =>
-  state.channel.data?.contentDetails?.relatedPlaylists?.uploads;
-
-export const selectChannelTitle = (state: RootState) =>
-  state.channel.data?.snippet?.title;
-export const selectChannelDes = (state: RootState) =>
-  state.channel.data?.snippet?.description;
-export const selectChannelCountry = (state: RootState) =>
-  state.channel.data?.snippet?.country;
-export const selectChannelPublishAt = (state: RootState) =>
-  state.channel.data?.snippet?.publishedAt;
-export const selectChannelThumbUrl = (state: RootState) =>
-  state.channel.data?.snippet?.thumbnails?.default?.url;
-
-export const selectChannelViewCount = (state: RootState) =>
-  state.channel.data?.statistics?.viewCount;
-export const selectChannelSubscriberCount = (state: RootState) =>
-  state.channel.data?.statistics?.subscriberCount;
-
-export const selectChannelBannerExternalUrl = (state: RootState) =>
-  state.channel.data?.brandingSettings?.image?.bannerExternalUrl;
+export const selectChannelIsFetching = (state: RootState) =>
+  state.channel.isFetching;
+export const selectChannel = (state: RootState) => state.channel.data;
 
 export default channelSlice.reducer;

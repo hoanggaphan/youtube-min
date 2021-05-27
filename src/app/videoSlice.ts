@@ -62,7 +62,7 @@ export const ratingVideo = createAsyncThunk(
 const videoSlice = createSlice({
   name: 'video',
   initialState,
-  reducers: {},
+  reducers: { resetVideo: () => initialState },
   extraReducers: (builder) => {
     builder.addCase(fetchVideoById.fulfilled, (state, { payload }) => {
       if (!payload.items?.length) {
@@ -80,8 +80,10 @@ const videoSlice = createSlice({
   },
 });
 
+export const { resetVideo } = videoSlice.actions;
+
+export const selectVideoIsFetching = (state: RootState) => state.video.isFetching;
 export const selectVideo = (state: RootState) => state.video.data;
-export const selectIsFetching = (state: RootState) => state.video.isFetching;
 export const selectRating = (state: RootState) => state.video.rating?.rating;
 
 export default videoSlice.reducer;

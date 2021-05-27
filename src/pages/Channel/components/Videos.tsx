@@ -1,7 +1,7 @@
 import Box from '@material-ui/core/Box';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import { selectPlayListId } from 'app/channelSlice';
+import { selectChannel } from 'app/channelSlice';
 import { useAppDispatch, useAppSelector } from 'app/hook';
 import {
   fetchNextPlaylistItems,
@@ -49,12 +49,16 @@ const useStyles = makeStyles((theme: Theme) =>
 export default React.memo(function Videos(): JSX.Element {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const playlistId = useAppSelector(selectPlayListId);
+
+  const loader = React.useRef<HTMLDivElement | null>(null);
+  const observer = React.useRef<any>(null);
+
   const playListItems = useAppSelector(selectPlaylistItems);
   const nextPageToken = useAppSelector(selectNextPageToken);
   const error = useAppSelector(selectError);
-  const loader = React.useRef<HTMLDivElement | null>(null);
-  const observer = React.useRef<any>(null);
+
+  const channelData = useAppSelector(selectChannel);
+  const playlistId = channelData?.contentDetails?.relatedPlaylists?.uploads;
 
   React.useEffect(() => {
     if (!nextPageToken || !playlistId) return;

@@ -3,13 +3,7 @@ import Grid from '@material-ui/core/Grid';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Skeleton from '@material-ui/lab/Skeleton';
-import {
-  selectChannelCountry,
-  selectChannelDes,
-  selectChannelPublishAt,
-  selectChannelViewCount,
-  selectData,
-} from 'app/channelSlice';
+import { selectChannel } from 'app/channelSlice';
 import { useAppSelector } from 'app/hook';
 import FormattedString from 'components/FormattedString';
 import { formatNumberWithDots, formatPublishAt } from 'helpers/format';
@@ -43,15 +37,16 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function About(): JSX.Element {
   const classes = useStyles();
-  const description = useAppSelector(selectChannelDes);
-  const country = useAppSelector(selectChannelCountry);
-  const publishAt = useAppSelector(selectChannelPublishAt);
-  const viewCount = useAppSelector(selectChannelViewCount);
-  const data = useAppSelector(selectData);
+
+  const channelData = useAppSelector(selectChannel);
+  const description = channelData?.snippet?.description;
+  const country = channelData?.snippet?.country;
+  const publishAt = channelData?.snippet?.publishedAt;
+  const viewCount = channelData?.statistics?.viewCount;
 
   return (
     <div className={classes.container}>
-      {!data ? (
+      {!channelData ? (
         <>
           <Skeleton animation={false} />
           <Skeleton animation={false} />

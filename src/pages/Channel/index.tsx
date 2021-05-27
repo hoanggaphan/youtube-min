@@ -9,12 +9,7 @@ import { unwrapResult } from '@reduxjs/toolkit';
 import {
   fetchChannelById,
   resetChannel,
-  selectChannelBannerExternalUrl,
-  selectChannelId,
-  selectChannelSubscriberCount,
-  selectChannelThumbUrl,
-  selectChannelTitle,
-  selectPlayListId,
+  selectChannel,
 } from 'app/channelSlice';
 import { useAppDispatch, useAppSelector } from 'app/hook';
 import { fetchPlaylistItems, resetPlayListItems } from 'app/playlistItemsSlice';
@@ -76,19 +71,25 @@ const urlImageCropped =
 
 export default function Channel(): JSX.Element {
   const classes = useStyles();
-  const { id } = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
+
+  const { id } = useParams<{ id: string }>();
   const { url } = useRouteMatch();
   const { pathname } = useLocation();
+
   const [value, setValue] = React.useState(pathname);
-  const title = useAppSelector(selectChannelTitle);
-  const subscriberCount = useAppSelector(selectChannelSubscriberCount);
-  const bannerExternalUrl = useAppSelector(selectChannelBannerExternalUrl);
-  const exist = useAppSelector(selectExist);
-  const thumbUrl = useAppSelector(selectChannelThumbUrl);
-  const channelId = useAppSelector(selectChannelId);
-  const playlistId = useAppSelector(selectPlayListId);
   const [errors, setErrors] = React.useState<any>([]);
+
+  const exist = useAppSelector(selectExist);
+
+  const channelData = useAppSelector(selectChannel);
+  const title = channelData?.snippet?.title;
+  const subscriberCount = channelData?.statistics?.subscriberCount;
+  const bannerExternalUrl =
+    channelData?.brandingSettings?.image?.bannerExternalUrl;
+  const thumbUrl = channelData?.snippet?.thumbnails?.default?.url;
+  const channelId = channelData?.id;
+  const playlistId = channelData?.contentDetails?.relatedPlaylists?.uploads;
 
   const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
     setValue(newValue);
