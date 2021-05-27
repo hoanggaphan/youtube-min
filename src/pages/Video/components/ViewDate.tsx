@@ -1,12 +1,7 @@
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { useAppSelector } from 'app/hook';
-import {
-  selectLiveBroadcastContent,
-  selectLiveStreaming,
-  selectVideoPublishAt,
-  selectVideoViewCount,
-} from 'app/videoSlice';
+import { selectVideo } from 'app/videoSlice';
 import { formatNumberWithDots, formatPublishAt } from 'helpers/format';
 import React from 'react';
 
@@ -23,10 +18,11 @@ const useStyles = makeStyles((theme: Theme) => {
 
 export default function ViewDate(): JSX.Element {
   const classes = useStyles();
-  const viewCount = useAppSelector(selectVideoViewCount);
-  const publishAt = useAppSelector(selectVideoPublishAt);
-  const liveStreaming = useAppSelector(selectLiveStreaming);
-  const live = useAppSelector(selectLiveBroadcastContent);
+  const videoData = useAppSelector(selectVideo);
+  const publishAt = videoData?.snippet?.publishedAt;
+  const live = videoData?.snippet?.liveBroadcastContent;
+  const viewCount = videoData?.statistics?.viewCount;
+  const liveStreaming = videoData?.liveStreamingDetails;
 
   if (live === 'live') {
     return (

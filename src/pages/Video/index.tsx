@@ -16,15 +16,7 @@ import {
 } from 'app/channelSlice';
 import { useAppDispatch, useAppSelector } from 'app/hook';
 import { checkSubscriptionExist, selectExist } from 'app/subscriptionSlice';
-import {
-  fetchVideoById,
-  selectChannelId,
-  selectVideoDescription,
-  selectVideoDislikeCount,
-  selectVideoLikeCount,
-  selectVideoLoading,
-  selectVideoTitle,
-} from 'app/videoSlice';
+import { fetchVideoById, selectIsFetching, selectVideo } from 'app/videoSlice';
 import FormattedString from 'components/FormattedString';
 import MyContainer from 'components/MyContainer';
 import SubscribeButton from 'components/SubscribeButton';
@@ -87,22 +79,26 @@ const useStyles = makeStyles((theme: Theme) => {
 export default function Video(): JSX.Element {
   const classes = useStyles();
   const dispatch = useAppDispatch();
+  const { player } = useIframeAPI('ytb-player');
   const query = useQuery();
+  const [errors, setErrors] = React.useState<any>([]);
+
   const videoId = query.get('v') || '';
   const start = query.get('t') || '';
-  const videoTitle = useAppSelector(selectVideoTitle);
-  const likeCount = useAppSelector(selectVideoLikeCount);
-  const dislikeCount = useAppSelector(selectVideoDislikeCount);
-  const description = useAppSelector(selectVideoDescription);
+
   const avatarChannel = useAppSelector(selectChannelThumbUrl);
-  const channelId = useAppSelector(selectChannelId);
   const channelTitle = useAppSelector(selectChannelTitle);
   const subscriberCount = useAppSelector(selectChannelSubscriberCount);
   const exist = useAppSelector(selectExist);
-  const videoLoading = useAppSelector(selectVideoLoading);
-  const data = useAppSelector(selectData);
-  const { player } = useIframeAPI('ytb-player');
-  const [errors, setErrors] = React.useState<any>([]);
+  const channelData = useAppSelector(selectData);
+
+  const videoIsFetching = useAppSelector(selectIsFetching);
+  const videoData = useAppSelector(selectVideo);
+  const videoTitle = videoData?.snippet?.title;
+  const description = videoData?.snippet?.description;
+  const likeCount = videoData?.statistics?.likeCount;
+  const dislikeCount = videoData?.statistics?.dislikeCount;
+  const channelId = videoData?.snippet?.channelId;
 
   React.useEffect(() => {
     dispatch(fetchVideoById(videoId))
@@ -147,7 +143,7 @@ export default function Video(): JSX.Element {
   return (
     <MyContainer>
       <Box p='24px'>
-        {videoLoading === 'failed' ? (
+        {videoIsFetching === 'failed' ? (
           <div className={classes.iframeContainer}>
             <Box
               display='flex'
@@ -177,102 +173,98 @@ export default function Video(): JSX.Element {
           </div>
         )}
 
-        {videoLoading === 'failed' ? null : (
+        {videoIsFetching === 'pending' ? (
           <Box p='20px 0 8px 0'>
-            {videoLoading === 'succeeded' ? (
-              <>
-                <Typography variant='h5' className={classes.title}>
-                  {videoTitle}
-                </Typography>
-                <Box
-                  display='flex'
-                  justifyContent='space-between'
-                  alignItems='center'
-                >
-                  <ViewDate />
+            <Skeleton animation={false} width='50%' height='34px' />
+            <Box width='100%' display='flex' justifyContent='space-between'>
+              <Skeleton animation={false} width='30%' height='34px' />
 
-                  <Box position='relative'>
-                    <LikeDisLike />
-                    <Tooltip
-                      title={
-                        <span className={classes.tooltipText}>
-                          {likeCount &&
-                            dislikeCount &&
-                            `${formatNumberWithDots(
-                              likeCount
-                            )} / ${formatNumberWithDots(dislikeCount)}`}
-                        </span>
-                      }
-                      placement='top'
-                    >
-                      <Box
-                        width='100%'
-                        pt='6px'
-                        pb='28px'
-                        position='absolute'
-                        left='0'
-                      >
-                        <Box height='2px' bgcolor='#737373'></Box>
-                      </Box>
-                    </Tooltip>
-                  </Box>
+              <Box display='flex' alignItems='center'>
+                <Box mx='8px'>
+                  <Skeleton
+                    animation={false}
+                    variant='circle'
+                    width='20px'
+                    height='20px'
+                  />
                 </Box>
-              </>
-            ) : (
-              <>
-                <Skeleton animation={false} width='50%' height='34px' />
-                <Box width='100%' display='flex' justifyContent='space-between'>
-                  <Skeleton animation={false} width='30%' height='34px' />
-
-                  <Box display='flex' alignItems='center'>
-                    <Box mx='8px'>
-                      <Skeleton
-                        animation={false}
-                        variant='circle'
-                        width='20px'
-                        height='20px'
-                      />
-                    </Box>
-                    <Box mx='8px'>
-                      <Skeleton
-                        animation={false}
-                        variant='circle'
-                        width='20px'
-                        height='20px'
-                      />
-                    </Box>
-                    <Box mx='8px'>
-                      <Skeleton
-                        animation={false}
-                        variant='circle'
-                        width='20px'
-                        height='20px'
-                      />
-                    </Box>
-                    <Box mx='8px'>
-                      <Skeleton
-                        animation={false}
-                        variant='circle'
-                        width='20px'
-                        height='20px'
-                      />
-                    </Box>
-                    <Box mx='8px'>
-                      <Skeleton
-                        animation={false}
-                        variant='circle'
-                        width='20px'
-                        height='20px'
-                      />
-                    </Box>
-                  </Box>
+                <Box mx='8px'>
+                  <Skeleton
+                    animation={false}
+                    variant='circle'
+                    width='20px'
+                    height='20px'
+                  />
                 </Box>
-              </>
-            )}
+                <Box mx='8px'>
+                  <Skeleton
+                    animation={false}
+                    variant='circle'
+                    width='20px'
+                    height='20px'
+                  />
+                </Box>
+                <Box mx='8px'>
+                  <Skeleton
+                    animation={false}
+                    variant='circle'
+                    width='20px'
+                    height='20px'
+                  />
+                </Box>
+                <Box mx='8px'>
+                  <Skeleton
+                    animation={false}
+                    variant='circle'
+                    width='20px'
+                    height='20px'
+                  />
+                </Box>
+              </Box>
+            </Box>
           </Box>
-        )}
+        ) : videoIsFetching === 'succeed' ? (
+          <Box p='20px 0 8px 0'>
+            <Typography variant='h5' className={classes.title}>
+              {videoTitle}
+            </Typography>
+            <Box
+              display='flex'
+              justifyContent='space-between'
+              alignItems='center'
+            >
+              <ViewDate />
 
-        {videoLoading === 'succeeded' && (
+              <Box position='relative'>
+                <LikeDisLike />
+                <Tooltip
+                  title={
+                    <span className={classes.tooltipText}>
+                      {likeCount &&
+                        dislikeCount &&
+                        `${formatNumberWithDots(
+                          likeCount
+                        )} / ${formatNumberWithDots(dislikeCount)}`}
+                    </span>
+                  }
+                  placement='top'
+                >
+                  <Box
+                    width='100%'
+                    pt='6px'
+                    pb='28px'
+                    position='absolute'
+                    left='0'
+                  >
+                    <Box height='2px' bgcolor='#737373'></Box>
+                  </Box>
+                </Tooltip>
+              </Box>
+            </Box>
+          </Box>
+        ) : null}
+
+        {videoIsFetching === 'pending' ? (
           <div className={classes.metaContainer}>
             <Box
               display='flex'
@@ -280,39 +272,47 @@ export default function Video(): JSX.Element {
               alignItems='center'
             >
               <Box display='flex' flex='1' alignItems='center'>
-                {!data ? (
-                  <Skeleton
-                    animation={false}
-                    variant='circle'
-                    className={classes.avatar}
-                  />
-                ) : (
-                  <Avatar src={avatarChannel} className={classes.avatar}>
-                    {channelTitle && getLastWord(channelTitle).charAt(0)}
-                  </Avatar>
-                )}
+                <Skeleton
+                  animation={false}
+                  variant='circle'
+                  className={classes.avatar}
+                />
 
-                {!data ? (
-                  <Box width='100%'>
-                    <Skeleton animation={false} width='50%' />
-                    <Skeleton animation={false} width='30%' />
-                  </Box>
-                ) : (
-                  <div>
-                    <Typography variant='subtitle2'>
-                      {channelTitle && channelTitle}
-                    </Typography>
-                    <Typography variant='caption'>
-                      {subscriberCount &&
-                        `${formatSubscriptionCount(
-                          subscriberCount
-                        )} người đăng ký`}
-                    </Typography>
-                  </div>
-                )}
+                <Box width='100%'>
+                  <Skeleton animation={false} width='50%' />
+                  <Skeleton animation={false} width='30%' />
+                </Box>
               </Box>
 
-              {channelId && channelTitle ? (
+              <Skeleton animation={false} height='50px' width='100px' />
+            </Box>
+          </div>
+        ) : videoIsFetching === 'succeed' ? (
+          <div className={classes.metaContainer}>
+            <Box
+              display='flex'
+              justifyContent='space-between'
+              alignItems='center'
+            >
+              <Box display='flex' flex='1' alignItems='center'>
+                <Avatar src={avatarChannel} className={classes.avatar}>
+                  {channelTitle && getLastWord(channelTitle).charAt(0)}
+                </Avatar>
+
+                <div>
+                  <Typography variant='subtitle2'>
+                    {channelTitle && channelTitle}
+                  </Typography>
+                  <Typography variant='caption'>
+                    {subscriberCount &&
+                      `${formatSubscriptionCount(
+                        subscriberCount
+                      )} người đăng ký`}
+                  </Typography>
+                </div>
+              </Box>
+
+              {channelId && channelTitle && (
                 <div>
                   <SubscribeButton
                     exist={exist}
@@ -320,12 +320,10 @@ export default function Video(): JSX.Element {
                     channelTitle={channelTitle}
                   />
                 </div>
-              ) : (
-                <Skeleton animation={false} height='50px' width='100px' />
               )}
             </Box>
 
-            {data && description && (
+            {channelData && description && (
               <Box ml='64px' mt='12px' maxWidth='615px'>
                 <Collapsed height={60}>
                   <FormattedString str={description} player={player} />
@@ -333,9 +331,9 @@ export default function Video(): JSX.Element {
               </Box>
             )}
           </div>
-        )}
+        ) : null}
 
-        {videoLoading === 'succeeded' && channelId && (
+        {channelId && (
           <Comments videoId={videoId} channelId={channelId} player={player} />
         )}
       </Box>

@@ -8,9 +8,9 @@ import Popover from '@material-ui/core/Popover';
 import Typography from '@material-ui/core/Typography';
 import SortIcon from '@material-ui/icons/Sort';
 import { useAppSelector } from 'app/hook';
-import React from 'react';
-import { selectVideoCommentCount } from 'app/videoSlice';
+import { selectVideo } from 'app/videoSlice';
 import { formatNumberWithDots } from 'helpers/format';
+import React from 'react';
 
 const useStyles = makeStyles((theme: Theme) => {
   return createStyles({
@@ -26,7 +26,8 @@ export default function CommentHeader() {
   const [anchorEl, setAnchorEl] =
     React.useState<HTMLButtonElement | null>(null);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
-  const commentCount = useAppSelector(selectVideoCommentCount);
+  const videoData = useAppSelector(selectVideo);
+  const commentCount = videoData?.statistics?.commentCount;
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
