@@ -9,14 +9,17 @@ import { unwrapResult } from '@reduxjs/toolkit';
 import {
   fetchChannelById,
   resetChannel,
-  selectChannelSubscriberCount,
-  selectChannelThumbUrl,
-  selectChannelTitle,
-  selectData,
+  selectChannelIsFetching,
+  selectChannel,
 } from 'app/channelSlice';
 import { useAppDispatch, useAppSelector } from 'app/hook';
 import { checkSubscriptionExist, selectExist } from 'app/subscriptionSlice';
-import { fetchVideoById, selectIsFetching, selectVideo } from 'app/videoSlice';
+import {
+  fetchVideoById,
+  resetVideo,
+  selectVideoIsFetching,
+  selectVideo,
+} from 'app/videoSlice';
 import FormattedString from 'components/FormattedString';
 import MyContainer from 'components/MyContainer';
 import SubscribeButton from 'components/SubscribeButton';
@@ -85,14 +88,15 @@ export default function Video(): JSX.Element {
 
   const videoId = query.get('v') || '';
   const start = query.get('t') || '';
-
-  const avatarChannel = useAppSelector(selectChannelThumbUrl);
-  const channelTitle = useAppSelector(selectChannelTitle);
-  const subscriberCount = useAppSelector(selectChannelSubscriberCount);
   const exist = useAppSelector(selectExist);
-  const channelData = useAppSelector(selectData);
 
-  const videoIsFetching = useAppSelector(selectIsFetching);
+  const channelIsFetching = useAppSelector(selectChannelIsFetching);
+  const channelData = useAppSelector(selectChannel);
+  const avatarChannel = channelData?.snippet?.thumbnails?.default?.url;
+  const channelTitle = channelData?.snippet?.title;
+  const subscriberCount = channelData?.statistics?.subscriberCount;
+
+  const videoIsFetching = useAppSelector(selectVideoIsFetching);
   const videoData = useAppSelector(selectVideo);
   const videoTitle = videoData?.snippet?.title;
   const description = videoData?.snippet?.description;
@@ -106,6 +110,7 @@ export default function Video(): JSX.Element {
       .catch((error) => setErrors((prevState: any) => [...prevState, error]));
     return () => {
       dispatch(resetChannel());
+      dispatch(resetVideo());
     };
     // eslint-disable-next-line
   }, []);
@@ -264,7 +269,7 @@ export default function Video(): JSX.Element {
           </Box>
         ) : null}
 
-        {videoIsFetching === 'pending' ? (
+        {channelIsFetching === 'pending' ? (
           <div className={classes.metaContainer}>
             <Box
               display='flex'
@@ -287,7 +292,7 @@ export default function Video(): JSX.Element {
               <Skeleton animation={false} height='50px' width='100px' />
             </Box>
           </div>
-        ) : videoIsFetching === 'succeed' ? (
+        ) : channelIsFetching === 'succeed' ? (
           <div className={classes.metaContainer}>
             <Box
               display='flex'
@@ -296,36 +301,33 @@ export default function Video(): JSX.Element {
             >
               <Box display='flex' flex='1' alignItems='center'>
                 <Avatar src={avatarChannel} className={classes.avatar}>
-                  {channelTitle && getLastWord(channelTitle).charAt(0)}
+                  {getLastWord(channelTitle!).charAt(0)}
                 </Avatar>
 
                 <div>
-                  <Typography variant='subtitle2'>
-                    {channelTitle && channelTitle}
-                  </Typography>
+                  <Typography variant='subtitle2'>{channelTitle}</Typography>
                   <Typography variant='caption'>
-                    {subscriberCount &&
-                      `${formatSubscriptionCount(
-                        subscriberCount
-                      )} người đăng ký`}
+                    {`${formatSubscriptionCount(
+                      subscriberCount!
+                    )} người đăng ký`}
                   </Typography>
                 </div>
               </Box>
 
-              {channelId && channelTitle && (
+              {
                 <div>
                   <SubscribeButton
                     exist={exist}
-                    channelId={channelId}
-                    channelTitle={channelTitle}
+                    channelId={channelId!}
+                    channelTitle={channelTitle!}
                   />
                 </div>
-              )}
+              }
             </Box>
 
-            {channelData && description && (
+            {description && (
               <Box ml='64px' mt='12px' maxWidth='615px'>
-                <Collapsed height={60}>
+                <Collapsed height={60} showBtnCol>
                   <FormattedString str={description} player={player} />
                 </Collapsed>
               </Box>
@@ -333,8 +335,8 @@ export default function Video(): JSX.Element {
           </div>
         ) : null}
 
-        {channelId && (
-          <Comments videoId={videoId} channelId={channelId} player={player} />
+        {channelIsFetching === 'succeed' && (
+          <Comments videoId={videoId} channelId={channelId!} player={player} />
         )}
       </Box>
     </MyContainer>
