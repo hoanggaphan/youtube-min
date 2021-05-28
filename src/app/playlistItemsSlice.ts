@@ -4,14 +4,12 @@ import * as videoAPI from 'api/videoAPI';
 import { RootState } from 'app/store';
 
 interface PlaylistItemsState {
-  loading: 'idle' | 'pending' | 'succeeded' | 'failed';
   nextPageToken: string | undefined;
   playListItems: any;
   error: string | null;
 }
 
 const initialState: PlaylistItemsState = {
-  loading: 'idle',
   nextPageToken: undefined,
   playListItems: [],
   error: null,
@@ -19,40 +17,39 @@ const initialState: PlaylistItemsState = {
 
 export const fetchPlaylistItems = createAsyncThunk(
   'playListItems/fetchList',
-  async (playlistId: string, thunkApi) => {
-    // fetch videos list
-    const resPlaylistItems = await playlistItemsAPI.fetchListById(playlistId);
+  async (playlistId: string, { rejectWithValue }) => {
+    try {
+      // fetch videos list
+      const resPlaylistItems = await playlistItemsAPI.fetchListById(playlistId);
 
-    if (resPlaylistItems.status !== 200) {
-      // Return the known error for future handling
-      return thunkApi.rejectWithValue(resPlaylistItems.result);
+      // ids for call api to get videos views
+      const ids = resPlaylistItems.result.items?.map(
+        (item: gapi.client.youtube.PlaylistItem) =>
+          item.snippet?.resourceId?.videoId!
+      )!;
+
+      // fetch videos views
+      const resVideos = await videoAPI.fetchVideosViews(ids);
+      const videosItems = resVideos.result.items!;
+
+      resPlaylistItems.result.items?.forEach((pItem: any) => {
+        const index = videosItems.findIndex(
+          (vItem: gapi.client.youtube.Video) =>
+            vItem.id === pItem.snippet.resourceId.videoId
+        );
+
+        pItem.snippet.viewCount = videosItems[index].statistics?.viewCount;
+        pItem.snippet.duration = videosItems[index].contentDetails?.duration;
+        return pItem;
+      });
+
+      return resPlaylistItems.result;
+    } catch (error) {
+      // All errors will be handled at component
+      error.result.error.message =
+        'An error occurred while fetching playlistItems';
+      return rejectWithValue(error.result.error);
     }
-
-    // ids for call api to get videos views
-    const ids = resPlaylistItems.result.items.map(
-      (item: any) => item.snippet.resourceId.videoId
-    );
-
-    // fetch videos views
-    const resVideos = await videoAPI.fetchVideosViews(ids);
-    if (resVideos.status !== 200) {
-      // Return the known error for future handling
-      return thunkApi.rejectWithValue(resVideos.result);
-    }
-
-    const videosItems = resVideos.result.items;
-
-    resPlaylistItems.result.items.forEach((pItem: any) => {
-      const index = videosItems.findIndex(
-        (vItem: any) => vItem.id === pItem.snippet.resourceId.videoId
-      );
-
-      pItem.snippet.viewCount = videosItems[index].statistics.viewCount;
-      pItem.snippet.duration = videosItems[index].contentDetails.duration;
-      return pItem;
-    });
-
-    return resPlaylistItems.result;
   }
 );
 
@@ -66,43 +63,43 @@ export const fetchNextPlaylistItems = createAsyncThunk(
       playlistId: string;
       nextPageToken: string | undefined;
     },
-    thunkApi
+    { rejectWithValue }
   ) => {
-    // fetch videos list
-    const resPlaylistItems = await playlistItemsAPI.fetchNextListById(
-      playlistId,
-      nextPageToken
-    );
-    if (resPlaylistItems.status !== 200) {
-      // Return the known error for future handling
-      return thunkApi.rejectWithValue(resPlaylistItems.result);
-    }
-
-    // ids for call api to get videos views
-    const ids = resPlaylistItems.result.items.map(
-      (item: any) => item.snippet.resourceId.videoId
-    );
-
-    // fetch videos views
-    const resVideos = await videoAPI.fetchVideosViews(ids);
-    if (resVideos.status !== 200) {
-      // Return the known error for future handling
-      return thunkApi.rejectWithValue(resVideos.result);
-    }
-
-    const videosItems = resVideos.result.items;
-
-    resPlaylistItems.result.items.forEach((pItem: any) => {
-      const index = videosItems.findIndex(
-        (vItem: any) => vItem.id === pItem.snippet.resourceId.videoId
+    try {
+      // fetch videos list
+      const resPlaylistItems = await playlistItemsAPI.fetchNextListById(
+        playlistId,
+        nextPageToken
       );
 
-      pItem.snippet.viewCount = videosItems[index].statistics.viewCount;
-      pItem.snippet.duration = videosItems[index].contentDetails.duration;
-      return pItem;
-    });
+      // ids for call api to get videos views
+      const ids = resPlaylistItems.result.items?.map(
+        (item: gapi.client.youtube.PlaylistItem) =>
+          item.snippet?.resourceId?.videoId!
+      )!;
 
-    return resPlaylistItems.result;
+      // fetch videos views
+      const resVideos = await videoAPI.fetchVideosViews(ids);
+      const videosItems = resVideos.result.items!;
+
+      resPlaylistItems.result.items?.forEach((pItem: any) => {
+        const index = videosItems.findIndex(
+          (vItem: gapi.client.youtube.Video) =>
+            vItem.id === pItem.snippet.resourceId.videoId
+        );
+
+        pItem.snippet.viewCount = videosItems[index].statistics?.viewCount;
+        pItem.snippet.duration = videosItems[index].contentDetails?.duration;
+        return pItem;
+      });
+
+      return resPlaylistItems.result;
+    } catch (error) {
+      // All errors will be handled at component
+      error.result.error.message =
+        'An error occurred while fetching next playlistItems';
+      return rejectWithValue(error.result.error);
+    }
   }
 );
 
@@ -113,44 +110,29 @@ const playlistItemsSlice = createSlice({
     resetPlayListItems: () => initialState,
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchPlaylistItems.pending, (state, action) => {
-      state.loading = 'pending';
-    });
-    builder.addCase(fetchPlaylistItems.rejected, (state, action) => {
-      state.loading = 'failed';
-
-      const { error }: any = action.payload;
+    builder.addCase(fetchPlaylistItems.rejected, (state, { payload }) => {
+      const error: any = payload;
       if (error.code === 404 && error.errors[0].reason === 'playlistNotFound') {
         state.error = 'Kênh này không có video nào.';
         return;
       }
-
-      console.error(error);
     });
     builder.addCase(fetchPlaylistItems.fulfilled, (state, action) => {
-      state.loading = 'succeeded';
       state.nextPageToken = action.payload.nextPageToken;
-      state.playListItems = action.payload.items;
+      state.playListItems = action.payload.items!;
     });
-    builder.addCase(fetchNextPlaylistItems.pending, (state, action) => {
-      state.loading = 'pending';
-    });
-    builder.addCase(fetchNextPlaylistItems.rejected, (state, action) => {
-      state.loading = 'failed';
-      console.error(action.payload);
-    });
-    builder.addCase(fetchNextPlaylistItems.fulfilled, (state, action) => {
-      state.loading = 'succeeded';
-      state.nextPageToken = action.payload.nextPageToken;
-      state.playListItems.push(...action.payload.items);
+
+    builder.addCase(fetchNextPlaylistItems.fulfilled, (state, { payload }) => {
+      state.nextPageToken = payload.nextPageToken;
+      state.playListItems.push(...payload.items!);
     });
   },
 });
 
 export const { resetPlayListItems } = playlistItemsSlice.actions;
 
-export const selectLoading = (state: RootState) => state.playListItems.loading;
-export const selectError = (state: RootState) => state.playListItems.error;
+export const selectPlaylistItemsError = (state: RootState) =>
+  state.playListItems.error;
 export const selectPlaylistItems = (state: RootState) =>
   state.playListItems.playListItems;
 export const selectNextPageToken = (state: RootState) =>

@@ -5,7 +5,7 @@ import { selectChannel } from 'app/channelSlice';
 import { useAppDispatch, useAppSelector } from 'app/hook';
 import {
   fetchNextPlaylistItems,
-  selectError,
+  selectPlaylistItemsError,
   selectNextPageToken,
   selectPlaylistItems,
 } from 'app/playlistItemsSlice';
@@ -55,7 +55,7 @@ export default React.memo(function Videos(): JSX.Element {
 
   const playListItems = useAppSelector(selectPlaylistItems);
   const nextPageToken = useAppSelector(selectNextPageToken);
-  const error = useAppSelector(selectError);
+  const error = useAppSelector(selectPlaylistItemsError);
 
   const channelData = useAppSelector(selectChannel);
   const playlistId = channelData?.contentDetails?.relatedPlaylists?.uploads;

@@ -1,31 +1,19 @@
-export async function fetchListById(playlistId: string) {
-  try {
-    const response = await gapi.client.youtube.playlistItems.list({
-      part: ['snippet,contentDetails'],
-      maxResults: 30,
-      playlistId,
-    });
-
-    return response;
-  } catch (error) {
-    return error;
-  }
+export function fetchListById(playlistId: string) {
+  return gapi.client.youtube.playlistItems.list({
+    part: ['snippet,contentDetails'],
+    maxResults: 30,
+    playlistId,
+  });
 }
 
-export async function fetchNextListById(
+export function fetchNextListById(
   playlistId: string,
   nextPageToken: string | undefined
 ) {
-  try {
-    const response = await gapi.client.youtube.playlistItems.list({
-      part: ['snippet,contentDetails'],
-      maxResults: 30,
-      playlistId,
-      pageToken: nextPageToken,
-    });
-
-    return response;
-  } catch (error) {
-    return error;
-  }
+  return gapi.client.youtube.playlistItems.list({
+    part: ['snippet,contentDetails'],
+    maxResults: 30,
+    playlistId,
+    pageToken: nextPageToken,
+  });
 }
