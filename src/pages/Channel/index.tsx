@@ -10,9 +10,14 @@ import {
   fetchChannelById,
   resetChannel,
   selectChannel,
+  selectChannelIsFetching,
 } from 'app/channelSlice';
 import { useAppDispatch, useAppSelector } from 'app/hook';
-import { fetchPlaylistItems, resetPlayListItems } from 'app/playlistItemsSlice';
+import {
+  fetchPlaylistItems,
+  resetPlayListItems,
+  selectPlaylistItemsIsFetching,
+} from 'app/playlistItemsSlice';
 import { checkSubscriptionExist, selectExist } from 'app/subscriptionSlice';
 import MyContainer from 'components/MyContainer';
 import SubscribeButton from 'components/SubscribeButton';
@@ -81,7 +86,9 @@ export default function Channel(): JSX.Element {
   const [errors, setErrors] = React.useState<any>([]);
 
   const exist = useAppSelector(selectExist);
+  const playlistIsFetching = useAppSelector(selectPlaylistItemsIsFetching);
 
+  const channelIsFetching = useAppSelector(selectChannelIsFetching);
   const channelData = useAppSelector(selectChannel);
   const title = channelData?.snippet?.title;
   const subscriberCount = channelData?.statistics?.subscriberCount;
@@ -142,15 +149,17 @@ export default function Channel(): JSX.Element {
 
   return (
     <MyContainer>
-      {!bannerExternalUrl ? (
-        <Skeleton animation={false} variant='rect' className={classes.banner} />
+      {channelIsFetching === 'succeed' && playlistIsFetching === 'succeed' ? (
+        bannerExternalUrl && (
+          <div
+            className={classes.banner}
+            style={{
+              backgroundImage: `url(${bannerExternalUrl}${urlImageCropped})`,
+            }}
+          />
+        )
       ) : (
-        <div
-          className={classes.banner}
-          style={{
-            backgroundImage: `url(${bannerExternalUrl}${urlImageCropped})`,
-          }}
-        />
+        <Skeleton animation={false} variant='rect' className={classes.banner} />
       )}
 
       <Box className={classes.channelHeader}>

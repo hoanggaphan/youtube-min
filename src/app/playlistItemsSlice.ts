@@ -4,14 +4,16 @@ import * as videoAPI from 'api/videoAPI';
 import { RootState } from 'app/store';
 
 interface PlaylistItemsState {
+  isFetching: 'pending' | 'succeed' | 'failed';
+  playListItems: gapi.client.youtube.PlaylistItem[];
   nextPageToken: string | undefined;
-  playListItems: any;
   error: string | null;
 }
 
 const initialState: PlaylistItemsState = {
-  nextPageToken: undefined,
+  isFetching: 'pending',
   playListItems: [],
+  nextPageToken: undefined,
   error: null,
 };
 
@@ -118,6 +120,7 @@ const playlistItemsSlice = createSlice({
       }
     });
     builder.addCase(fetchPlaylistItems.fulfilled, (state, action) => {
+      state.isFetching = 'succeed';
       state.nextPageToken = action.payload.nextPageToken;
       state.playListItems = action.payload.items!;
     });
@@ -131,10 +134,12 @@ const playlistItemsSlice = createSlice({
 
 export const { resetPlayListItems } = playlistItemsSlice.actions;
 
-export const selectPlaylistItemsError = (state: RootState) =>
-  state.playListItems.error;
+export const selectPlaylistItemsIsFetching = (state: RootState) =>
+  state.playListItems.isFetching;
 export const selectPlaylistItems = (state: RootState) =>
   state.playListItems.playListItems;
+export const selectPlaylistItemsError = (state: RootState) =>
+  state.playListItems.error;
 export const selectNextPageToken = (state: RootState) =>
   state.playListItems.nextPageToken;
 
