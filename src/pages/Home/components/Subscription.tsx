@@ -3,17 +3,11 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
-import { unwrapResult } from '@reduxjs/toolkit';
-import { useAppDispatch, useAppSelector } from 'app/hook';
-import {
-  fetchNextSubscriptions,
-  fetchSubscriptions,
-  selectNextPageToken,
-  selectSubscriptions,
-} from 'app/subscriptionSlice';
+import * as subscriptionAPI from 'api/subscriptionAPI';
 import React from 'react';
 import ScrollMenu from 'react-horizontal-scrolling-menu';
 import { useHistory } from 'react-router';
+import useSWR from 'swr';
 import Arrow from './Arrow';
 import SubscriptionItem from './SubscriptionItem';
 import SubscriptionSkeleton from './SubscriptionSkeleton';
@@ -62,17 +56,32 @@ const SubscriptionList = (list: any) => {
   });
 };
 
+const fetch = async (url: string) => {
+  try {
+    const response = await subscriptionAPI.fetchList();
+    return response.result;
+  } catch (error) {
+    error.result.error.message =
+      'An error occurred while fetching subscription';
+    throw error.result.error;
+  }
+};
+
 export default React.memo(function Subscription(): JSX.Element {
-  const history = useHistory();
-  const dispatch = useAppDispatch();
   const classes = useStyles();
+  const history = useHistory();
+
   const menuRef = React.useRef<ScrollMenu>(null);
+  const isAdding = React.useRef(false);
   const [allItemsWidth, setAllItemsWidth] = React.useState<number | null>(null);
   const [menuWidth, setMenuWidth] = React.useState<number | null>(null);
-  const subscriptions = useAppSelector(selectSubscriptions);
-  const nextPageToken = useAppSelector(selectNextPageToken);
-  const [error, setError] = React.useState<any>();
-  const [isLoadingMore, setIsLoadingMore] = React.useState(false);
+
+  const { data, error, isValidating, mutate } = useSWR(
+    'api/subscription',
+    fetch
+  );
+  const nextPageToken = data?.nextPageToken;
+  const subscriptions = data?.items;
 
   // Get Menu Width, to disable dragging when Items Width < Menu Width
   React.useEffect(() => {
@@ -85,19 +94,11 @@ export default React.memo(function Subscription(): JSX.Element {
     }
   }, [subscriptions]);
 
-  // Initialize list for first load
-  React.useEffect(() => {
-    dispatch(fetchSubscriptions())
-      .then(unwrapResult)
-      .catch((error) => setError(error));
-    // eslint-disable-next-line
-  }, []);
-
   const handleItemSelected = (key: string | number | null) =>
     history.push(`/channel/${key}`);
 
-  const handleLazyLoad = () => {
-    if (!subscriptions || isLoadingMore) return;
+  const handleLazyLoad = async () => {
+    if (!subscriptions || isAdding.current) return;
 
     // nextPageToken check subscriptions list from api has ended or not
     if (nextPageToken && menuRef.current) {
@@ -110,13 +111,17 @@ export default React.memo(function Subscription(): JSX.Element {
 
       // if 25-rd visible, it will fetch data
       if (last_item_will_be_visible_soon) {
-        setIsLoadingMore(true);
-        dispatch(fetchNextSubscriptions(nextPageToken))
-          .then(unwrapResult)
-          .catch((error) => alert(error.message))
-          .finally(() => {
-            setIsLoadingMore(false);
-          });
+        try {
+          isAdding.current = true;
+          const res = await subscriptionAPI.fetchList(nextPageToken);
+          res.result.items = [...subscriptions, ...res.result.items!];
+          mutate(res.result, false);
+        } catch (error) {
+          // console.log(error);
+          alert('An error occurred while fetching next subscription');
+        } finally {
+          isAdding.current = false;
+        }
       }
     }
   };
@@ -127,7 +132,22 @@ export default React.memo(function Subscription(): JSX.Element {
         <Typography align='center' variant='h2' className={classes.title}>
           Kênh đăng ký
         </Typography>
-        {error.message}
+        <Box textAlign='center' pt='24px'>
+          {error.message}
+        </Box>
+      </>
+    );
+  }
+
+  if (subscriptions && !subscriptions.length) {
+    return (
+      <>
+        <Typography align='center' variant='h2' className={classes.title}>
+          Kênh đăng ký
+        </Typography>
+        <Box textAlign='center' pt='24px'>
+          Bạn chưa đăng ký bắt kỳ kênh nào!
+        </Box>
       </>
     );
   }
@@ -137,12 +157,8 @@ export default React.memo(function Subscription(): JSX.Element {
       <Typography align='center' variant='h2' className={classes.title}>
         Kênh đăng ký
       </Typography>
-      {!subscriptions ? (
+      {isValidating ? (
         <SubscriptionSkeleton num={10} />
-      ) : !subscriptions.length ? (
-        <Box textAlign='center' pt='24px'>
-          Bạn chưa đăng ký bắt kỳ kênh nào!
-        </Box>
       ) : (
         <ScrollMenu
           ref={menuRef}

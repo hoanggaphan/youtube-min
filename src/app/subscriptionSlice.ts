@@ -14,36 +14,6 @@ const initialState: SubscriptionState = {
   exist: null,
 };
 
-export const fetchSubscriptions = createAsyncThunk(
-  'subscription/fetchList',
-  async (user, { rejectWithValue }) => {
-    try {
-      const response = await subscriptionAPI.fetchList();
-      return response.result;
-    } catch (error) {
-      // All errors will be handled at component
-      error.result.error.message =
-        'An error occurred while fetching subscription';
-      return rejectWithValue(error.result.error);
-    }
-  }
-);
-
-export const fetchNextSubscriptions = createAsyncThunk(
-  'subscription/fetchNextList',
-  async (nextPageToken: string | undefined, { rejectWithValue }) => {
-    try {
-      const response = await subscriptionAPI.fetchNextList(nextPageToken);
-      return response.result;
-    } catch (error) {
-      // All errors will be handled at component
-      error.result.error.message =
-        'An error occurred while fetching next subscription';
-      return rejectWithValue(error.result.error);
-    }
-  }
-);
-
 export const checkSubscriptionExist = createAsyncThunk(
   'subscription/checkExist',
   async (channelId: string, { rejectWithValue }) => {
@@ -96,16 +66,6 @@ const subscriptionSlice = createSlice({
     resetSubscription: () => initialState,
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchSubscriptions.fulfilled, (state, action) => {
-      state.data = action.payload.items!;
-      state.nextPageToken = action.payload.nextPageToken;
-    });
-
-    builder.addCase(fetchNextSubscriptions.fulfilled, (state, action) => {
-      state.data?.push(...action.payload.items!);
-      state.nextPageToken = action.payload.nextPageToken;
-    });
-
     builder.addCase(checkSubscriptionExist.fulfilled, (state, action) => {
       state.exist = action.payload.items;
     });
@@ -122,8 +82,6 @@ const subscriptionSlice = createSlice({
 
 export const { resetSubscription } = subscriptionSlice.actions;
 
-export const selectSubscriptions = (state: RootState) =>
-  state.subscription.data;
 export const selectNextPageToken = (state: RootState) =>
   state.subscription.nextPageToken;
 export const selectExist = (state: RootState) => state.subscription.exist;
