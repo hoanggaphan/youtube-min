@@ -12,7 +12,7 @@ const regexUrl = XRegExp(
 );
 const regexHashTag = XRegExp('#[-\\p{L}\\p{N}@:%._+~#=]*', 'g');
 const regexTime =
-  /\b([01]?\d|2[0-3]):([0-5]\d):([0-5]\d)\b|\b([0-5]?\d):([0-5]\d)\b/g;
+  /([01]?\d|2[0-3]):([0-5]\d):([0-5]\d)\b|\b([0-5]?\d):([0-5]\d)/g;
 
 function addHtmlTags(str: string, player?: any) {
   if (player) {

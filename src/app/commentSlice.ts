@@ -46,6 +46,20 @@ export const insertComment = createAsyncThunk(
   }
 );
 
+export const fetchRepliesList = createAsyncThunk(
+  'comment/fetchReplies',
+  async (parentId: string, { rejectWithValue }) => {
+    try {
+      const res = await commentAPI.fetchRepliesById(parentId);
+      return res.result;
+    } catch (error) {
+      // All errors will be handled at component
+      error.result.error.message = 'An error occurred while inserting comment';
+      return rejectWithValue(error.result.error);
+    }
+  }
+);
+
 const commentSlice = createSlice({
   name: 'comment',
   initialState,

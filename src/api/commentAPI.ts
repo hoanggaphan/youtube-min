@@ -9,7 +9,7 @@ export function fetchListByVideoId(videoId: string) {
 
 export function insertByVideoId(videoId: string, text: string) {
   return gapi.client.youtube.commentThreads.insert({
-    part: ['snippet1'],
+    part: ['snippet'],
     resource: {
       snippet: {
         videoId,
@@ -20,5 +20,18 @@ export function insertByVideoId(videoId: string, text: string) {
         },
       },
     },
+  });
+}
+
+export function fetchRepliesById(
+  parentId: string,
+  pageToken?: string,
+  maxResults: number = 10
+) {
+  return gapi.client.youtube.comments.list({
+    part: ['snippet'],
+    pageToken,
+    maxResults,
+    parentId,
   });
 }
