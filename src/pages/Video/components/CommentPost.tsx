@@ -42,6 +42,9 @@ const useStyles = makeStyles((theme: Theme) => {
       margin: '24px auto 0',
       width: 'fit-content',
     },
+    none: {
+      display: 'none',
+    },
   });
 });
 
@@ -96,63 +99,61 @@ export default function CommentPost({
   return (
     <Box mt='24px' mb='32px'>
       <CommentHeader />
-      {adding ? (
-        <div className={classes.loader}>
-          <CircularProgress size={30} color='inherit' />
-        </div>
-      ) : (
-        <Box display='flex'>
-          <Box mr='16px'>
-            <Avatar src={user?.imgUrl}>
-              {user && getLastWord(user.firstName).charAt(0)}
-            </Avatar>
-          </Box>
+      <div className={`${classes.loader} ${!adding && classes.none}`}>
+        <CircularProgress size={30} color='inherit' />
+      </div>
+      
+      <Box display='flex' className={`${adding && classes.none}`}>
+        <Box mr='16px'>
+          <Avatar src={user?.imgUrl}>
+            {user && getLastWord(user.firstName).charAt(0)}
+          </Avatar>
+        </Box>
 
-          <Box width='100%'>
-            <Input
-              value={value}
-              onChange={handleChange}
-              onFocus={handleFocus}
-              className={classes.input}
-              placeholder='Bình luẩn công khai...'
-              multiline
-              fullWidth
-            />
+        <Box width='100%'>
+          <Input
+            value={value}
+            onChange={handleChange}
+            onFocus={handleFocus}
+            className={classes.input}
+            placeholder='Bình luẩn công khai...'
+            multiline
+            fullWidth
+          />
 
-            {show && (
-              <Box
-                mt='8px'
-                display='flex'
-                justifyContent='flex-end'
-                alignItems='center'
-              >
-                <Box mr='7px'>
-                  <Button
-                    onClick={handleHide}
-                    className={classes.btnText}
-                    disableElevation
-                    disableRipple
-                  >
-                    Hủy
-                  </Button>
-                </Box>
-
+          {show && (
+            <Box
+              mt='8px'
+              display='flex'
+              justifyContent='flex-end'
+              alignItems='center'
+            >
+              <Box mr='7px'>
                 <Button
-                  onClick={handleClick}
-                  disabled={value ? false : true}
-                  className={classes.btnPrimary}
-                  color='primary'
-                  variant='contained'
+                  onClick={handleHide}
+                  className={classes.btnText}
                   disableElevation
                   disableRipple
                 >
-                  Bình luận
+                  Hủy
                 </Button>
               </Box>
-            )}
-          </Box>
+
+              <Button
+                onClick={handleClick}
+                disabled={value ? false : true}
+                className={classes.btnPrimary}
+                color='primary'
+                variant='contained'
+                disableElevation
+                disableRipple
+              >
+                Bình luận
+              </Button>
+            </Box>
+          )}
         </Box>
-      )}
+      </Box>
     </Box>
   );
 }
