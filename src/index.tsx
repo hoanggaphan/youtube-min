@@ -9,6 +9,7 @@ import { Provider } from 'react-redux';
 import App from './App';
 import { store } from './app/store';
 import * as serviceWorker from './serviceWorker';
+import { SWRConfig } from 'swr';
 
 const theme = createMuiTheme({
   overrides: {
@@ -34,12 +35,12 @@ const theme = createMuiTheme({
           borderRadius: '10px',
           backgroundClip: 'padding-box',
           border: '4px solid transparent',
-          "&:hover": {
+          '&:hover': {
             background: '#ccc',
             borderRadius: '10px',
             backgroundClip: 'padding-box',
             border: '4px solid transparent',
-          }
+          },
         },
       },
     },
@@ -55,13 +56,20 @@ const theme = createMuiTheme({
   },
 });
 
+const swrConfigs = {
+  revalidateOnFocus: false,
+  shouldRetryOnError: false,
+};
+
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <App />
-      </ThemeProvider>
+      <SWRConfig value={swrConfigs}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <App />
+        </ThemeProvider>
+      </SWRConfig>
     </Provider>
   </React.StrictMode>,
   document.getElementById('root')

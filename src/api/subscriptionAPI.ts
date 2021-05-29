@@ -1,19 +1,10 @@
-export function fetchList() {
+export function fetchList(pageToken?: string, maxResults: number = 25) {
   return gapi.client.youtube.subscriptions.list({
     part: ['snippet, contentDetails'],
-    maxResults: 25, // max 0 - 50, default is 5
+    maxResults, // max 0 - 50, default is 25
     order: 'alphabetical',
     mine: true,
-  });
-}
-
-export function fetchNextList(nextPageToken: string | undefined) {
-  return gapi.client.youtube.subscriptions.list({
-    part: ['snippet, contentDetails'],
-    maxResults: 25, // max 0 - 50, default is 5
-    mine: true,
-    order: 'alphabetical',
-    pageToken: nextPageToken,
+    pageToken,
   });
 }
 

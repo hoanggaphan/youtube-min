@@ -226,7 +226,7 @@ export default function Channel(): JSX.Element {
           path={url}
           render={() => (
             <TabPanel>
-              <Videos />
+              <Videos channelData={channelData} />
             </TabPanel>
           )}
         />
@@ -234,7 +234,7 @@ export default function Channel(): JSX.Element {
           path={`${url}/about`}
           render={() => (
             <TabPanel>
-              <About />
+              <About channelData={channelData} />
             </TabPanel>
           )}
         />

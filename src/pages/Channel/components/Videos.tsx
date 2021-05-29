@@ -1,13 +1,12 @@
 import Box from '@material-ui/core/Box';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import { selectChannel } from 'app/channelSlice';
 import { useAppDispatch, useAppSelector } from 'app/hook';
 import {
   fetchNextPlaylistItems,
-  selectPlaylistItemsError,
   selectNextPageToken,
   selectPlaylistItems,
+  selectPlaylistItemsError,
 } from 'app/playlistItemsSlice';
 import React from 'react';
 import VideoItem from './VideoItem';
@@ -46,7 +45,11 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export default React.memo(function Videos(): JSX.Element {
+export default React.memo(function Videos({
+  channelData,
+}: {
+  channelData: null | gapi.client.youtube.Channel;
+}): JSX.Element {
   const classes = useStyles();
   const dispatch = useAppDispatch();
 
@@ -57,7 +60,6 @@ export default React.memo(function Videos(): JSX.Element {
   const nextPageToken = useAppSelector(selectNextPageToken);
   const error = useAppSelector(selectPlaylistItemsError);
 
-  const channelData = useAppSelector(selectChannel);
   const playlistId = channelData?.contentDetails?.relatedPlaylists?.uploads;
 
   React.useEffect(() => {
