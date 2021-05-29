@@ -1,29 +1,34 @@
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Box from '@material-ui/core/Box';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import * as commentAPI from 'api/commentAPI';
 import React from 'react';
 import CommentCard from './CommentCard';
+import SubdirectoryArrowRightIcon from '@material-ui/icons/SubdirectoryArrowRight';
+import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import ReactDOM from 'react-dom';
 
 const useStyles = makeStyles((theme: Theme) => {
   return createStyles({
+    ml8: {
+      marginLeft: '8px',
+    },
     textMore: {
-      marginLeft: '15px',
       color: theme.palette.primary.main,
       cursor: 'pointer',
     },
-    arrowUp: {
-      width: 0,
-      height: 0,
-      borderLeft: '5px solid transparent',
-      borderRight: '5px solid transparent',
-      borderBottom: `5px solid ${theme.palette.primary.main}`,
+    arrowIcon: {
+      width: '20px',
+      height: '20px',
+      color: theme.palette.primary.main,
     },
-    arrowDown: {
-      width: 0,
-      height: 0,
-      borderLeft: '5px solid transparent',
-      borderRight: '5px solid transparent',
-      borderTop: `5px solid ${theme.palette.primary.main}`,
+    userSelect: {
+      userSelect: 'none',
+    },
+    none: {
+      display: 'none',
     },
   });
 });
@@ -36,10 +41,62 @@ export default function CommentItem({
   player?: any;
 }): JSX.Element {
   const classes = useStyles();
-  const [toggle, setToggle] = React.useState(false);
+  const isFirstReqSucceed = React.useRef(false);
 
-  const handleShow = () => {
-    setToggle(!toggle);
+  const [isFetching, setIsFetching] = React.useState(false);
+  const [show, setShow] = React.useState(false);
+  const [replies, setReplies] = React.useState<gapi.client.youtube.Comment[]>(
+    []
+  );
+  const [nextPageToken, setNextPageToken] = React.useState<string>();
+
+  const handleShow = async () => {
+    setShow(true);
+    if (!isFirstReqSucceed.current && !isFetching) {
+      try {
+        setIsFetching(true);
+        const res = await commentAPI.fetchRepliesById(item.id!);
+        isFirstReqSucceed.current = true;
+        ReactDOM.unstable_batchedUpdates(() => {
+          setReplies(res.result.items!);
+          setNextPageToken(res.result.nextPageToken);
+          setIsFetching(false);
+        });
+      } catch (error) {
+        // console.log(error);
+        setIsFetching(false);
+        const message = "An error occurred while fetching user's replies";
+        alert(message);
+      }
+    }
+  };
+
+  const handleHide = () => {
+    setShow(false);
+  };
+  console.log(replies);
+  const handleFetchNextReplies = async () => {
+    if (!isFetching) {
+      try {
+        setIsFetching(true);
+        const res = await commentAPI.fetchRepliesById(
+          item.id!,
+          nextPageToken,
+          20
+        );
+        isFirstReqSucceed.current = true;
+        ReactDOM.unstable_batchedUpdates(() => {
+          setIsFetching(false);
+          setReplies([...replies, ...res.result.items!]);
+          setNextPageToken(res.result.nextPageToken);
+        });
+      } catch (error) {
+        // console.log(error);
+        setIsFetching(false);
+        const message = "An error occurred while fetching next user's replies";
+        alert(message);
+      }
+    }
   };
 
   return (
@@ -47,43 +104,80 @@ export default function CommentItem({
       <CommentCard item={item} player={player} />
       {item.replies && (
         <Box ml='56px'>
-          {!toggle ? (
-            <Box
-              onClick={handleShow}
-              width='fit-content'
-              display='flex'
-              alignItems='center'
-              pb='10px'
+          <Box
+            onClick={handleShow}
+            width='fit-content'
+            display='flex'
+            alignItems='center'
+            pb='10px'
+            className={`${classes.userSelect} ${show && classes.none}`}
+          >
+            <ArrowDropDownIcon className={classes.arrowIcon} />
+            <Typography
+              variant='subtitle2'
+              className={`${classes.textMore} ${classes.ml8}`}
             >
-              <div className={classes.arrowDown}></div>
-              <Typography variant='subtitle2' className={classes.textMore}>
-                Xem câu trả lời
-              </Typography>
-            </Box>
-          ) : (
-            <>
-              <Box
-                onClick={handleShow}
-                width='fit-content'
-                display='flex'
-                alignItems='center'
-                pb='10px'
-              >
-                <div className={classes.arrowUp}></div>
-                <Typography variant='subtitle2' className={classes.textMore}>
-                  Ẩn phản hồi
-                </Typography>
-              </Box>
-              {item.replies.comments!.map((rep: any) => (
+              Xem câu trả lời
+            </Typography>
+          </Box>
+
+          <Box
+            onClick={handleHide}
+            width='fit-content'
+            display='flex'
+            alignItems='center'
+            pb='10px'
+            className={`${classes.userSelect} ${!show && classes.none}`}
+          >
+            <ArrowDropUpIcon className={classes.arrowIcon} />
+            <Typography
+              variant='subtitle2'
+              className={`${classes.textMore} ${classes.ml8}`}
+            >
+              Ẩn phản hồi
+            </Typography>
+          </Box>
+
+          <div className={`${!show && classes.none}`}>
+            <div>
+              {replies.map((rep: gapi.client.youtube.Comment) => (
                 <CommentCard
-                  key={item.id}
+                  key={rep.id}
                   item={rep}
                   player={player}
                   size={24}
                 />
               ))}
-            </>
-          )}
+            </div>
+
+            {nextPageToken && (
+              <Box
+                width='fit-content'
+                display='flex'
+                alignItems='center'
+                pb='10px'
+                className={`${classes.userSelect} ${
+                  isFetching && classes.none
+                }`}
+                onClick={handleFetchNextReplies}
+              >
+                <Box ml='8px' mr='12px'>
+                  <SubdirectoryArrowRightIcon className={classes.arrowIcon} />
+                </Box>
+                <Typography variant='subtitle2' className={classes.textMore}>
+                  Hiển thị thêm phản hồi
+                </Typography>
+              </Box>
+            )}
+
+            <Box
+              className={`${!isFetching && classes.none}`}
+              pt='16px'
+              pb='10px'
+            >
+              <CircularProgress size={30} color='inherit' />
+            </Box>
+          </div>
         </Box>
       )}
     </Box>
