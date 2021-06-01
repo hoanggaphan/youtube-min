@@ -3,8 +3,6 @@ import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import { useAppDispatch } from 'app/hook';
-import { resetSubscription } from 'app/subscriptionSlice';
 import MyContainer from 'components/MyContainer';
 import { getLastWord } from 'helpers/string';
 import { useAuth } from 'hooks/use-auth';
@@ -40,22 +38,16 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export default function Home(): JSX.Element {
-  const { user, revokeAccess, signOut, reset } = useAuth();
-  const dispatch = useAppDispatch();
+  const { user, revokeAccess, signOut } = useAuth();
   const classes = useStyles();
 
   React.useEffect(() => {
     document.title = 'Mini YouTube';
-
-    return () => {
-      dispatch(resetSubscription());
-    };
     // eslint-disable-next-line
   }, []);
 
   const handleSignOut = () => {
     signOut();
-    reset();
   };
 
   return (

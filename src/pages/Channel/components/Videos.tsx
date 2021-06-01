@@ -1,13 +1,9 @@
 import Box from '@material-ui/core/Box';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import { useAppDispatch, useAppSelector } from 'app/hook';
-import {
-  fetchNextPlaylistItems,
-  selectNextPageToken,
-  selectPlaylistItems,
-  selectPlaylistItemsError,
-} from 'app/playlistItemsSlice';
+import * as playlistItemsAPI from 'api/playListItemsAPI';
+import * as videoAPI from 'api/videoAPI';
+import usePlaylistItems from 'app/usePlaylistItems';
 import React from 'react';
 import VideoItem from './VideoItem';
 import VideosSkeleton from './VideosSkeleton';
@@ -45,34 +41,74 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+const fetchNextPlaylistItems = async (
+  playlistId: string,
+  nextPageToken: string
+) => {
+  try {
+    // fetch videos list
+    const resPlaylistItems = await playlistItemsAPI.fetchListById(
+      playlistId,
+      nextPageToken
+    );
+
+    // ids for call api to get videos views
+    const ids = resPlaylistItems.result.items?.map(
+      (item: gapi.client.youtube.PlaylistItem) =>
+        item.snippet?.resourceId?.videoId!
+    )!;
+
+    // fetch videos views
+    const resVideos = await videoAPI.fetchVideosViews(ids);
+    const videosItems = resVideos.result.items!;
+
+    resPlaylistItems.result.items?.forEach((pItem: any) => {
+      const index = videosItems.findIndex(
+        (vItem: gapi.client.youtube.Video) =>
+          vItem.id === pItem.snippet.resourceId.videoId
+      );
+
+      pItem.snippet.viewCount = videosItems[index].statistics?.viewCount;
+      pItem.snippet.duration = videosItems[index].contentDetails?.duration;
+      return pItem;
+    });
+
+    return resPlaylistItems.result;
+  } catch (error) {
+    // All errors will be handled at component
+    error.result.error.message =
+      'An error occurred while fetching next playlistItems';
+    throw error.result.error;
+  }
+};
+
 export default React.memo(function Videos({
   channelData,
 }: {
-  channelData: null | gapi.client.youtube.Channel;
+  channelData: undefined | gapi.client.youtube.Channel;
 }): JSX.Element {
   const classes = useStyles();
-  const dispatch = useAppDispatch();
-
   const loader = React.useRef<HTMLDivElement | null>(null);
   const observer = React.useRef<any>(null);
 
-  const playListItems = useAppSelector(selectPlaylistItems);
-  const nextPageToken = useAppSelector(selectNextPageToken);
-  const error = useAppSelector(selectPlaylistItemsError);
-
   const playlistId = channelData?.contentDetails?.relatedPlaylists?.uploads;
+
+  const { data, error, isLoading, mutate } = usePlaylistItems(playlistId);
+  const playListItems = data?.items!;
+  const nextPageToken = data?.nextPageToken;
 
   React.useEffect(() => {
     if (!nextPageToken || !playlistId) return;
 
-    const handleObserver = (entities: IntersectionObserverEntry[]) => {
+    const handleObserver = async (entities: IntersectionObserverEntry[]) => {
       if (entities[0].isIntersecting) {
-        dispatch(
-          fetchNextPlaylistItems({
-            playlistId,
-            nextPageToken,
-          })
-        );
+        try {
+          const res = await fetchNextPlaylistItems(playlistId, nextPageToken);
+          res.items = [...data?.items!, ...res.items!];
+          mutate(res, false);
+        } catch (error) {
+          alert(error.message);
+        }
       }
     };
 
@@ -91,22 +127,36 @@ export default React.memo(function Videos({
   }, [nextPageToken, playlistId]);
 
   function renderList() {
-    return playListItems.map((item: any) => (
+    return playListItems?.map((item: any) => (
       <VideoItem key={item.id} item={item} />
     ));
   }
 
-  return (
-    <Box mb='24px'>
-      {error ? (
-        <Box textAlign='center'>{error}</Box>
-      ) : !playListItems.length ? (
+  if (error) {
+    return (
+      <Box mb='24px'>
+        <Box textAlign='center'>
+          {error.code === 404 && error.errors[0].reason === 'playlistNotFound'
+            ? 'Kênh này không có video nào.'
+            : error.message}
+        </Box>
+      </Box>
+    );
+  }
+
+  if (isLoading || !playlistId) {
+    return (
+      <Box mb='24px'>
         <div className={classes.grid}>
           <VideosSkeleton num={10} />
         </div>
-      ) : (
-        <div className={classes.grid}>{renderList()}</div>
-      )}
+      </Box>
+    );
+  }
+
+  return (
+    <Box mb='24px'>
+      <div className={classes.grid}>{renderList()}</div>
       {nextPageToken && (
         <div ref={loader} className={classes.loader}>
           <CircularProgress size={30} />

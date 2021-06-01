@@ -1,9 +1,7 @@
 import Box from '@material-ui/core/Box';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import { unwrapResult } from '@reduxjs/toolkit';
-import { fetchCommentList, selectComments } from 'app/commentSlice';
-import { useAppDispatch, useAppSelector } from 'app/hook';
+import useComment from 'app/useComment';
 import React from 'react';
 import CommentItem from './CommentItem';
 import CommentPost from './CommentPost';
@@ -31,16 +29,7 @@ export default React.memo(function Comments({
   player?: any;
 }) {
   const classes = useStyles();
-  const dispatch = useAppDispatch();
-  const data = useAppSelector(selectComments);
-  const [error, setError] = React.useState<any>();
-
-  React.useEffect(() => {
-    dispatch(fetchCommentList(videoId))
-      .then(unwrapResult)
-      .catch((err) => setError(err));
-    // eslint-disable-next-line
-  }, []);
+  const { comments, error, isLoading } = useComment(videoId);
 
   if (error) {
     if (error.code === 403 && error.errors[0].reason === 'commentsDisabled') {
@@ -62,7 +51,7 @@ export default React.memo(function Comments({
     return <>{error.message}</>;
   }
 
-  if (!data)
+  if (!comments)
     return (
       <div className={classes.loader}>
         <CircularProgress size={30} color='inherit' />
@@ -72,7 +61,7 @@ export default React.memo(function Comments({
   return (
     <Box maxWidth='805px'>
       <CommentPost videoId={videoId} channelId={channelId} />
-      {data.map((item: gapi.client.youtube.CommentThread) => (
+      {comments.map((item: gapi.client.youtube.CommentThread) => (
         <CommentItem key={item.id} item={item} player={player} />
       ))}
     </Box>

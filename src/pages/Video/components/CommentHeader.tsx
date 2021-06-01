@@ -7,9 +7,9 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Popover from '@material-ui/core/Popover';
 import Typography from '@material-ui/core/Typography';
 import SortIcon from '@material-ui/icons/Sort';
-import { useAppSelector } from 'app/hook';
-import { selectVideo } from 'app/videoSlice';
+import useVideo from 'app/useVideo';
 import { formatNumberWithDots } from 'helpers/format';
+import useQuery from 'hooks/useQuery';
 import React from 'react';
 
 const useStyles = makeStyles((theme: Theme) => {
@@ -26,7 +26,15 @@ export default function CommentHeader() {
   const [anchorEl, setAnchorEl] =
     React.useState<HTMLButtonElement | null>(null);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
-  const videoData = useAppSelector(selectVideo);
+
+  const query = useQuery();
+  const videoId = query.get('v') || '';
+
+  const {
+    video: videoData,
+    error: videoError,
+    isLoading: videoIsValidating,
+  } = useVideo(videoId);
   const commentCount = videoData?.statistics?.commentCount;
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {

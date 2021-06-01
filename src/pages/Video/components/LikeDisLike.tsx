@@ -4,17 +4,11 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Tooltip from '@material-ui/core/Tooltip';
 import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
-import { unwrapResult } from '@reduxjs/toolkit';
-import { useAppDispatch, useAppSelector } from 'app/hook';
-import {
-  getVideoRating,
-  ratingVideo,
-  selectRating,
-  selectVideo,
-} from 'app/videoSlice';
+import * as videoAPI from 'api/videoAPI';
 import { formatLikeCount } from 'helpers/format';
 import useQuery from 'hooks/useQuery';
 import React from 'react';
+import useSWR from 'swr';
 
 const useStyles = makeStyles((theme: Theme) => {
   return createStyles({
@@ -38,30 +32,45 @@ const useStyles = makeStyles((theme: Theme) => {
   });
 });
 
-export default React.memo(function LikeDisLike(): JSX.Element {
+const fetchVideoRating = async (url: string, videoId: string) => {
+  try {
+    const response = await videoAPI.getRating(videoId);
+    return response.result.items![0];
+  } catch (error) {
+    // All errors will be handled at component
+    error.result.error.message = 'An error occurred while getting rate video';
+    throw error.result.error;
+  }
+};
+
+export default React.memo(function LikeDisLike({
+  videoData,
+}: {
+  videoData: gapi.client.youtube.Video;
+}): JSX.Element {
   const classes = useStyles();
   const query = useQuery();
   const id = query.get('v') || '';
-  const dispatch = useAppDispatch();
-  const rating = useAppSelector(selectRating);
-  const videoData = useAppSelector(selectVideo);
+  const { data, error, isValidating, mutate } = useSWR(
+    ['api/video/getRating', id],
+    fetchVideoRating
+  );
+
+  const rating = data?.rating;
   const likeCount = videoData?.statistics?.likeCount;
   const dislikeCount = videoData?.statistics?.dislikeCount;
 
-  const handleRate = (type: string) => {
+  const handleRate = async (type: string) => {
     if (!rating) return;
 
-    dispatch(ratingVideo({ id, type }))
-      .then(unwrapResult)
-      .catch((error) => alert(error.message));
+    try {
+      await videoAPI.rating(id, type);
+      mutate();
+    } catch (error) {
+      // console.log(error)
+      alert('An error occurred while rating video');
+    }
   };
-
-  React.useEffect(() => {
-    dispatch(getVideoRating(id))
-      .then(unwrapResult)
-      .catch((error) => console.log(error.message));
-    // eslint-disable-next-line
-  }, []);
 
   return (
     <Box display='flex' minWidth='135px'>

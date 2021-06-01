@@ -5,24 +5,12 @@ import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
 import Typography from '@material-ui/core/Typography';
 import Skeleton from '@material-ui/lab/Skeleton';
-import { unwrapResult } from '@reduxjs/toolkit';
-import {
-  fetchChannelById,
-  resetChannel,
-  selectChannel,
-  selectChannelIsFetching,
-} from 'app/channelSlice';
-import { useAppDispatch, useAppSelector } from 'app/hook';
-import {
-  fetchPlaylistItems,
-  resetPlayListItems,
-  selectPlaylistItemsIsFetching,
-} from 'app/playlistItemsSlice';
-import { checkSubscriptionExist, selectExist } from 'app/subscriptionSlice';
+import useChannel from 'app/useChannel';
 import MyContainer from 'components/MyContainer';
 import SubscribeButton from 'components/SubscribeButton';
 import { formatSubscriptionCount } from 'helpers/format';
 import { getLastWord } from 'helpers/string';
+import PageNotFound from 'pages/NotFound';
 import React from 'react';
 import { Route, useLocation, useParams, useRouteMatch } from 'react-router';
 import { Link, Switch } from 'react-router-dom';
@@ -76,27 +64,11 @@ const urlImageCropped =
 
 export default function Channel(): JSX.Element {
   const classes = useStyles();
-  const dispatch = useAppDispatch();
-
-  const { id } = useParams<{ id: string }>();
+  const { id: channelId } = useParams<{ id: string }>();
   const { url } = useRouteMatch();
   const { pathname } = useLocation();
-
   const [value, setValue] = React.useState(pathname);
-  const [errors, setErrors] = React.useState<any>([]);
-
-  const exist = useAppSelector(selectExist);
-  const playlistIsFetching = useAppSelector(selectPlaylistItemsIsFetching);
-
-  const channelIsFetching = useAppSelector(selectChannelIsFetching);
-  const channelData = useAppSelector(selectChannel);
-  const title = channelData?.snippet?.title;
-  const subscriberCount = channelData?.statistics?.subscriberCount;
-  const bannerExternalUrl =
-    channelData?.brandingSettings?.image?.bannerExternalUrl;
-  const thumbUrl = channelData?.snippet?.thumbnails?.default?.url;
-  const channelId = channelData?.id;
-  const playlistId = channelData?.contentDetails?.relatedPlaylists?.uploads;
+  const { channel, error, isLoading } = useChannel(channelId);
 
   const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
     setValue(newValue);
@@ -111,50 +83,25 @@ export default function Channel(): JSX.Element {
   }, [pathname]);
 
   React.useEffect(() => {
-    dispatch(fetchChannelById(id))
-      .then(unwrapResult)
-      .catch((error) => setErrors((prevState: any) => [...prevState, error]));
-    dispatch(checkSubscriptionExist(id))
-      .then(unwrapResult)
-      .catch((error) => setErrors((prevState: any) => [...prevState, error]));
-    // eslint-disable-next-line
-  }, []);
+    document.title = channel?.snippet?.title + ' - Mini YouTube';
+  }, [channel?.snippet?.title]);
 
-  React.useEffect(() => {
-    playlistId && dispatch(fetchPlaylistItems(playlistId));
-    // eslint-disable-next-line
-  }, [playlistId]);
+  if (error) {
+    return <MyContainer>{error.message}</MyContainer>;
+  }
 
-  React.useEffect(() => {
-    return () => {
-      dispatch(resetChannel());
-      dispatch(resetPlayListItems());
-    };
-    // eslint-disable-next-line
-  }, []);
-
-  React.useEffect(() => {
-    document.title = title + ' - Mini YouTube';
-  }, [title]);
-
-  if (errors.length) {
-    return (
-      <>
-        {errors.map((err: any, index: number) => (
-          <MyContainer key={index}>{err.message}</MyContainer>
-        ))}
-      </>
-    );
+  if (!isLoading && !channel) {
+    return <PageNotFound />;
   }
 
   return (
     <MyContainer>
-      {channelIsFetching === 'succeed' && playlistIsFetching === 'succeed' ? (
-        bannerExternalUrl && (
+      {!isLoading ? (
+        channel?.brandingSettings?.image?.bannerExternalUrl && (
           <div
             className={classes.banner}
             style={{
-              backgroundImage: `url(${bannerExternalUrl}${urlImageCropped})`,
+              backgroundImage: `url(${channel.brandingSettings.image.bannerExternalUrl}${urlImageCropped})`,
             }}
           />
         )
@@ -165,9 +112,12 @@ export default function Channel(): JSX.Element {
       <Box className={classes.channelHeader}>
         <Box display='flex' alignItems='center'>
           <Box mr='25px'>
-            {title ? (
-              <Avatar src={thumbUrl} className={classes.avatar}>
-                {getLastWord(title).charAt(0)}
+            {channel?.snippet?.title ? (
+              <Avatar
+                src={channel.snippet.thumbnails?.default?.url}
+                className={classes.avatar}
+              >
+                {getLastWord(channel.snippet.title).charAt(0)}
               </Avatar>
             ) : (
               <Skeleton animation={false} variant='circle'>
@@ -176,28 +126,28 @@ export default function Channel(): JSX.Element {
             )}
           </Box>
           <div>
-            {title ? (
+            {channel?.snippet?.title ? (
               <Typography variant='h5' className={classes.title}>
-                {title}
+                {channel.snippet.title}
               </Typography>
             ) : (
               <Skeleton animation={false} variant='text' width={150} />
             )}
-            {!subscriberCount ? (
+            {!channel?.statistics?.subscriberCount ? (
               <Skeleton animation={false} variant='text' width={100} />
             ) : (
               <Typography variant='body2' color='textSecondary'>
-                {formatSubscriptionCount(subscriberCount) + ' người đăng ký'}
+                {formatSubscriptionCount(channel.statistics.subscriberCount) +
+                  ' người đăng ký'}
               </Typography>
             )}
           </div>
         </Box>
-        {channelId && title && (
+        {channelId && channel?.snippet?.title && (
           <Box my='10px'>
             <SubscribeButton
-              exist={exist}
               channelId={channelId}
-              channelTitle={title}
+              channelTitle={channel.snippet.title}
             />
           </Box>
         )}
@@ -226,7 +176,7 @@ export default function Channel(): JSX.Element {
           path={url}
           render={() => (
             <TabPanel>
-              <Videos channelData={channelData} />
+              <Videos channelData={channel} />
             </TabPanel>
           )}
         />
@@ -234,7 +184,7 @@ export default function Channel(): JSX.Element {
           path={`${url}/about`}
           render={() => (
             <TabPanel>
-              <About channelData={channelData} />
+              <About channelData={channel} />
             </TabPanel>
           )}
         />

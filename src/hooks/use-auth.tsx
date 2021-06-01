@@ -1,7 +1,3 @@
-import { resetChannel } from 'app/channelSlice';
-import { useAppDispatch } from 'app/hook';
-import { resetPlayListItems } from 'app/playlistItemsSlice';
-import { resetSubscription } from 'app/subscriptionSlice';
 import React from 'react';
 
 type AuthContextType = ReturnType<typeof useProvideAuth>;
@@ -58,8 +54,6 @@ function initClient(updateSignInStatus: () => void) {
 }
 
 function useProvideAuth() {
-  const dispatch = useAppDispatch();
-
   // null is initial state _ true is sign-in _ false is sign-out.
   const [isSignedIn, setIsSignedIn] = React.useState<boolean | null>(null);
 
@@ -102,19 +96,11 @@ function useProvideAuth() {
   const signOut = () => GoogleAuth.signOut();
   const revokeAccess = () => GoogleAuth.disconnect();
 
-  // reset all state in redux 
-  const reset = () => {
-    dispatch(resetChannel());
-    dispatch(resetPlayListItems());
-    dispatch(resetSubscription());
-  };
-
   return {
     user,
     isSignedIn,
     signIn,
     signOut,
     revokeAccess,
-    reset,
   };
 }

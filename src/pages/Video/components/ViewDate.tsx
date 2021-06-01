@@ -1,7 +1,5 @@
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import { useAppSelector } from 'app/hook';
-import { selectVideo } from 'app/videoSlice';
 import { formatNumberWithDots, formatPublishAt } from 'helpers/format';
 import React from 'react';
 
@@ -16,9 +14,12 @@ const useStyles = makeStyles((theme: Theme) => {
   });
 });
 
-export default function ViewDate(): JSX.Element {
+export default function ViewDate({
+  videoData,
+}: {
+  videoData: gapi.client.youtube.Video;
+}): JSX.Element {
   const classes = useStyles();
-  const videoData = useAppSelector(selectVideo);
   const publishAt = videoData?.snippet?.publishedAt;
   const live = videoData?.snippet?.liveBroadcastContent;
   const viewCount = videoData?.statistics?.viewCount;

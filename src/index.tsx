@@ -1,15 +1,13 @@
 import CssBaseline from '@material-ui/core/CssBaseline';
 import {
-  unstable_createMuiStrictModeTheme as createMuiTheme,
   ThemeProvider,
+  unstable_createMuiStrictModeTheme as createMuiTheme,
 } from '@material-ui/core/styles';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import App from './App';
-import { store } from './app/store';
-import * as serviceWorker from './serviceWorker';
 import { SWRConfig } from 'swr';
+import App from './App';
+import * as serviceWorker from './serviceWorker';
 
 const theme = createMuiTheme({
   overrides: {
@@ -63,14 +61,12 @@ const swrConfigs = {
 
 ReactDOM.render(
   <React.StrictMode>
-    <Provider store={store}>
-      <SWRConfig value={swrConfigs}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <App />
-        </ThemeProvider>
-      </SWRConfig>
-    </Provider>
+    <SWRConfig value={swrConfigs}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <App />
+      </ThemeProvider>
+    </SWRConfig>
   </React.StrictMode>,
   document.getElementById('root')
 );

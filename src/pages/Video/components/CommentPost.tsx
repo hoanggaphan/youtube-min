@@ -1,17 +1,16 @@
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Input from '@material-ui/core/Input';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import useComment from 'app/useComment';
 import { getLastWord } from 'helpers/string';
 import { useAuth } from 'hooks/use-auth';
 import React from 'react';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import CommentHeader from './CommentHeader';
+import * as commentAPI from 'api/commentAPI';
 import ReactDOM from 'react-dom';
-import { useAppDispatch } from 'app/hook';
-import { insertComment } from 'app/commentSlice';
-import { unwrapResult } from '@reduxjs/toolkit';
 
 const useStyles = makeStyles((theme: Theme) => {
   return createStyles({
@@ -60,7 +59,7 @@ export default function CommentPost({
   const [show, setShow] = React.useState(false);
   const [value, setValue] = React.useState('');
   const [adding, setAdding] = React.useState(false);
-  const dispatch = useAppDispatch();
+  const { mutate } = useComment(videoId);
 
   const handleChange = (
     e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -71,11 +70,27 @@ export default function CommentPost({
   const handleClick = async () => {
     try {
       setAdding(true);
-      await dispatch(insertComment({ videoId, channelId, text: value })).then(
-        unwrapResult
-      );
-    } catch (err) {
-      alert(err.message);
+      const res = await commentAPI.insertByVideoId(videoId, value);
+      const newComment = res.result;
+
+      mutate((comments) => {
+        const newComments = [...comments!];
+        const firstComment = comments![0];
+
+        if (
+          firstComment.snippet?.topLevelComment?.snippet?.authorChannelId
+            ?.value === channelId
+        ) {
+          newComments.splice(1, 0, newComment);
+        } else {
+          newComments.unshift(newComment);
+        }
+
+        return newComments;
+      }, false);
+    } catch (error) {
+      // console.log(error);
+      alert('An error occurred while inserting comment');
     } finally {
       ReactDOM.unstable_batchedUpdates(() => {
         setValue('');
@@ -102,7 +117,7 @@ export default function CommentPost({
       <div className={`${classes.loader} ${!adding && classes.none}`}>
         <CircularProgress size={30} color='inherit' />
       </div>
-      
+
       <Box display='flex' className={`${adding && classes.none}`}>
         <Box mr='16px'>
           <Avatar src={user?.imgUrl}>
