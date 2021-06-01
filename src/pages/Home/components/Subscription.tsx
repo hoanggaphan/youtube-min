@@ -4,10 +4,10 @@ import Typography from '@material-ui/core/Typography';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import * as subscriptionAPI from 'api/subscriptionAPI';
+import useSubscription from 'app/useSubscription';
 import React from 'react';
 import ScrollMenu from 'react-horizontal-scrolling-menu';
 import { useHistory } from 'react-router';
-import useSWR from 'swr';
 import Arrow from './Arrow';
 import SubscriptionItem from './SubscriptionItem';
 import SubscriptionSkeleton from './SubscriptionSkeleton';
@@ -56,17 +56,6 @@ const SubscriptionList = (list: any) => {
   });
 };
 
-const fetch = async (url: string) => {
-  try {
-    const response = await subscriptionAPI.fetchList();
-    return response.result;
-  } catch (error) {
-    error.result.error.message =
-      'An error occurred while fetching subscription';
-    throw error.result.error;
-  }
-};
-
 export default React.memo(function Subscription(): JSX.Element {
   const classes = useStyles();
   const history = useHistory();
@@ -76,10 +65,7 @@ export default React.memo(function Subscription(): JSX.Element {
   const [allItemsWidth, setAllItemsWidth] = React.useState<number | null>(null);
   const [menuWidth, setMenuWidth] = React.useState<number | null>(null);
 
-  const { data, error, isValidating, mutate } = useSWR(
-    'api/subscription',
-    fetch
-  );
+  const { data, error, isLoading, mutate } = useSubscription();
   const nextPageToken = data?.nextPageToken;
   const subscriptions = data?.items;
 
@@ -157,7 +143,7 @@ export default React.memo(function Subscription(): JSX.Element {
       <Typography align='center' variant='h2' className={classes.title}>
         Kênh đăng ký
       </Typography>
-      {isValidating ? (
+      {isLoading ? (
         <SubscriptionSkeleton num={10} />
       ) : (
         <ScrollMenu

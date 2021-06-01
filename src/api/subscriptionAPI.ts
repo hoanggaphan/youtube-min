@@ -8,7 +8,7 @@ export function fetchList(pageToken?: string, maxResults: number = 25) {
   });
 }
 
-export function checkSubExist(channelId: string) {
+export function fetchStatus(channelId: string) {
   return gapi.client.youtube.subscriptions.list({
     part: ['snippet,contentDetails'],
     forChannelId: channelId,
@@ -16,13 +16,13 @@ export function checkSubExist(channelId: string) {
   });
 }
 
-export function deleteSub(id: string) {
+export function unSubscribe(id: string) {
   return gapi.client.youtube.subscriptions.delete({
     id,
   });
 }
 
-export function addSub(channelId: string) {
+export function subscribe(channelId: string) {
   return gapi.client.youtube.subscriptions.insert({
     part: ['snippet'],
     resource: {

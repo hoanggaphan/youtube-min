@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function About({
   channelData,
 }: {
-  channelData: null | gapi.client.youtube.Channel;
+  channelData: undefined | gapi.client.youtube.Channel;
 }): JSX.Element {
   const classes = useStyles();
 
@@ -45,67 +45,69 @@ export default function About({
   const publishAt = channelData?.snippet?.publishedAt;
   const viewCount = channelData?.statistics?.viewCount;
 
+  if (!channelData) {
+    return (
+      <>
+        <Skeleton animation={false} />
+        <Skeleton animation={false} />
+        <Skeleton animation={false} width='60%' />
+      </>
+    );
+  }
+
   return (
     <div className={classes.container}>
-      {!channelData ? (
-        <>
-          <Skeleton animation={false} />
-          <Skeleton animation={false} />
-          <Skeleton animation={false} width='60%' />
-        </>
-      ) : (
-        <Grid container className={classes.grid}>
-          <Grid item xs={12} sm={8}>
-            {description && (
-              <Box pb='32px' borderBottom='1px solid rgba(125,125,125, .2)'>
-                <Typography variant='subtitle1' className={classes.subTitle}>
-                  Mô tả
-                </Typography>
-                <FormattedString str={description} />
-              </Box>
-            )}
+      <Grid container className={classes.grid}>
+        <Grid item xs={12} sm={8}>
+          {description && (
+            <Box pb='32px' borderBottom='1px solid rgba(125,125,125, .2)'>
+              <Typography variant='subtitle1' className={classes.subTitle}>
+                Mô tả
+              </Typography>
+              <FormattedString str={description} />
+            </Box>
+          )}
 
-            {country && (
-              <Box pb='32px' borderBottom='1px solid rgba(125,125,125, .2)'>
-                <Typography variant='subtitle1' className={classes.subTitle}>
-                  Chi tiết
+          {country && (
+            <Box pb='32px' borderBottom='1px solid rgba(125,125,125, .2)'>
+              <Typography variant='subtitle1' className={classes.subTitle}>
+                Chi tiết
+              </Typography>
+              <div>
+                <Typography
+                  variant='caption'
+                  color='textSecondary'
+                  display='inline'
+                >
+                  {'Địa điểm: '}
                 </Typography>
-                <div>
-                  <Typography
-                    variant='caption'
-                    color='textSecondary'
-                    display='inline'
-                  >
-                    {'Địa điểm: '}
-                  </Typography>
-                  <Typography variant='caption' display='inline'>
-                    <IntlProvider locale='vi'>
-                      <FormattedDisplayName type='region' value={country} />
-                    </IntlProvider>
-                  </Typography>
-                </div>
-              </Box>
-            )}
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <Box py='12px' borderBottom='1px solid rgba(125,125,125, .2)'>
-              <Typography variant='subtitle1' className={classes.mt12}>
-                Thống kê
-              </Typography>
+                <Typography variant='caption' display='inline'>
+                  <IntlProvider locale='vi'>
+                    <FormattedDisplayName type='region' value={country} />
+                  </IntlProvider>
+                </Typography>
+              </div>
             </Box>
-            <Box py='12px' borderBottom='1px solid rgba(125,125,125, .2)'>
-              <Typography variant='body2'>
-                {publishAt && 'Đã tham gia ' + formatPublishAt(publishAt)}
-              </Typography>
-            </Box>
-            <Box py='12px' borderBottom='1px solid rgba(125,125,125, .2)'>
-              <Typography variant='body2'>
-                {viewCount && formatNumberWithDots(viewCount) + ' lượt xem'}
-              </Typography>
-            </Box>
-          </Grid>
+          )}
         </Grid>
-      )}
+        <Grid item xs={12} sm={4}>
+          <Box py='12px' borderBottom='1px solid rgba(125,125,125, .2)'>
+            <Typography variant='subtitle1' className={classes.mt12}>
+              Thống kê
+            </Typography>
+          </Box>
+          <Box py='12px' borderBottom='1px solid rgba(125,125,125, .2)'>
+            <Typography variant='body2'>
+              {publishAt && 'Đã tham gia ' + formatPublishAt(publishAt)}
+            </Typography>
+          </Box>
+          <Box py='12px' borderBottom='1px solid rgba(125,125,125, .2)'>
+            <Typography variant='body2'>
+              {viewCount && formatNumberWithDots(viewCount) + ' lượt xem'}
+            </Typography>
+          </Box>
+        </Grid>
+      </Grid>
     </div>
   );
 }

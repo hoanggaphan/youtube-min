@@ -74,7 +74,7 @@ export default function CommentItem({
   const handleHide = () => {
     setShow(false);
   };
-  console.log(replies);
+  
   const handleFetchNextReplies = async () => {
     if (!isFetching) {
       try {

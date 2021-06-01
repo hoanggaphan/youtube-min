@@ -5,21 +5,8 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import Skeleton from '@material-ui/lab/Skeleton';
-import { unwrapResult } from '@reduxjs/toolkit';
-import {
-  fetchChannelById,
-  resetChannel,
-  selectChannelIsFetching,
-  selectChannel,
-} from 'app/channelSlice';
-import { useAppDispatch, useAppSelector } from 'app/hook';
-import { checkSubscriptionExist, selectExist } from 'app/subscriptionSlice';
-import {
-  fetchVideoById,
-  resetVideo,
-  selectVideoIsFetching,
-  selectVideo,
-} from 'app/videoSlice';
+import useChannel from 'app/useChannel';
+import useVideo from 'app/useVideo';
 import FormattedString from 'components/FormattedString';
 import MyContainer from 'components/MyContainer';
 import SubscribeButton from 'components/SubscribeButton';
@@ -81,51 +68,28 @@ const useStyles = makeStyles((theme: Theme) => {
 
 export default function Video(): JSX.Element {
   const classes = useStyles();
-  const dispatch = useAppDispatch();
   const { player } = useIframeAPI('ytb-player');
   const query = useQuery();
-  const [errors, setErrors] = React.useState<any>([]);
 
   const videoId = query.get('v') || '';
   const start = query.get('t') || '';
-  const exist = useAppSelector(selectExist);
 
-  const channelIsFetching = useAppSelector(selectChannelIsFetching);
-  const channelData = useAppSelector(selectChannel);
-  const avatarChannel = channelData?.snippet?.thumbnails?.default?.url;
-  const channelTitle = channelData?.snippet?.title;
-  const subscriberCount = channelData?.statistics?.subscriberCount;
-
-  const videoIsFetching = useAppSelector(selectVideoIsFetching);
-  const videoData = useAppSelector(selectVideo);
+  const {
+    video: videoData,
+    error: videoError,
+    isLoading: videoIsValidating,
+  } = useVideo(videoId);
   const videoTitle = videoData?.snippet?.title;
   const description = videoData?.snippet?.description;
   const likeCount = videoData?.statistics?.likeCount;
   const dislikeCount = videoData?.statistics?.dislikeCount;
   const channelId = videoData?.snippet?.channelId;
 
-  React.useEffect(() => {
-    dispatch(fetchVideoById(videoId))
-      .then(unwrapResult)
-      .catch((error) => setErrors((prevState: any) => [...prevState, error]));
-    return () => {
-      dispatch(resetChannel());
-      dispatch(resetVideo());
-    };
-    // eslint-disable-next-line
-  }, []);
-
-  React.useEffect(() => {
-    if (!channelId) return;
-
-    dispatch(fetchChannelById(channelId))
-      .then(unwrapResult)
-      .catch((error) => setErrors((prevState: any) => [...prevState, error]));
-    dispatch(checkSubscriptionExist(channelId))
-      .then(unwrapResult)
-      .catch((error) => setErrors((prevState: any) => [...prevState, error]));
-    // eslint-disable-next-line
-  }, [channelId]);
+  const {
+    channel: channelData,
+    error: channelError,
+    isLoading: channelIsValidating,
+  } = useChannel(channelId);
 
   React.useEffect(() => {
     document.title = videoTitle + ' - Mini YouTube';
@@ -135,20 +99,19 @@ export default function Video(): JSX.Element {
     return <Redirect to='/home' />;
   }
 
-  if (errors.length) {
-    return (
-      <>
-        {errors.map((err: any, index: number) => (
-          <MyContainer key={index}>{err.message}</MyContainer>
-        ))}
-      </>
-    );
+  if (channelError) {
+    return <MyContainer>{channelError.message}</MyContainer>;
   }
-
-  return (
-    <MyContainer>
-      <Box p='24px'>
-        {videoIsFetching === 'failed' ? (
+  
+  if (
+    !videoIsValidating &&
+    !channelIsValidating &&
+    !videoData &&
+    !channelData
+  ) {
+    return (
+      <MyContainer>
+        <Box p='24px'>
           <div className={classes.iframeContainer}>
             <Box
               display='flex'
@@ -162,9 +125,16 @@ export default function Video(): JSX.Element {
               </span>
             </Box>
           </div>
-        ) : (
-          <div className={classes.iframeContainer}>
-            {/* <iframe
+        </Box>
+      </MyContainer>
+    );
+  }
+
+  return (
+    <MyContainer>
+      <Box p='24px'>
+        <div className={classes.iframeContainer}>
+          {/* <iframe
               id='ytb-player'
               className={classes.iframe}
               title='Youtube video player'
@@ -175,10 +145,9 @@ export default function Video(): JSX.Element {
               frameBorder='0'
               allowFullScreen
             /> */}
-          </div>
-        )}
+        </div>
 
-        {videoIsFetching === 'pending' ? (
+        {videoIsValidating ? (
           <Box p='20px 0 8px 0'>
             <Skeleton animation={false} width='50%' height='34px' />
             <Box width='100%' display='flex' justifyContent='space-between'>
@@ -228,7 +197,7 @@ export default function Video(): JSX.Element {
               </Box>
             </Box>
           </Box>
-        ) : videoIsFetching === 'succeed' ? (
+        ) : (
           <Box p='20px 0 8px 0'>
             <Typography variant='h5' className={classes.title}>
               {videoTitle}
@@ -238,10 +207,11 @@ export default function Video(): JSX.Element {
               justifyContent='space-between'
               alignItems='center'
             >
-              <ViewDate />
+              {videoData && <ViewDate videoData={videoData} />}
 
               <Box position='relative'>
-                <LikeDisLike />
+                {videoData && <LikeDisLike videoData={videoData} />}
+
                 <Tooltip
                   title={
                     <span className={classes.tooltipText}>
@@ -267,9 +237,9 @@ export default function Video(): JSX.Element {
               </Box>
             </Box>
           </Box>
-        ) : null}
+        )}
 
-        {channelIsFetching === 'pending' ? (
+        {!channelData ? (
           <div className={classes.metaContainer}>
             <Box
               display='flex'
@@ -292,7 +262,7 @@ export default function Video(): JSX.Element {
               <Skeleton animation={false} height='50px' width='100px' />
             </Box>
           </div>
-        ) : channelIsFetching === 'succeed' ? (
+        ) : (
           <div className={classes.metaContainer}>
             <Box
               display='flex'
@@ -300,29 +270,33 @@ export default function Video(): JSX.Element {
               alignItems='center'
             >
               <Box display='flex' flex='1' alignItems='center'>
-                <Avatar src={avatarChannel} className={classes.avatar}>
-                  {getLastWord(channelTitle!).charAt(0)}
+                <Avatar
+                  src={channelData?.snippet?.thumbnails?.default?.url}
+                  className={classes.avatar}
+                >
+                  {channelData?.snippet?.title &&
+                    getLastWord(channelData.snippet.title).charAt(0)}
                 </Avatar>
 
                 <div>
-                  <Typography variant='subtitle2'>{channelTitle}</Typography>
+                  <Typography variant='subtitle2'>
+                    {channelData?.snippet?.title}
+                  </Typography>
                   <Typography variant='caption'>
-                    {`${formatSubscriptionCount(
-                      subscriberCount!
-                    )} người đăng ký`}
+                    {channelData?.statistics?.subscriberCount &&
+                      `${formatSubscriptionCount(
+                        channelData.statistics.subscriberCount
+                      )} người đăng ký`}
                   </Typography>
                 </div>
               </Box>
 
-              {
-                <div>
-                  <SubscribeButton
-                    exist={exist}
-                    channelId={channelId!}
-                    channelTitle={channelTitle!}
-                  />
-                </div>
-              }
+              <div>
+                <SubscribeButton
+                  channelId={channelId!}
+                  channelTitle={channelData?.snippet?.title!}
+                />
+              </div>
             </Box>
 
             {description && (
@@ -333,9 +307,9 @@ export default function Video(): JSX.Element {
               </Box>
             )}
           </div>
-        ) : null}
+        )}
 
-        {channelIsFetching === 'succeed' && (
+        {channelData && (
           <Comments videoId={videoId} channelId={channelId!} player={player} />
         )}
       </Box>
