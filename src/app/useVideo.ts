@@ -13,15 +13,16 @@ const fetchVideo = async (url: string, videoId: string) => {
 };
 
 function useVideo(videoId: string | undefined) {
-  const { data, error, isValidating } = useSWR(
+  const { data, error, isValidating, mutate } = useSWR(
     videoId ? [`/api/video/list`, videoId] : null,
     fetchVideo
   );
-  
+
   return {
-    video: data,
-    error: error,
+    data,
+    error,
     isLoading: isValidating,
+    mutate,
   };
 }
 

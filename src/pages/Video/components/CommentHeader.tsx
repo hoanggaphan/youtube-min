@@ -31,7 +31,7 @@ export default function CommentHeader() {
   const videoId = query.get('v') || '';
 
   const {
-    video: videoData,
+    data: videoData,
     error: videoError,
     isLoading: videoIsValidating,
   } = useVideo(videoId);

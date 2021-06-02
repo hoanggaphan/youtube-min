@@ -19,7 +19,7 @@ function useComment(videoId: string | undefined) {
   );
 
   return {
-    comments: data,
+    data,
     error,
     isLoading: isValidating,
     mutate,

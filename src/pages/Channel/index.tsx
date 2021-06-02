@@ -68,7 +68,7 @@ export default function Channel(): JSX.Element {
   const { url } = useRouteMatch();
   const { pathname } = useLocation();
   const [value, setValue] = React.useState(pathname);
-  const { channel, error, isLoading } = useChannel(channelId);
+  const { data, error, isLoading } = useChannel(channelId);
 
   const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
     setValue(newValue);
@@ -83,25 +83,25 @@ export default function Channel(): JSX.Element {
   }, [pathname]);
 
   React.useEffect(() => {
-    document.title = channel?.snippet?.title + ' - Mini YouTube';
-  }, [channel?.snippet?.title]);
+    document.title = data?.snippet?.title + ' - Mini YouTube';
+  }, [data?.snippet?.title]);
 
   if (error) {
     return <MyContainer>{error.message}</MyContainer>;
   }
 
-  if (!isLoading && !channel) {
+  if (!isLoading && !data) {
     return <PageNotFound />;
   }
 
   return (
     <MyContainer>
       {!isLoading ? (
-        channel?.brandingSettings?.image?.bannerExternalUrl && (
+        data?.brandingSettings?.image?.bannerExternalUrl && (
           <div
             className={classes.banner}
             style={{
-              backgroundImage: `url(${channel.brandingSettings.image.bannerExternalUrl}${urlImageCropped})`,
+              backgroundImage: `url(${data.brandingSettings.image.bannerExternalUrl}${urlImageCropped})`,
             }}
           />
         )
@@ -112,12 +112,12 @@ export default function Channel(): JSX.Element {
       <Box className={classes.channelHeader}>
         <Box display='flex' alignItems='center'>
           <Box mr='25px'>
-            {channel?.snippet?.title ? (
+            {data?.snippet?.title ? (
               <Avatar
-                src={channel.snippet.thumbnails?.default?.url}
+                src={data.snippet.thumbnails?.default?.url}
                 className={classes.avatar}
               >
-                {getLastWord(channel.snippet.title).charAt(0)}
+                {getLastWord(data.snippet.title).charAt(0)}
               </Avatar>
             ) : (
               <Skeleton animation={false} variant='circle'>
@@ -126,28 +126,28 @@ export default function Channel(): JSX.Element {
             )}
           </Box>
           <div>
-            {channel?.snippet?.title ? (
+            {data?.snippet?.title ? (
               <Typography variant='h5' className={classes.title}>
-                {channel.snippet.title}
+                {data.snippet.title}
               </Typography>
             ) : (
               <Skeleton animation={false} variant='text' width={150} />
             )}
-            {!channel?.statistics?.subscriberCount ? (
+            {!data?.statistics?.subscriberCount ? (
               <Skeleton animation={false} variant='text' width={100} />
             ) : (
               <Typography variant='body2' color='textSecondary'>
-                {formatSubscriptionCount(channel.statistics.subscriberCount) +
+                {formatSubscriptionCount(data.statistics.subscriberCount) +
                   ' người đăng ký'}
               </Typography>
             )}
           </div>
         </Box>
-        {channelId && channel?.snippet?.title && (
+        {channelId && data?.snippet?.title && (
           <Box my='10px'>
             <SubscribeButton
               channelId={channelId}
-              channelTitle={channel.snippet.title}
+              channelTitle={data.snippet.title}
             />
           </Box>
         )}
@@ -176,7 +176,7 @@ export default function Channel(): JSX.Element {
           path={url}
           render={() => (
             <TabPanel>
-              <Videos channelData={channel} />
+              <Videos channelData={data} />
             </TabPanel>
           )}
         />
@@ -184,7 +184,7 @@ export default function Channel(): JSX.Element {
           path={`${url}/about`}
           render={() => (
             <TabPanel>
-              <About channelData={channel} />
+              <About channelData={data} />
             </TabPanel>
           )}
         />
