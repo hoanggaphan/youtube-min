@@ -75,7 +75,7 @@ export default function Video(): JSX.Element {
   const start = query.get('t') || '';
 
   const {
-    video: videoData,
+    data: videoData,
     error: videoError,
     isLoading: videoIsValidating,
   } = useVideo(videoId);
@@ -86,7 +86,7 @@ export default function Video(): JSX.Element {
   const channelId = videoData?.snippet?.channelId;
 
   const {
-    channel: channelData,
+    data: channelData,
     error: channelError,
     isLoading: channelIsValidating,
   } = useChannel(channelId);
@@ -102,7 +102,7 @@ export default function Video(): JSX.Element {
   if (channelError) {
     return <MyContainer>{channelError.message}</MyContainer>;
   }
-  
+
   if (
     !videoIsValidating &&
     !channelIsValidating &&
