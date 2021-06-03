@@ -29,10 +29,9 @@ const fetchPlaylistItems = async (url: string, playlistId: string) => {
     });
 
     return resPlaylistItems.result;
-  } catch (error) {
-    error.result.error.message =
-      'An error occurred while fetching playlistItems';
-    throw error.result.error;
+  } catch (err) {
+    err.result.error.message = 'An error occurred while fetching playlistItems';
+    throw err.result.error;
   }
 };
 
@@ -49,5 +48,7 @@ function usePlaylistItems(playlistId: string | undefined) {
     mutate,
   };
 }
+
+export type playlistItemsState = ReturnType<typeof usePlaylistItems>;
 
 export default usePlaylistItems;

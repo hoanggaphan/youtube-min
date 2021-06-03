@@ -3,12 +3,14 @@ import useSWR from 'swr';
 
 const fetchVideo = async (url: string, videoId: string) => {
   try {
-    const response = await videoAPI.fetchVideoById(videoId);
-    return response.result.items![0];
-  } catch (error) {
+    const res = await videoAPI.fetchVideoById(videoId);
+    if (res.result.items) {
+      return res.result.items[0];
+    }
+  } catch (err) {
     // All errors will be handled at component
-    error.result.error.message = 'An error occurred while fetching video';
-    throw error.result.error;
+    err.result.error.message = 'An error occurred while fetching video';
+    throw err.result.error;
   }
 };
 
@@ -25,5 +27,7 @@ function useVideo(videoId: string | undefined) {
     mutate,
   };
 }
+
+export type videoState = ReturnType<typeof useVideo>;
 
 export default useVideo;

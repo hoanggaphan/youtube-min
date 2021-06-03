@@ -6,6 +6,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Typography from '@material-ui/core/Typography';
 import Skeleton from '@material-ui/lab/Skeleton';
 import useChannel from 'app/useChannel';
+import usePlaylistItems from 'app/usePlaylistItems';
 import MyContainer from 'components/MyContainer';
 import SubscribeButton from 'components/SubscribeButton';
 import { formatSubscriptionCount } from 'helpers/format';
@@ -69,6 +70,10 @@ export default function Channel(): JSX.Element {
   const { pathname } = useLocation();
   const [value, setValue] = React.useState(pathname);
   const { data, error, isLoading } = useChannel(channelId);
+
+  const playlistItems = usePlaylistItems(
+    data?.contentDetails?.relatedPlaylists?.uploads
+  );
 
   const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
     setValue(newValue);
@@ -176,7 +181,7 @@ export default function Channel(): JSX.Element {
           path={url}
           render={() => (
             <TabPanel>
-              <Videos channelData={data} />
+              <Videos channelData={data} playlistItems={playlistItems} />
             </TabPanel>
           )}
         />

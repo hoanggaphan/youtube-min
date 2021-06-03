@@ -3,12 +3,11 @@ import * as subscriptionAPI from 'api/subscriptionAPI';
 
 const fetchSubscription = async (url: string) => {
   try {
-    const response = await subscriptionAPI.fetchList();
-    return response.result;
-  } catch (error) {
-    error.result.error.message =
-      'An error occurred while fetching subscription';
-    throw error.result.error;
+    const res = await subscriptionAPI.fetchList();
+    return res.result;
+  } catch (err) {
+    err.result.error.message = 'An error occurred while fetching subscription';
+    throw err.result.error;
   }
 };
 
@@ -25,5 +24,7 @@ function useSubscription() {
     mutate,
   };
 }
+
+export type subscriptionState = ReturnType<typeof useSubscription>;
 
 export default useSubscription;
