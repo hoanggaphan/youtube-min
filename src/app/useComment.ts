@@ -6,9 +6,9 @@ const fetchComments = async (url: string, videoId: string) => {
     const res = await commentAPI.fetchListByVideoId(videoId);
     const data = res.result.items!;
     return data;
-  } catch (error) {
-    error.result.error.message = 'An error occurred while fetching comment';
-    throw error.result.error;
+  } catch (err) {
+    err.result.error.message = 'An error occurred while fetching comment';
+    throw err.result.error;
   }
 };
 
@@ -25,5 +25,7 @@ function useComment(videoId: string | undefined) {
     mutate,
   };
 }
+
+export type commentState = ReturnType<typeof useComment>;
 
 export default useComment;

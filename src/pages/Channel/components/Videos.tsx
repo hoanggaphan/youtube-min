@@ -3,8 +3,9 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import * as playlistItemsAPI from 'api/playListItemsAPI';
 import * as videoAPI from 'api/videoAPI';
-import usePlaylistItems from 'app/usePlaylistItems';
+import { playlistItemsState } from 'app/usePlaylistItems';
 import React from 'react';
+import { useParams } from 'react-router';
 import VideoItem from './VideoItem';
 import VideosSkeleton from './VideosSkeleton';
 
@@ -84,8 +85,10 @@ const fetchNextPlaylistItems = async (
 
 export default React.memo(function Videos({
   channelData,
+  playlistItems,
 }: {
   channelData: undefined | gapi.client.youtube.Channel;
+  playlistItems: playlistItemsState;
 }): JSX.Element {
   const classes = useStyles();
   const loader = React.useRef<HTMLDivElement | null>(null);
@@ -93,8 +96,8 @@ export default React.memo(function Videos({
 
   const playlistId = channelData?.contentDetails?.relatedPlaylists?.uploads;
 
-  const { data, error, isLoading, mutate } = usePlaylistItems(playlistId);
-  const playListItems = data?.items!;
+  const { data, error, isLoading, mutate } = playlistItems;
+  const playlistItemsData = data?.items!;
   const nextPageToken = data?.nextPageToken;
 
   React.useEffect(() => {
@@ -105,7 +108,7 @@ export default React.memo(function Videos({
         try {
           const res = await fetchNextPlaylistItems(playlistId, nextPageToken);
           res.items = [...data?.items!, ...res.items!];
-          mutate(res, false);
+          await mutate(res, false);
         } catch (error) {
           alert(error.message);
         }
@@ -127,7 +130,7 @@ export default React.memo(function Videos({
   }, [nextPageToken, playlistId]);
 
   function renderList() {
-    return playListItems?.map((item: any) => (
+    return playlistItemsData?.map((item: any) => (
       <VideoItem key={item.id} item={item} />
     ));
   }
@@ -157,11 +160,13 @@ export default React.memo(function Videos({
   return (
     <Box mb='24px'>
       <div className={classes.grid}>{renderList()}</div>
-      {nextPageToken && (
-        <div ref={loader} className={classes.loader}>
-          <CircularProgress size={30} />
-        </div>
-      )}
+      <div
+        ref={loader}
+        style={{ display: nextPageToken ? 'block' : 'none' }}
+        className={classes.loader}
+      >
+        <CircularProgress size={30} />
+      </div>
     </Box>
   );
 });
