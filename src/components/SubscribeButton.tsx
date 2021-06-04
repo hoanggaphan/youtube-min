@@ -3,7 +3,11 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
+import IconButton from '@material-ui/core/IconButton';
+import Snackbar from '@material-ui/core/Snackbar';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import CloseIcon from '@material-ui/icons/Close';
+import Skeleton from '@material-ui/lab/Skeleton';
 import * as subscriptionAPI from 'api/subscriptionAPI';
 import React from 'react';
 import useSWR from 'swr';
@@ -55,10 +59,23 @@ export default function SubscribeButton({
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
 
-  const { data, error, isValidating, mutate } = useSWR(
+  const { data, error, mutate } = useSWR(
     ['api/subscription/status', channelId],
     fetchStatus
   );
+
+  const [errorSnack, setErrorSnack] = React.useState('');
+
+  const handleCloseSnack = (
+    event: React.SyntheticEvent | React.MouseEvent,
+    reason?: string
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setErrorSnack('');
+  };
 
   const handleOpen = () => {
     setOpen(true);
@@ -74,7 +91,7 @@ export default function SubscribeButton({
       mutate([], false);
     } catch (error) {
       // console.log(error);
-      alert('An error occurred while deleting subscription');
+      setErrorSnack('An error occurred while deleting subscription');
     } finally {
       setOpen(false);
     }
@@ -86,7 +103,7 @@ export default function SubscribeButton({
       mutate([res.result], false);
     } catch (error) {
       // console.log(error);
-      alert('An error occurred while deleting subscription');
+      setErrorSnack('An error occurred while subscripting');
     }
   };
 
@@ -94,10 +111,36 @@ export default function SubscribeButton({
     return <div>{error.message}</div>;
   }
 
-  if (isValidating) return <></>;
+  if (!data) return <Skeleton animation={false} height='50px' width='100px' />;
 
   return (
     <>
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        open={!!errorSnack}
+        autoHideDuration={6000}
+        onClose={handleCloseSnack}
+        message={errorSnack}
+        action={
+          <>
+            <Button color='secondary' size='small' onClick={handleCloseSnack}>
+              UNDO
+            </Button>
+            <IconButton
+              size='small'
+              aria-label='close'
+              color='inherit'
+              onClick={handleCloseSnack}
+            >
+              <CloseIcon fontSize='small' />
+            </IconButton>
+          </>
+        }
+      />
+
       <Button
         className={`${classes.registeredBtn} ${!data?.length && classes.none}`}
         variant='contained'

@@ -5,7 +5,6 @@ import * as playlistItemsAPI from 'api/playListItemsAPI';
 import * as videoAPI from 'api/videoAPI';
 import { playlistItemsState } from 'app/usePlaylistItems';
 import React from 'react';
-import { useParams } from 'react-router';
 import VideoItem from './VideoItem';
 import VideosSkeleton from './VideosSkeleton';
 
@@ -30,14 +29,9 @@ const useStyles = makeStyles((theme: Theme) =>
         gridTemplateColumns: 'repeat(5, 210px)',
       },
     },
-
     loader: {
       margin: '24px auto 0',
       width: 'fit-content',
-    },
-
-    mt24: {
-      marginTop: '24px',
     },
   })
 );

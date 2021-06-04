@@ -27,9 +27,6 @@ const useStyles = makeStyles((theme: Theme) =>
     mt2: {
       marginTop: theme.spacing(2),
     },
-    mt8: {
-      marginTop: theme.spacing(8),
-    },
     mx: {
       marginTop: theme.spacing(6),
       marginBottom: theme.spacing(6),

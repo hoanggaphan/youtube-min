@@ -103,6 +103,10 @@ export default function Video(): JSX.Element {
     return <MyContainer>{channelError.message}</MyContainer>;
   }
 
+  if (videoError) {
+    return <MyContainer>{videoError.message}</MyContainer>;
+  }
+
   if (
     !videoIsValidating &&
     !channelIsValidating &&
@@ -135,16 +139,16 @@ export default function Video(): JSX.Element {
       <Box p='24px'>
         <div className={classes.iframeContainer}>
           {/* <iframe
-              id='ytb-player'
-              className={classes.iframe}
-              title='Youtube video player'
-              src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1${
-                start && '&start=' + start
-              }`}
-              allow='autoplay'
-              frameBorder='0'
-              allowFullScreen
-            /> */}
+            id='ytb-player'
+            className={classes.iframe}
+            title='Youtube video player'
+            src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1${
+              start && '&start=' + start
+            }`}
+            allow='autoplay'
+            frameBorder='0'
+            allowFullScreen
+          /> */}
         </div>
 
         {videoIsValidating ? (
@@ -268,6 +272,7 @@ export default function Video(): JSX.Element {
               display='flex'
               justifyContent='space-between'
               alignItems='center'
+              minHeight='50px'
             >
               <Box display='flex' flex='1' alignItems='center'>
                 <Avatar

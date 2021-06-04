@@ -30,12 +30,8 @@ export default function CommentHeader() {
   const query = useQuery();
   const videoId = query.get('v') || '';
 
-  const {
-    data: videoData,
-    error: videoError,
-    isLoading: videoIsValidating,
-  } = useVideo(videoId);
-  const commentCount = videoData?.statistics?.commentCount;
+  const { data } = useVideo(videoId);
+  const commentCount = data?.statistics?.commentCount;
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);

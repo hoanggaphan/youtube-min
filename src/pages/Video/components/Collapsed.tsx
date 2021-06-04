@@ -42,7 +42,7 @@ export default function Collapsed({
   const [collapsed, setCollapsed] = React.useState(false);
   const [expanded, setExpanded] = React.useState(false);
 
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     if (collapsedRef.current && collapsedRef.current.offsetHeight > height) {
       setCollapsed(true);
     }
