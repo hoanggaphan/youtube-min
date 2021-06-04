@@ -26,9 +26,6 @@ const useStyles = makeStyles((theme: Theme) => {
     likeCountText: {
       fontWeight: 500,
     },
-    tooltip: {
-      margin: '0',
-    },
     tooltipText: {
       fontSize: '12px',
     },
@@ -92,7 +89,7 @@ export default React.memo(function LikeDisLike({
   };
 
   return (
-    <Box display='flex' minWidth='135px'>
+    <Box display='flex'>
       {!isValidating && !data && (
         <Snackbar
           className={classes.snackBar}
@@ -125,11 +122,10 @@ export default React.memo(function LikeDisLike({
       )}
 
       <Tooltip
-        className={classes.tooltip}
         title={<span className={classes.tooltipText}>Tôi thích video này</span>}
         placement='bottom'
       >
-        <div className={classes.likeContainer}>
+        <Box mr='7.5px' className={classes.likeContainer}>
           {rating === 'like' ? (
             <IconButton
               onClick={() => handleRate('none')}
@@ -149,7 +145,7 @@ export default React.memo(function LikeDisLike({
           <span className={classes.likeCountText}>
             {likeCount && formatLikeCount(likeCount)}
           </span>
-        </div>
+        </Box>
       </Tooltip>
       <Tooltip
         title={
@@ -157,7 +153,7 @@ export default React.memo(function LikeDisLike({
         }
         placement='bottom'
       >
-        <Box ml='15px' className={classes.likeContainer}>
+        <Box ml='7.5px' pr='6px' className={classes.likeContainer}>
           {rating === 'dislike' ? (
             <IconButton
               onClick={() => handleRate('none')}
