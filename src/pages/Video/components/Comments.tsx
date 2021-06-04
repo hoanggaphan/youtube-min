@@ -29,7 +29,7 @@ export default React.memo(function Comments({
   player?: any;
 }) {
   const classes = useStyles();
-  const { data, error, isLoading } = useComment(videoId);
+  const { data, error } = useComment(videoId);
 
   if (error) {
     if (error.code === 403 && error.errors[0].reason === 'commentsDisabled') {
