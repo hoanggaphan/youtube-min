@@ -1,15 +1,14 @@
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import Input from '@material-ui/core/Input';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import * as commentAPI from 'api/commentAPI';
 import useComment from 'app/useComment';
+import Spinner from 'components/Spinner';
 import { getLastWord } from 'helpers/string';
 import { useAuth } from 'hooks/use-auth';
 import React from 'react';
-import CommentHeader from './CommentHeader';
-import * as commentAPI from 'api/commentAPI';
 import ReactDOM from 'react-dom';
 
 const useStyles = makeStyles((theme: Theme) => {
@@ -112,11 +111,12 @@ export default function CommentPost({
   };
 
   return (
-    <Box mt='24px' mb='32px'>
-      <CommentHeader />
-      <div className={`${classes.loader} ${!adding && classes.none}`}>
-        <CircularProgress size={30} color='inherit' />
-      </div>
+    <Box mb='32px'>
+      {adding && (
+        <div className={classes.loader}>
+          <Spinner />
+        </div>
+      )}
 
       <Box display='flex' className={`${adding && classes.none}`}>
         <Box mr='16px'>

@@ -1,14 +1,14 @@
-import CircularProgress from '@material-ui/core/CircularProgress';
 import Box from '@material-ui/core/Box';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import * as commentAPI from 'api/commentAPI';
-import React from 'react';
-import CommentCard from './CommentCard';
-import SubdirectoryArrowRightIcon from '@material-ui/icons/SubdirectoryArrowRight';
-import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
+import SubdirectoryArrowRightIcon from '@material-ui/icons/SubdirectoryArrowRight';
+import * as commentAPI from 'api/commentAPI';
+import Spinner from 'components/Spinner';
+import React from 'react';
 import ReactDOM from 'react-dom';
+import CommentCard from './CommentCard';
 
 const useStyles = makeStyles((theme: Theme) => {
   return createStyles({
@@ -74,7 +74,7 @@ export default function CommentItem({
   const handleHide = () => {
     setShow(false);
   };
-  
+
   const handleFetchNextReplies = async () => {
     if (!isFetching) {
       try {
@@ -104,39 +104,41 @@ export default function CommentItem({
       <CommentCard item={item} player={player} />
       {item.replies && (
         <Box ml='56px'>
-          <Box
-            onClick={handleShow}
-            width='fit-content'
-            display='flex'
-            alignItems='center'
-            pb='10px'
-            className={`${classes.userSelect} ${show && classes.none}`}
-          >
-            <ArrowDropDownIcon className={classes.arrowIcon} />
-            <Typography
-              variant='subtitle2'
-              className={`${classes.textMore} ${classes.ml8}`}
+          {!show ? (
+            <Box
+              onClick={handleShow}
+              width='fit-content'
+              display='flex'
+              alignItems='center'
+              pb='10px'
+              className={classes.userSelect}
             >
-              Xem câu trả lời
-            </Typography>
-          </Box>
-
-          <Box
-            onClick={handleHide}
-            width='fit-content'
-            display='flex'
-            alignItems='center'
-            pb='10px'
-            className={`${classes.userSelect} ${!show && classes.none}`}
-          >
-            <ArrowDropUpIcon className={classes.arrowIcon} />
-            <Typography
-              variant='subtitle2'
-              className={`${classes.textMore} ${classes.ml8}`}
+              <ArrowDropDownIcon className={classes.arrowIcon} />
+              <Typography
+                variant='subtitle2'
+                className={`${classes.textMore} ${classes.ml8}`}
+              >
+                Xem câu trả lời
+              </Typography>
+            </Box>
+          ) : (
+            <Box
+              onClick={handleHide}
+              width='fit-content'
+              display='flex'
+              alignItems='center'
+              pb='10px'
+              className={classes.userSelect}
             >
-              Ẩn phản hồi
-            </Typography>
-          </Box>
+              <ArrowDropUpIcon className={classes.arrowIcon} />
+              <Typography
+                variant='subtitle2'
+                className={`${classes.textMore} ${classes.ml8}`}
+              >
+                Ẩn phản hồi
+              </Typography>
+            </Box>
+          )}
 
           <div className={`${!show && classes.none}`}>
             <div>
@@ -150,15 +152,13 @@ export default function CommentItem({
               ))}
             </div>
 
-            {nextPageToken && (
+            {nextPageToken && !isFetching && (
               <Box
                 width='fit-content'
                 display='flex'
                 alignItems='center'
                 pb='10px'
-                className={`${classes.userSelect} ${
-                  isFetching && classes.none
-                }`}
+                className={classes.userSelect}
                 onClick={handleFetchNextReplies}
               >
                 <Box ml='8px' mr='12px'>
@@ -170,13 +170,11 @@ export default function CommentItem({
               </Box>
             )}
 
-            <Box
-              className={`${!isFetching && classes.none}`}
-              pt='16px'
-              pb='10px'
-            >
-              <CircularProgress size={30} color='inherit' />
-            </Box>
+            {isFetching && (
+              <Box pt='16px' pb='10px'>
+                <Spinner />
+              </Box>
+            )}
           </div>
         </Box>
       )}
