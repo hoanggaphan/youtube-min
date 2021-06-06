@@ -62,7 +62,7 @@ export default React.memo(function LikeDisLike({
   const rating = data?.rating;
   const likeCount = videoData?.statistics?.likeCount;
   const dislikeCount = videoData?.statistics?.dislikeCount;
-
+console.log(videoData)
   const [open, setOpen] = React.useState(true);
 
   const handleClose = (
