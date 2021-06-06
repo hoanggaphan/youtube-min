@@ -57,7 +57,7 @@ const useStyles = makeStyles((theme: Theme) => {
       padding: '16px 0',
       borderTop: '1px solid #0000001a',
       borderBottom: '1px solid #0000001a',
-      marginBlock: '24px',
+      marginBottom: '24px',
     },
     avatar: {
       width: '48px',
@@ -217,28 +217,27 @@ export default function Video(): JSX.Element {
               <Box position='relative'>
                 {videoData && <LikeDisLike videoData={videoData} />}
 
-                <Tooltip
-                  title={
-                    <span className={classes.tooltipText}>
-                      {likeCount &&
-                        dislikeCount &&
-                        `${formatNumberWithDots(
-                          likeCount
-                        )} / ${formatNumberWithDots(dislikeCount)}`}
-                    </span>
-                  }
-                  placement='top'
-                >
-                  <Box
-                    width='100%'
-                    pt='6px'
-                    pb='28px'
-                    position='absolute'
-                    left='0'
+                {likeCount && dislikeCount && (
+                  <Tooltip
+                    title={
+                      <span className={classes.tooltipText}>
+                        `${formatNumberWithDots(likeCount)} / $
+                        {formatNumberWithDots(dislikeCount)}`
+                      </span>
+                    }
+                    placement='top'
                   >
-                    <Box height='2px' bgcolor='#737373'></Box>
-                  </Box>
-                </Tooltip>
+                    <Box
+                      width='100%'
+                      pt='6px'
+                      pb='28px'
+                      position='absolute'
+                      left='0'
+                    >
+                      <Box height='2px' bgcolor='#737373'></Box>
+                    </Box>
+                  </Tooltip>
+                )}
               </Box>
             </Box>
           </Box>
