@@ -12,9 +12,9 @@ const fetchComments = async (url: string, videoId: string) => {
   }
 };
 
-function useComment(videoId: string | undefined) {
+function useComment(videoId: string | undefined, load?: boolean) {
   const { data, error, isValidating, mutate } = useSWR(
-    videoId ? ['api/comment/list', videoId] : null,
+    videoId && load ? ['api/comment/list', videoId] : null,
     fetchComments
   );
 

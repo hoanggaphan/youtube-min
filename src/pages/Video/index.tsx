@@ -57,6 +57,7 @@ const useStyles = makeStyles((theme: Theme) => {
       padding: '16px 0',
       borderTop: '1px solid #0000001a',
       borderBottom: '1px solid #0000001a',
+      marginBlock: '24px',
     },
     avatar: {
       width: '48px',
@@ -136,7 +137,7 @@ export default function Video(): JSX.Element {
 
   return (
     <MyContainer>
-      <Box p='24px'>
+      <Box p='24px' mb='100px'>
         <div className={classes.iframeContainer}>
           {/* <iframe
             id='ytb-player'
@@ -151,7 +152,7 @@ export default function Video(): JSX.Element {
           /> */}
         </div>
 
-        {videoIsValidating ? (
+        {!videoData ? (
           <Box p='20px 0 8px 0'>
             <Skeleton animation={false} width='50%' height='34px' />
             <Box width='100%' display='flex' justifyContent='space-between'>
