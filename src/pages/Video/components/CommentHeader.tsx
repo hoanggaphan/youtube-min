@@ -40,7 +40,7 @@ export default function CommentHeader({
   const { data } = useVideo(videoId);
   const commentCount = data?.statistics?.commentCount;
 
-  const { mutate } = useComment(videoId);
+  const { mutate } = useComment(videoId, true);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -75,7 +75,7 @@ export default function CommentHeader({
   const open = Boolean(anchorEl);
 
   return (
-    <Box my='24px'>
+    <Box mb='24px'>
       <Box>
         <Typography component='span' className={classes.commentCount}>
           {commentCount && formatNumberWithDots(commentCount)} bình luận

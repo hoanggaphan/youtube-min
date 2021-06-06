@@ -11,11 +11,11 @@ const useStyles = makeStyles((theme: Theme) =>
 
     spinner: {
       display: 'inline-block',
-      width: '2rem',
-      height: '2rem',
+      width: '1.7rem',
+      height: '1.7rem',
       verticalAlign: 'text-bottom',
-      border: '.25em solid',
-      borderRight: '.25em solid transparent',
+      border: '.20em solid',
+      borderRight: '.20em solid transparent',
       borderRadius: '50%',
       animation: '$spinner .75s linear infinite',
     },

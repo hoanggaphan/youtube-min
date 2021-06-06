@@ -10,8 +10,10 @@ import CommentPost from './CommentPost';
 const useStyles = makeStyles((theme: Theme) => {
   return createStyles({
     loader: {
-      margin: '24px auto 0',
-      width: 'fit-content',
+      display: 'inline-block',
+      width: '100%',
+      textAlign: 'center',
+      marginTop: '24px',
     },
     sortingLoader: {
       position: 'absolute',
@@ -39,8 +41,33 @@ export default React.memo(function Comments({
   player?: any;
 }) {
   const classes = useStyles();
-  const { data, error } = useComment(videoId);
+
+  const observer = React.useRef<any>(null);
+  const loader = React.useRef<HTMLDivElement | null>(null);
+
+  const [load, setLoad] = React.useState(false);
   const [sorting, setSorting] = React.useState(false);
+
+  const { data, error } = useComment(videoId, load);
+
+  React.useEffect(() => {
+    const handleObserver = async (entities: IntersectionObserverEntry[]) => {
+      if (entities[0].isIntersecting) {
+        setLoad(true);
+      }
+    };
+
+    if (observer.current) observer.current.disconnect();
+
+    observer.current = new IntersectionObserver(handleObserver);
+
+    if (loader.current) {
+      observer.current.observe(loader.current);
+    }
+
+    return () => observer.current.disconnect();
+    // eslint-disable-next-line
+  }, []);
 
   if (error) {
     if (error.code === 403 && error.errors[0].reason === 'commentsDisabled') {
@@ -62,17 +89,17 @@ export default React.memo(function Comments({
     return <>{error.message}</>;
   }
 
+  const handleSorting = (status: boolean) => {
+    setSorting(status);
+  };
+
   if (!data)
     return (
-      <div className={classes.loader}>
+      <div ref={loader} className={classes.loader}>
         <Spinner />
       </div>
     );
 
-  const handleSorting = (status: boolean) => {
-    setSorting(status);
-  };
-  
   return (
     <Box position='relative' maxWidth='805px'>
       <div className={`${sorting ? classes.opacity : ''}`}>
