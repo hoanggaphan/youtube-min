@@ -72,7 +72,7 @@ export default React.memo(function Comments({
   const handleSorting = (status: boolean) => {
     setSorting(status);
   };
-  console.log(1);
+  
   return (
     <Box position='relative' maxWidth='805px'>
       <div className={`${sorting ? classes.opacity : ''}`}>
