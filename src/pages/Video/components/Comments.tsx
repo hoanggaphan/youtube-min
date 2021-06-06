@@ -1,8 +1,9 @@
 import Box from '@material-ui/core/Box';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import useComment from 'app/useComment';
+import Spinner from 'components/Spinner';
 import React from 'react';
+import CommentHeader from './CommentHeader';
 import CommentItem from './CommentItem';
 import CommentPost from './CommentPost';
 
@@ -11,6 +12,15 @@ const useStyles = makeStyles((theme: Theme) => {
     loader: {
       margin: '24px auto 0',
       width: 'fit-content',
+    },
+    sortingLoader: {
+      position: 'absolute',
+      left: '50%',
+      top: '250px',
+      transform: 'translateX(-50%)',
+    },
+    opacity: {
+      opacity: '.25',
     },
     link: {
       textDecoration: 'none',
@@ -30,6 +40,7 @@ export default React.memo(function Comments({
 }) {
   const classes = useStyles();
   const { data, error } = useComment(videoId);
+  const [sorting, setSorting] = React.useState(false);
 
   if (error) {
     if (error.code === 403 && error.errors[0].reason === 'commentsDisabled') {
@@ -54,16 +65,28 @@ export default React.memo(function Comments({
   if (!data)
     return (
       <div className={classes.loader}>
-        <CircularProgress size={30} color='inherit' />
+        <Spinner />
       </div>
     );
 
+  const handleSorting = (status: boolean) => {
+    setSorting(status);
+  };
+  console.log(1);
   return (
-    <Box maxWidth='805px'>
-      <CommentPost videoId={videoId} channelId={channelId} />
-      {data.map((item: gapi.client.youtube.CommentThread) => (
-        <CommentItem key={item.id} item={item} player={player} />
-      ))}
+    <Box position='relative' maxWidth='805px'>
+      <div className={`${sorting ? classes.opacity : ''}`}>
+        <CommentHeader sorting={handleSorting} />
+        <CommentPost videoId={videoId} channelId={channelId} />
+        {data.map((item: gapi.client.youtube.CommentThread) => (
+          <CommentItem key={item.id} item={item} player={player} />
+        ))}
+      </div>
+      {sorting && (
+        <div className={classes.sortingLoader}>
+          <Spinner />
+        </div>
+      )}
     </Box>
   );
 });

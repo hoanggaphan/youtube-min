@@ -11,6 +11,8 @@ import Collapsed from './Collapsed';
 import IconButton from '@material-ui/core/IconButton';
 import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
+import LazyLoad from 'react-lazyload';
+import Skeleton from '@material-ui/lab/Skeleton';
 
 const useStyles = makeStyles((theme: Theme) => {
   return createStyles({
@@ -71,14 +73,20 @@ export default function CommentCard({
   return (
     <Box display='flex'>
       <Box mr='16px'>
-        <Avatar
-          component={Box}
-          width={size}
-          height={size}
-          src={snippet.authorProfileImageUrl}
+        <LazyLoad
+          placeholder={<Skeleton variant='circle' width={size} height={size} />}
+          once
+          offset={400}
         >
-          {getLastWord(snippet.authorDisplayName).charAt(0)}
-        </Avatar>
+          <Avatar
+            component={Box}
+            width={size}
+            height={size}
+            src={snippet.authorProfileImageUrl}
+          >
+            {getLastWord(snippet.authorDisplayName).charAt(0)}
+          </Avatar>
+        </LazyLoad>
       </Box>
 
       <Box>

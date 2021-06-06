@@ -35,9 +35,6 @@ const useStyles = makeStyles((theme: Theme) =>
         backgroundColor: theme.palette.secondary.main,
       },
     },
-    none: {
-      display: 'none',
-    },
   })
 );
 
@@ -141,26 +138,28 @@ export default function SubscribeButton({
         }
       />
 
-      <Button
-        className={`${classes.registeredBtn} ${!data?.length && classes.none}`}
-        variant='contained'
-        disableElevation
-        disableRipple
-        onClick={handleOpen}
-      >
-        Đã đăng ký
-      </Button>
-
-      <Button
-        className={`${classes.registerBtn} ${data?.length && classes.none}`}
-        color='secondary'
-        variant='contained'
-        disableElevation
-        disableRipple
-        onClick={handleSubscribe}
-      >
-        Đăng ký
-      </Button>
+      {data?.length ? (
+        <Button
+          className={classes.registeredBtn}
+          variant='contained'
+          disableElevation
+          disableRipple
+          onClick={handleOpen}
+        >
+          Đã đăng ký
+        </Button>
+      ) : (
+        <Button
+          className={classes.registerBtn}
+          color='secondary'
+          variant='contained'
+          disableElevation
+          disableRipple
+          onClick={handleSubscribe}
+        >
+          Đăng ký
+        </Button>
+      )}
 
       <Dialog open={open} onClose={handleClose}>
         <DialogContent>

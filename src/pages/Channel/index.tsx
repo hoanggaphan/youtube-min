@@ -6,7 +6,6 @@ import Tabs from '@material-ui/core/Tabs';
 import Typography from '@material-ui/core/Typography';
 import Skeleton from '@material-ui/lab/Skeleton';
 import useChannel from 'app/useChannel';
-import usePlaylistItems from 'app/usePlaylistItems';
 import MyContainer from 'components/MyContainer';
 import SubscribeButton from 'components/SubscribeButton';
 import { formatSubscriptionCount } from 'helpers/format';
@@ -14,9 +13,8 @@ import { getLastWord } from 'helpers/string';
 import PageNotFound from 'pages/NotFound';
 import React from 'react';
 import { Route, useLocation, useParams, useRouteMatch } from 'react-router';
-import { Link, Switch } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import About from './components/About';
-import TabPanel from './components/TabPanel';
 import Videos from './components/Videos';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -70,10 +68,6 @@ export default function Channel(): JSX.Element {
   const { pathname } = useLocation();
   const [value, setValue] = React.useState(pathname);
   const { data, error, isLoading } = useChannel(channelId);
-
-  const playlistItems = usePlaylistItems(
-    data?.contentDetails?.relatedPlaylists?.uploads
-  );
 
   const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
     setValue(newValue);
@@ -175,25 +169,35 @@ export default function Channel(): JSX.Element {
         />
       </Tabs>
 
-      <Switch>
-        <Route
-          exact
-          path={url}
-          render={() => (
-            <TabPanel>
-              <Videos channelData={data} playlistItems={playlistItems} />
-            </TabPanel>
-          )}
-        />
-        <Route
-          path={`${url}/about`}
-          render={() => (
-            <TabPanel>
+      <Route
+        exact
+        path={url}
+        children={({ match }) => {
+          return (
+            <Box
+              pt='25px'
+              style={{ display: match?.path === url ? 'block' : 'none' }}
+            >
+              <Videos channelData={data} />
+            </Box>
+          );
+        }}
+      />
+      <Route
+        path={`${url}/about`}
+        children={({ match }) => {
+          return (
+            <Box
+              pt='25px'
+              style={{
+                display: match?.path === `${url}/about` ? 'block' : 'none',
+              }}
+            >
               <About channelData={data} />
-            </TabPanel>
-          )}
-        />
-      </Switch>
+            </Box>
+          );
+        }}
+      />
     </MyContainer>
   );
 }

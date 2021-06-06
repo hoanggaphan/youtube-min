@@ -1,9 +1,9 @@
 import Box from '@material-ui/core/Box';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import * as playlistItemsAPI from 'api/playListItemsAPI';
 import * as videoAPI from 'api/videoAPI';
-import { playlistItemsState } from 'app/usePlaylistItems';
+import usePlaylistItems from 'app/usePlaylistItems';
+import Spinner from 'components/Spinner';
 import React from 'react';
 import VideoItem from './VideoItem';
 import VideosSkeleton from './VideosSkeleton';
@@ -29,6 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
         gridTemplateColumns: 'repeat(5, 210px)',
       },
     },
+
     loader: {
       margin: '24px auto 0',
       width: 'fit-content',
@@ -79,10 +80,8 @@ const fetchNextPlaylistItems = async (
 
 export default React.memo(function Videos({
   channelData,
-  playlistItems,
 }: {
   channelData: undefined | gapi.client.youtube.Channel;
-  playlistItems: playlistItemsState;
 }): JSX.Element {
   const classes = useStyles();
   const loader = React.useRef<HTMLDivElement | null>(null);
@@ -90,7 +89,9 @@ export default React.memo(function Videos({
 
   const playlistId = channelData?.contentDetails?.relatedPlaylists?.uploads;
 
-  const { data, error, isLoading, mutate } = playlistItems;
+  const { data, error, isLoading, mutate } = usePlaylistItems(
+    channelData?.contentDetails?.relatedPlaylists?.uploads
+  );
   const playlistItemsData = data?.items!;
   const nextPageToken = data?.nextPageToken;
 
@@ -123,12 +124,6 @@ export default React.memo(function Videos({
     // eslint-disable-next-line
   }, [nextPageToken, playlistId]);
 
-  function renderList() {
-    return playlistItemsData?.map((item: any) => (
-      <VideoItem key={item.id} item={item} />
-    ));
-  }
-
   if (error) {
     return (
       <Box mb='24px'>
@@ -151,16 +146,21 @@ export default React.memo(function Videos({
     );
   }
 
+  function renderList() {
+    return playlistItemsData?.map((item: any) => (
+      <VideoItem key={item.id} item={item} />
+    ));
+  }
+
   return (
     <Box mb='24px'>
       <div className={classes.grid}>{renderList()}</div>
-      <div
-        ref={loader}
-        style={{ display: nextPageToken ? 'block' : 'none' }}
-        className={classes.loader}
-      >
-        <CircularProgress size={30} />
-      </div>
+
+      {nextPageToken && (
+        <div ref={loader} className={classes.loader}>
+          <Spinner />
+        </div>
+      )}
     </Box>
   );
 });
