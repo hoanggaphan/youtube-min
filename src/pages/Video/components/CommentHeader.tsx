@@ -12,6 +12,7 @@ import useComment from 'app/useComment';
 import useVideo from 'app/useVideo';
 import { formatNumberWithDots } from 'helpers/format';
 import useQuery from 'hooks/useQuery';
+import { useSnackbar } from 'notistack';
 import React from 'react';
 
 const useStyles = makeStyles((theme: Theme) => {
@@ -25,14 +26,17 @@ const useStyles = makeStyles((theme: Theme) => {
 
 export default function CommentHeader({
   sorting,
+  selectedIndex,
+  setSelectedIndex,
 }: {
   sorting: (status: boolean) => void;
+  selectedIndex: number;
+  setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
 }) {
   const classes = useStyles();
 
   const [anchorEl, setAnchorEl] =
     React.useState<HTMLButtonElement | null>(null);
-  const [selectedIndex, setSelectedIndex] = React.useState(0);
 
   const query = useQuery();
   const videoId = query.get('v') || '';
@@ -41,6 +45,7 @@ export default function CommentHeader({
   const commentCount = data?.statistics?.commentCount;
 
   const { mutate } = useComment(videoId, true);
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -61,12 +66,16 @@ export default function CommentHeader({
       if (index === 0) {
         await mutate();
       } else if (index === 1) {
-        const res = await commentAPI.fetchListByVideoId(videoId, 'time');
-        const data = res.result.items!;
-        mutate(data, false);
+        const res = await commentAPI.fetchListByVideoId(
+          videoId,
+          '',
+          30,
+          'time'
+        );
+        mutate(res.result, false);
       }
     } catch (err) {
-      alert('An error occurred while fetching comment');
+      enqueueSnackbar('An error occurred while fetching comment');
     } finally {
       sorting(false);
     }

@@ -8,6 +8,7 @@ import useComment from 'app/useComment';
 import Spinner from 'components/Spinner';
 import { getLastWord } from 'helpers/string';
 import { useAuth } from 'hooks/use-auth';
+import { useSnackbar } from 'notistack';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -58,7 +59,8 @@ export default function CommentPost({
   const [show, setShow] = React.useState(false);
   const [value, setValue] = React.useState('');
   const [adding, setAdding] = React.useState(false);
-  const { mutate } = useComment(videoId);
+  const { mutate } = useComment(videoId, true);
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleChange = (
     e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -72,24 +74,25 @@ export default function CommentPost({
       const res = await commentAPI.insertByVideoId(videoId, value);
       const newComment = res.result;
 
-      mutate((comments) => {
-        const newComments = [...comments!];
-        const firstComment = comments![0];
+      mutate((data) => {
+        const newItems = [...data?.items!];
+        const firstComment = data?.items![0];
 
         if (
-          firstComment.snippet?.topLevelComment?.snippet?.authorChannelId
+          firstComment?.snippet?.topLevelComment?.snippet?.authorChannelId
             ?.value === channelId
         ) {
-          newComments.splice(1, 0, newComment);
+          newItems.splice(1, 0, newComment);
         } else {
-          newComments.unshift(newComment);
+          newItems.unshift(newComment);
         }
 
-        return newComments;
+        return { ...data, items: newItems };
       }, false);
     } catch (error) {
-      // console.log(error);
-      alert('An error occurred while inserting comment');
+      enqueueSnackbar('An error occurred while inserting comment', {
+        variant: 'error',
+      });
     } finally {
       ReactDOM.unstable_batchedUpdates(() => {
         setValue('');

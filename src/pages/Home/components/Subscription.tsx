@@ -5,6 +5,7 @@ import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import * as subscriptionAPI from 'api/subscriptionAPI';
 import useSubscription from 'app/useSubscription';
+import { useSnackbar } from 'notistack';
 import React from 'react';
 import ScrollMenu from 'react-horizontal-scrolling-menu';
 import { useHistory } from 'react-router';
@@ -65,6 +66,7 @@ export default React.memo(function Subscription(): JSX.Element {
   const [allItemsWidth, setAllItemsWidth] = React.useState<number | null>(null);
   const [menuWidth, setMenuWidth] = React.useState<number | null>(null);
 
+  const { enqueueSnackbar } = useSnackbar();
   const { data, error, isLoading, mutate } = useSubscription();
   const nextPageToken = data?.nextPageToken;
   const subscriptions = data?.items;
@@ -103,8 +105,7 @@ export default React.memo(function Subscription(): JSX.Element {
           res.result.items = [...subscriptions, ...res.result.items!];
           mutate(res.result, false);
         } catch (error) {
-          // console.log(error);
-          alert('An error occurred while fetching next subscription');
+          enqueueSnackbar('An error occurred while fetching next subscription');
         } finally {
           isAdding.current = false;
         }

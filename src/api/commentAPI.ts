@@ -1,12 +1,16 @@
 export function fetchListByVideoId(
   videoId: string,
+  pageToken?: string,
+  maxResults: number = 30,
   order: string = 'relevance'
 ) {
   return gapi.client.youtube.commentThreads.list({
     part: ['snippet,replies'],
     textFormat: 'plainText',
-    order,
     videoId,
+    maxResults,
+    order,
+    pageToken,
   });
 }
 

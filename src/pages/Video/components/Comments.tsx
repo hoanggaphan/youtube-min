@@ -6,6 +6,8 @@ import React from 'react';
 import CommentHeader from './CommentHeader';
 import CommentItem from './CommentItem';
 import CommentPost from './CommentPost';
+import * as commentAPI from 'api/commentAPI';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles((theme: Theme) => {
   return createStyles({
@@ -42,14 +44,20 @@ export default React.memo(function Comments({
 }) {
   const classes = useStyles();
 
-  const observer = React.useRef<any>(null);
-  const loader = React.useRef<HTMLDivElement | null>(null);
+  const observerLoaderF = React.useRef<any>(null);
+  const loaderF = React.useRef<HTMLDivElement | null>(null);
+
+  const observerLoaderM = React.useRef<any>(null);
+  const loaderM = React.useRef<HTMLDivElement | null>(null);
 
   const [load, setLoad] = React.useState(false);
   const [sorting, setSorting] = React.useState(false);
+  const [selectedIndex, setSelectedIndex] = React.useState(0);
 
-  const { data, error } = useComment(videoId, load);
+  const { data, error, mutate } = useComment(videoId, load);
+  const { enqueueSnackbar } = useSnackbar();
 
+  // Lazy First Load Comment
   React.useEffect(() => {
     const handleObserver = async (entities: IntersectionObserverEntry[]) => {
       if (entities[0].isIntersecting) {
@@ -57,17 +65,52 @@ export default React.memo(function Comments({
       }
     };
 
-    if (observer.current) observer.current.disconnect();
+    if (observerLoaderF.current) observerLoaderF.current.disconnect();
 
-    observer.current = new IntersectionObserver(handleObserver);
+    observerLoaderF.current = new IntersectionObserver(handleObserver);
 
-    if (loader.current) {
-      observer.current.observe(loader.current);
+    if (loaderF.current) {
+      observerLoaderF.current.observe(loaderF.current);
     }
 
-    return () => observer.current.disconnect();
+    return () => observerLoaderF.current.disconnect();
     // eslint-disable-next-line
   }, []);
+
+  // Lazy Load More Comment
+  React.useEffect(() => {
+    if (!data) return;
+
+    const handleObserver = async (entities: IntersectionObserverEntry[]) => {
+      if (entities[0].isIntersecting) {
+        try {
+          const res = await commentAPI.fetchListByVideoId(
+            videoId,
+            data.nextPageToken,
+            30,
+            selectedIndex === 0 ? 'relevance' : 'time'
+          );
+
+          const newItems = [...data.items!, ...res.result.items!];
+          res.result.items = newItems;
+          mutate(res.result, false);
+        } catch (err) {
+          enqueueSnackbar('An error occurred while fetching next comment');
+        }
+      }
+    };
+
+    if (observerLoaderM.current) observerLoaderM.current.disconnect();
+
+    observerLoaderM.current = new IntersectionObserver(handleObserver);
+
+    if (loaderM.current) {
+      observerLoaderM.current.observe(loaderM.current);
+    }
+
+    return () => observerLoaderM.current.disconnect();
+    // eslint-disable-next-line
+  }, [data]);
 
   if (error) {
     if (error.code === 403 && error.errors[0].reason === 'commentsDisabled') {
@@ -95,7 +138,7 @@ export default React.memo(function Comments({
 
   if (!data)
     return (
-      <div ref={loader} className={classes.loader}>
+      <div ref={loaderF} className={classes.loader}>
         <Spinner />
       </div>
     );
@@ -103,12 +146,23 @@ export default React.memo(function Comments({
   return (
     <Box position='relative' maxWidth='805px'>
       <div className={`${sorting ? classes.opacity : ''}`}>
-        <CommentHeader sorting={handleSorting} />
+        <CommentHeader
+          sorting={handleSorting}
+          selectedIndex={selectedIndex}
+          setSelectedIndex={setSelectedIndex}
+        />
+
         <CommentPost videoId={videoId} channelId={channelId} />
-        {data.map((item: gapi.client.youtube.CommentThread) => (
+
+        {data.items?.map((item: gapi.client.youtube.CommentThread) => (
           <CommentItem key={item.id} item={item} player={player} />
         ))}
+
+        <div ref={loaderM} className={classes.loader}>
+          <Spinner />
+        </div>
       </div>
+
       {sorting && (
         <div className={classes.sortingLoader}>
           <Spinner />

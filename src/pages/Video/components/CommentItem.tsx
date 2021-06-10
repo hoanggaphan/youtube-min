@@ -6,6 +6,7 @@ import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import SubdirectoryArrowRightIcon from '@material-ui/icons/SubdirectoryArrowRight';
 import * as commentAPI from 'api/commentAPI';
 import Spinner from 'components/Spinner';
+import { useSnackbar } from 'notistack';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import CommentCard from './CommentCard';
@@ -49,6 +50,7 @@ export default function CommentItem({
     []
   );
   const [nextPageToken, setNextPageToken] = React.useState<string>();
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleShow = async () => {
     setShow(true);
@@ -63,10 +65,8 @@ export default function CommentItem({
           setIsFetching(false);
         });
       } catch (error) {
-        // console.log(error);
         setIsFetching(false);
-        const message = "An error occurred while fetching user's replies";
-        alert(message);
+        enqueueSnackbar("An error occurred while fetching user's replies");
       }
     }
   };
@@ -91,10 +91,8 @@ export default function CommentItem({
           setNextPageToken(res.result.nextPageToken);
         });
       } catch (error) {
-        // console.log(error);
         setIsFetching(false);
-        const message = "An error occurred while fetching next user's replies";
-        alert(message);
+        enqueueSnackbar("An error occurred while fetching next user's replies");
       }
     }
   };

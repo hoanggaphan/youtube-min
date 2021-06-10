@@ -221,8 +221,7 @@ export default function Video(): JSX.Element {
                   <Tooltip
                     title={
                       <span className={classes.tooltipText}>
-                        `${formatNumberWithDots(likeCount)} / $
-                        {formatNumberWithDots(dislikeCount)}`
+                        {formatNumberWithDots(likeCount)} / {formatNumberWithDots(dislikeCount)}
                       </span>
                     }
                     placement='top'
