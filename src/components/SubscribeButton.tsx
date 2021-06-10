@@ -3,12 +3,10 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
-import IconButton from '@material-ui/core/IconButton';
-import Snackbar from '@material-ui/core/Snackbar';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import CloseIcon from '@material-ui/icons/Close';
 import Skeleton from '@material-ui/lab/Skeleton';
 import * as subscriptionAPI from 'api/subscriptionAPI';
+import { useSnackbar } from 'notistack';
 import React from 'react';
 import useSWR from 'swr';
 
@@ -55,24 +53,12 @@ export default function SubscribeButton({
 }: SubscribeButtonProps): JSX.Element {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
+  const { enqueueSnackbar } = useSnackbar();
 
   const { data, error, mutate } = useSWR(
     ['api/subscription/status', channelId],
     fetchStatus
   );
-
-  const [errorSnack, setErrorSnack] = React.useState('');
-
-  const handleCloseSnack = (
-    event: React.SyntheticEvent | React.MouseEvent,
-    reason?: string
-  ) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    setErrorSnack('');
-  };
 
   const handleOpen = () => {
     setOpen(true);
@@ -87,8 +73,9 @@ export default function SubscribeButton({
       await subscriptionAPI.unSubscribe(data![0].id!);
       mutate([], false);
     } catch (error) {
-      // console.log(error);
-      setErrorSnack('An error occurred while deleting subscription');
+      enqueueSnackbar('An error occurred while deleting subscription', {
+        variant: 'error',
+      });
     } finally {
       setOpen(false);
     }
@@ -99,8 +86,9 @@ export default function SubscribeButton({
       const res = await subscriptionAPI.subscribe(channelId);
       mutate([res.result], false);
     } catch (error) {
-      // console.log(error);
-      setErrorSnack('An error occurred while subscripting');
+      enqueueSnackbar('An error occurred while subscripting', {
+        variant: 'error',
+      });
     }
   };
 
@@ -112,32 +100,6 @@ export default function SubscribeButton({
 
   return (
     <>
-      <Snackbar
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-        open={!!errorSnack}
-        autoHideDuration={6000}
-        onClose={handleCloseSnack}
-        message={errorSnack}
-        action={
-          <>
-            <Button color='secondary' size='small' onClick={handleCloseSnack}>
-              UNDO
-            </Button>
-            <IconButton
-              size='small'
-              aria-label='close'
-              color='inherit'
-              onClick={handleCloseSnack}
-            >
-              <CloseIcon fontSize='small' />
-            </IconButton>
-          </>
-        }
-      />
-
       {data?.length ? (
         <Button
           className={classes.registeredBtn}

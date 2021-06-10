@@ -4,6 +4,7 @@ import * as playlistItemsAPI from 'api/playListItemsAPI';
 import * as videoAPI from 'api/videoAPI';
 import usePlaylistItems from 'app/usePlaylistItems';
 import Spinner from 'components/Spinner';
+import { useSnackbar } from 'notistack';
 import React from 'react';
 import VideoItem from './VideoItem';
 import VideosSkeleton from './VideosSkeleton';
@@ -87,6 +88,8 @@ export default React.memo(function Videos({
   const loader = React.useRef<HTMLDivElement | null>(null);
   const observer = React.useRef<any>(null);
 
+  const { enqueueSnackbar } = useSnackbar();
+
   const playlistId = channelData?.contentDetails?.relatedPlaylists?.uploads;
 
   const { data, error, isLoading, mutate } = usePlaylistItems(
@@ -105,7 +108,7 @@ export default React.memo(function Videos({
           res.items = [...data?.items!, ...res.items!];
           await mutate(res, false);
         } catch (error) {
-          alert(error.message);
+          enqueueSnackbar(error.message, { variant: 'error' });
         }
       }
     };
