@@ -23,6 +23,12 @@ import ViewDate from './components/ViewDate';
 
 const useStyles = makeStyles((theme: Theme) => {
   return createStyles({
+    iframeWrapperPadding: {
+      padding: '0',
+      [theme.breakpoints.up('sm')]: {
+        padding: '24px 24px 0 24px',
+      },
+    },
     iframeContainer: {
       position: 'relative',
       paddingTop: 'calc(9/16 * 100%)',
@@ -43,6 +49,22 @@ const useStyles = makeStyles((theme: Theme) => {
       left: 0,
       width: '100%',
       height: '100%',
+    },
+    contentWrapperPadding: {
+      marginBottom: '50px',
+      padding: '0 12px 0 12px',
+      [theme.breakpoints.up('sm')]: {
+        padding: '0 24px 0 24px',
+      },
+    },
+    likeDislikeContainer: {
+      marginTop: '5px',
+      [theme.breakpoints.up('sm')]: {
+        marginTop: '0',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      },
     },
     title: {
       fontSize: '18px',
@@ -116,7 +138,7 @@ export default function Video(): JSX.Element {
   ) {
     return (
       <MyContainer>
-        <Box p='24px'>
+        <div className={classes.iframeWrapperPadding}>
           <div className={classes.iframeContainer}>
             <Box
               display='flex'
@@ -130,28 +152,30 @@ export default function Video(): JSX.Element {
               </span>
             </Box>
           </div>
-        </Box>
+        </div>
       </MyContainer>
     );
   }
 
   return (
     <MyContainer>
-      <Box p='24px' mb='100px'>
+      <div className={classes.iframeWrapperPadding}>
         <div className={classes.iframeContainer}>
           {/* <iframe
-            id='ytb-player'
-            className={classes.iframe}
-            title='Youtube video player'
-            src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1${
-              start && '&start=' + start
-            }`}
-            allow='autoplay'
-            frameBorder='0'
-            allowFullScreen
-          /> */}
+              id='ytb-player'
+              className={classes.iframe}
+              title='Youtube video player'
+              src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1${
+                start && '&start=' + start
+              }`}
+              allow='autoplay'
+              frameBorder='0'
+              allowFullScreen
+            /> */}
         </div>
+      </div>
 
+      <div className={classes.contentWrapperPadding}>
         {!videoData ? (
           <Box p='20px 0 8px 0'>
             <Skeleton animation={false} width='50%' height='34px' />
@@ -207,21 +231,18 @@ export default function Video(): JSX.Element {
             <Typography variant='h5' className={classes.title}>
               {videoTitle}
             </Typography>
-            <Box
-              display='flex'
-              justifyContent='space-between'
-              alignItems='center'
-            >
+            <div className={classes.likeDislikeContainer}>
               {videoData && <ViewDate videoData={videoData} />}
 
-              <Box position='relative'>
+              <Box position='relative' display='inline-block'>
                 {videoData && <LikeDisLike videoData={videoData} />}
 
                 {likeCount && dislikeCount && (
                   <Tooltip
                     title={
                       <span className={classes.tooltipText}>
-                        {formatNumberWithDots(likeCount)} / {formatNumberWithDots(dislikeCount)}
+                        {formatNumberWithDots(likeCount)} /{' '}
+                        {formatNumberWithDots(dislikeCount)}
                       </span>
                     }
                     placement='top'
@@ -238,7 +259,7 @@ export default function Video(): JSX.Element {
                   </Tooltip>
                 )}
               </Box>
-            </Box>
+            </div>
           </Box>
         )}
 
@@ -316,7 +337,7 @@ export default function Video(): JSX.Element {
         {channelData && (
           <Comments videoId={videoId} channelId={channelId!} player={player} />
         )}
-      </Box>
+      </div>
     </MyContainer>
   );
 }

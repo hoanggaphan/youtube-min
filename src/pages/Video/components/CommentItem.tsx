@@ -49,7 +49,8 @@ export default function CommentItem({
   const [replies, setReplies] = React.useState<gapi.client.youtube.Comment[]>(
     []
   );
-  const [nextPageToken, setNextPageToken] = React.useState<string>();
+  const [nextPageToken, setNextPageToken] =
+    React.useState<string | undefined>();
   const { enqueueSnackbar } = useSnackbar();
 
   const handleShow = async () => {
@@ -66,7 +67,9 @@ export default function CommentItem({
         });
       } catch (error) {
         setIsFetching(false);
-        enqueueSnackbar("An error occurred while fetching user's replies");
+        enqueueSnackbar("An error occurred while fetching user's replies", {
+          variant: 'error',
+        });
       }
     }
   };
@@ -76,27 +79,26 @@ export default function CommentItem({
   };
 
   const handleFetchNextReplies = async () => {
-    if (!isFetching) {
-      try {
-        setIsFetching(true);
-        const res = await commentAPI.fetchRepliesById(
-          item.id!,
-          nextPageToken,
-          20
-        );
-        isFirstReqSucceed.current = true;
-        ReactDOM.unstable_batchedUpdates(() => {
-          setIsFetching(false);
-          setReplies([...replies, ...res.result.items!]);
-          setNextPageToken(res.result.nextPageToken);
-        });
-      } catch (error) {
+    try {
+      setIsFetching(true);
+      const res = await commentAPI.fetchRepliesById(
+        item.id!,
+        nextPageToken,
+        20
+      );
+      ReactDOM.unstable_batchedUpdates(() => {
+        setReplies([...replies, ...res.result.items!]);
+        setNextPageToken(res.result.nextPageToken);
         setIsFetching(false);
-        enqueueSnackbar("An error occurred while fetching next user's replies");
-      }
+      });
+    } catch (error) {
+      setIsFetching(false);
+      enqueueSnackbar("An error occurred while fetching next user's replies", {
+        variant: 'error',
+      });
     }
   };
-
+  console.log(replies);
   return (
     <Box mb='16px'>
       <CommentCard item={item} player={player} />

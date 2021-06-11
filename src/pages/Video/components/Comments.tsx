@@ -144,7 +144,7 @@ export default React.memo(function Comments({
     );
 
   return (
-    <Box position='relative' maxWidth='805px'>
+    <Box position='relative'>
       <div className={`${sorting ? classes.opacity : ''}`}>
         <CommentHeader
           sorting={handleSorting}
