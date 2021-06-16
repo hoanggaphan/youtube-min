@@ -107,7 +107,7 @@ export default function CommentCard({
           BtnCol={<StyledBtn text='Ản bớt' />}
           showBtnCol
         >
-          <FormattedString str={snippet.textOriginal} player={player} />
+          <FormattedString str={snippet.textDisplay} player={player} />
         </Collapsed>
 
         <Box mt='4px' display='flex' alignItems='center'>
