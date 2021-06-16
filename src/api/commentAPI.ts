@@ -6,7 +6,6 @@ export function fetchListByVideoId(
 ) {
   return gapi.client.youtube.commentThreads.list({
     part: ['snippet,replies'],
-    textFormat: 'plainText',
     videoId,
     maxResults,
     order,

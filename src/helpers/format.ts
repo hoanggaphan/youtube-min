@@ -111,21 +111,6 @@ function customTemplate(this: any) {
   return 'm:ss';
 }
 
-export function formatHHMMSStoSeconds(duration: string) {
-  const p = duration.split(':');
-  let seconds = 0;
-  let m = 1;
-
-  if (!p.length) return p;
-
-  while (p.length > 0) {
-    seconds += Number(p.pop()) * m;
-    m *= 60;
-  }
-
-  return seconds;
-}
-
 export function formatDuration(duration: string) {
   return moment.duration(duration).format(customTemplate, { trim: false });
 }

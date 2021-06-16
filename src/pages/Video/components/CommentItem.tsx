@@ -86,8 +86,9 @@ export default function CommentItem({
         nextPageToken,
         20
       );
+
       ReactDOM.unstable_batchedUpdates(() => {
-        setReplies([...replies, ...res.result.items!]);
+        setReplies([...replies, ...res.result.items!]); // BUG
         setNextPageToken(res.result.nextPageToken);
         setIsFetching(false);
       });
@@ -98,7 +99,7 @@ export default function CommentItem({
       });
     }
   };
-  console.log(replies);
+
   return (
     <Box mb='16px'>
       <CommentCard item={item} player={player} />

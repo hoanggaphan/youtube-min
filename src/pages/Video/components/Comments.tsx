@@ -80,7 +80,7 @@ export default React.memo(function Comments({
   // Lazy Load More Comment
   React.useEffect(() => {
     if (!data) return;
-
+    
     const handleObserver = async (entities: IntersectionObserverEntry[]) => {
       if (entities[0].isIntersecting) {
         try {
