@@ -27,6 +27,7 @@ const useStyles = makeStyles((theme: Theme) => {
     },
     userSelect: {
       userSelect: 'none',
+      cursor: 'pointer',
     },
     none: {
       display: 'none',

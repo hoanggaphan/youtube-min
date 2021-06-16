@@ -161,17 +161,17 @@ export default function Video(): JSX.Element {
     <MyContainer>
       <div className={classes.iframeWrapperPadding}>
         <div className={classes.iframeContainer}>
-          {/* <iframe
-              id='ytb-player'
-              className={classes.iframe}
-              title='Youtube video player'
-              src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1${
-                start && '&start=' + start
-              }`}
-              allow='autoplay'
-              frameBorder='0'
-              allowFullScreen
-            /> */}
+          <iframe
+            id='ytb-player'
+            className={classes.iframe}
+            title='Youtube video player'
+            src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1${
+              start && '&start=' + start
+            }`}
+            allow='autoplay'
+            frameBorder='0'
+            allowFullScreen
+          />
         </div>
       </div>
 
@@ -334,9 +334,9 @@ export default function Video(): JSX.Element {
           </div>
         )}
 
-        {/* {channelData && (
+        {channelData && (
           <Comments videoId={videoId} channelId={channelId!} player={player} />
-        )} */}
+        )}
       </div>
     </MyContainer>
   );
