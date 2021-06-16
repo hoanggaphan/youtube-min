@@ -24,8 +24,10 @@ const useStyles = makeStyles((theme: Theme) => {
       textTransform: 'uppercase',
       fontSize: '14px',
       fontWeight: 500,
+
       color: theme.palette.grey[600],
       cursor: 'pointer',
+      userSelect: 'none',
     },
   });
 });
