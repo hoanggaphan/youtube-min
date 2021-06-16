@@ -1,6 +1,5 @@
-export function convertQueryTimeToSeconds(time: string) {
-  let p = time.split(/h|m|s/);
-  p = p.filter(Boolean);
+export function convertHHMMSSToSeconds(time: string) {
+  const p = time.split(':');
   let seconds = 0;
   let m = 1;
 

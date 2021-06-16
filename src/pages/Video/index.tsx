@@ -334,9 +334,9 @@ export default function Video(): JSX.Element {
           </div>
         )}
 
-        {channelData && (
+        {/* {channelData && (
           <Comments videoId={videoId} channelId={channelId!} player={player} />
-        )}
+        )} */}
       </div>
     </MyContainer>
   );

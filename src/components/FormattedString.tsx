@@ -1,9 +1,10 @@
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import { convertQueryTimeToSeconds } from 'helpers/convert';
+import { convertHHMMSSToSeconds } from 'helpers/convert';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import parse from 'html-react-parser';
+import reactStringReplace from 'react-string-replace';
+import XRegExp from 'xregexp';
 
 const playTimeControl = (player: any, time: number) => {
   if (!player) return;
@@ -14,53 +15,63 @@ const playTimeControl = (player: any, time: number) => {
   });
 };
 
-function stringToReact(str: string, player?: any) {
-  return parse(str, {
-    replace: (domNode: any) => {
-      const { attribs, children, type, name } = domNode;
-      if (type !== 'tag') return;
+const regexHashTag = XRegExp('(#[\\p{L}\\w]+)', 'g');
+const regexUrl = /(https?:\/\/\S+)/g;
+const regexTime =
+  /(?<!:|\d)((?:\d?\d):(?:[0-5]?\d):(?:[0-5]\d)|(?:[0-5]?\d):(?:[0-5]\d))(?!\d)/g;
 
-      if (name === 'a' && attribs.href) {
-        const url = new URL(attribs.href);
-        const searchParams = new URLSearchParams(url.search);
+function stringToReact(text: string, player?: any) {
+  let replacedText;
 
-        if (searchParams.get('t')) {
-          const t = searchParams.get('t');
-          return (
-            <span
-              className='link'
-              onClick={() =>
-                t && playTimeControl(player, convertQueryTimeToSeconds(t))
-              }
-            >
-              {children[0].data}
-            </span>
-          );
-        }
+  // Match Hashtags
+  replacedText = reactStringReplace(
+    text,
+    regexHashTag,
+    (match: string, i: number) => (
+      <Link key={match + i} className='link' to='/home'>
+        {match}
+      </Link>
+    )
+  );
 
-        if (searchParams.get('search_query')) {
-          // const s = searchParams.get('search_query');
-          return (
-            <Link className='link' to='/home'>
-              {children[0].data}
-            </Link>
-          );
-        }
+  // Match URLS
+  replacedText = reactStringReplace(
+    replacedText,
+    regexUrl,
+    (match: string, i: number) => (
+      <a
+        key={match + i}
+        className='link'
+        spellCheck='false'
+        href={match}
+        rel='noopener noreferrer nofollow'
+        target='__blank'
+      >
+        {match}
+      </a>
+    )
+  );
 
-        return (
-          <a
-            className='link'
-            spellCheck='false'
-            href={attribs.href}
-            rel='noopener noreferrer nofollow'
-            target='__blank'
-          >
-            {children[0].data}
-          </a>
-        );
-      }
-    },
-  });
+  if (player) {
+    // Match Time hh:mm:ss
+    replacedText = reactStringReplace(
+      replacedText,
+      regexTime,
+      (match: string, i: number) => (
+        <span
+          key={match + i}
+          className='link'
+          onClick={() =>
+            playTimeControl(player, convertHHMMSSToSeconds(match))
+          }
+        >
+          {match}
+        </span>
+      )
+    );
+  }
+
+  return replacedText;
 }
 
 const useStyles = makeStyles((theme: Theme) => {
