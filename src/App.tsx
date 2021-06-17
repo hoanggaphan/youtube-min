@@ -7,6 +7,7 @@ import Login from 'pages/Login';
 import PageNotFound from 'pages/NotFound';
 import Video from 'pages/Video';
 import React from 'react';
+import { IntlProvider } from 'react-intl';
 import { Route, Router, Switch } from 'react-router-dom';
 import { ProtectedRoute } from 'routes/auth';
 
@@ -18,20 +19,24 @@ history.listen((location, action) => {
   }
 });
 
+const defaultLocale = window.navigator.language;
+
 function App() {
   return (
-    <ProvideAuth>
-      <Router history={history}>
-        <Switch>
-          <ProtectedRoute exact path='/' component={Login} />
-          <ProtectedRoute path='/home' component={Home} />
-          <ProtectedRoute path='/channel/:id' component={Channel} />
-          <ProtectedRoute path='/video' component={Video} />
-          <ProtectedRoute path='/hashtag/:keyword' component={Hashtag} />
-          <Route path='*' component={PageNotFound} />
-        </Switch>
-      </Router>
-    </ProvideAuth>
+    <IntlProvider locale={defaultLocale}>
+      <ProvideAuth>
+        <Router history={history}>
+          <Switch>
+            <ProtectedRoute exact path='/' component={Login} />
+            <ProtectedRoute path='/home' component={Home} />
+            <ProtectedRoute path='/channel/:id' component={Channel} />
+            <ProtectedRoute path='/video' component={Video} />
+            <ProtectedRoute path='/hashtag/:keyword' component={Hashtag} />
+            <Route path='*' component={PageNotFound} />
+          </Switch>
+        </Router>
+      </ProvideAuth>
+    </IntlProvider>
   );
 }
 
