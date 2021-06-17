@@ -15,7 +15,7 @@ const playTimeControl = (player: any, time: number) => {
   });
 };
 
-const regexHashTag = XRegExp('(#[\\p{L}\\w]+)', 'g');
+const regexHashTag = XRegExp('#([\\p{L}\\w]+)', 'g');
 const regexUrl = /(https?:\/\/\S+)/g;
 const regexTime =
   /(?<!:|\d)((?:\d?\d):(?:[0-5]?\d):(?:[0-5]\d)|(?:[0-5]?\d):(?:[0-5]\d))(?!\d)/g;
@@ -28,8 +28,8 @@ function stringToReact(text: string, player?: any) {
     text,
     regexHashTag,
     (match: string, i: number) => (
-      <Link key={match + i} className='link' to='/home'>
-        {match}
+      <Link key={match + i} className='link' to={`/hashtag/${match}`}>
+        #{match}
       </Link>
     )
   );
@@ -61,9 +61,7 @@ function stringToReact(text: string, player?: any) {
         <span
           key={match + i}
           className='link'
-          onClick={() =>
-            playTimeControl(player, convertHHMMSSToSeconds(match))
-          }
+          onClick={() => playTimeControl(player, convertHHMMSSToSeconds(match))}
         >
           {match}
         </span>
