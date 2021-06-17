@@ -15,13 +15,13 @@ const theme = createMuiTheme({
     MuiCssBaseline: {
       '@global': {
         img: {
-          display: 'block',
+          display: 'inline-block',
+          maxWidth: '100%',
         },
-
         body: {
           overflowX: 'hidden',
+          backgroundColor: '#f1f1f1',
         },
-
         '::-webkit-scrollbar': {
           width: '16px',
         },

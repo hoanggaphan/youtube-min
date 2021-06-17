@@ -6,7 +6,7 @@ import Skeleton from '@material-ui/lab/Skeleton';
 import FormattedString from 'components/FormattedString';
 import { formatNumberWithDots, formatPublishAt } from 'helpers/format';
 import React from 'react';
-import { FormattedDisplayName, IntlProvider } from 'react-intl';
+import { FormattedDisplayName } from 'react-intl';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -82,9 +82,7 @@ export default function About({
                   {'Địa điểm: '}
                 </Typography>
                 <Typography variant='caption' display='inline'>
-                  <IntlProvider locale='vi'>
-                    <FormattedDisplayName type='region' value={country} />
-                  </IntlProvider>
+                  <FormattedDisplayName type='region' value={country} />
                 </Typography>
               </div>
             </Box>
