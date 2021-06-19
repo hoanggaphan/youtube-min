@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     channelHeader: {
       display: 'flex',
-      backgroundColor: 'white',
+      backgroundColor: '#f9f9f9',
       justifyContent: 'space-between',
       flexDirection: 'column',
       padding: '15px 40px 0',
@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     tabs: {
-      backgroundColor: 'white',
+      backgroundColor: '#f9f9f9',
     },
   })
 );
