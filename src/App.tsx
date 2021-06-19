@@ -1,14 +1,13 @@
 import { createBrowserHistory } from 'history';
 import { ProvideAuth } from 'hooks/use-auth';
 import Channel from 'pages/Channel';
-import Hashtag from 'pages/Hashtag';
 import Home from 'pages/Home';
 import Login from 'pages/Login';
 import PageNotFound from 'pages/NotFound';
 import Video from 'pages/Video';
 import React from 'react';
 import { IntlProvider } from 'react-intl';
-import { Route, Router, Switch } from 'react-router-dom';
+import { Route, Router, Switch, Redirect } from 'react-router-dom';
 import { ProtectedRoute } from 'routes/auth';
 
 export const history = createBrowserHistory();
@@ -29,9 +28,9 @@ function App() {
           <Switch>
             <ProtectedRoute exact path='/' component={Login} />
             <ProtectedRoute path='/home' component={Home} />
-            <ProtectedRoute path='/channel/:id' component={Channel} />
             <ProtectedRoute path='/video' component={Video} />
-            <ProtectedRoute path='/hashtag/:keyword' component={Hashtag} />
+            <ProtectedRoute path='/channel/:id' component={Channel} />
+            <Redirect from='/channel' to='/home' />
             <Route path='*' component={PageNotFound} />
           </Switch>
         </Router>
