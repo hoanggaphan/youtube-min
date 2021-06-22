@@ -4,6 +4,7 @@ import Channel from 'pages/Channel';
 import Home from 'pages/Home';
 import Login from 'pages/Login';
 import PageNotFound from 'pages/NotFound';
+import Result from 'pages/Result';
 import Video from 'pages/Video';
 import React from 'react';
 import { IntlProvider } from 'react-intl';
@@ -31,6 +32,7 @@ function App() {
             <ProtectedRoute path='/video' component={Video} />
             <ProtectedRoute path='/channel/:id' component={Channel} />
             <Redirect from='/channel' to='/home' />
+            <ProtectedRoute path='/result' component={Result} />
             <Route path='*' component={PageNotFound} />
           </Switch>
         </Router>

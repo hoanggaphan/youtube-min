@@ -42,9 +42,18 @@ const useStyles = makeStyles((theme: Theme) =>
       fontSize: '13px',
     },
     duration: {
-      color: 'white',
-      fontWeight: 500,
+      margin: '4px',
+      padding: '1px 4px',
+
+      position: 'absolute',
+      bottom: 0,
+      right: 0,
+      borderRadius: '2px',
+
       fontSize: '12px',
+      fontWeight: 500,
+      color: 'white',
+      backgroundColor: 'rgb(19,16,7)',
     },
   })
 );
@@ -58,7 +67,7 @@ export default function VideoItem({ item }: { item: any }): JSX.Element {
       key={item.id}
       className={classes.gridItem}
     >
-      <Box position='relative'>
+      <Box position='relative' maxHeight='118px'>
         <LazyLoad height={118} offset={400} once>
           <img
             src={item.snippet.thumbnails.medium.url}
@@ -67,20 +76,9 @@ export default function VideoItem({ item }: { item: any }): JSX.Element {
             height='118'
           />
         </LazyLoad>
-        <Box
-          bgcolor='rgb(19,16,7)'
-          borderRadius='2px'
-          position='absolute'
-          bottom='0'
-          right='0'
-          m='4px'
-          p='3px 4px'
-          lineHeight='12px'
-        >
-          <Typography className={classes.duration} component='span'>
-            {formatDuration(item.snippet.duration)}
-          </Typography>
-        </Box>
+        <div className={classes.duration}>
+          {formatDuration(item.snippet.duration)}
+        </div>
       </Box>
       <h3
         className={`${classes.title} ${classes.textEllipsis}`}

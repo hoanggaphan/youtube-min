@@ -2,7 +2,6 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { convertHHMMSSToSeconds } from 'helpers/convert';
 import React from 'react';
-import { Link } from 'react-router-dom';
 import reactStringReplace from 'react-string-replace';
 import XRegExp from 'xregexp';
 
@@ -28,9 +27,9 @@ function stringToReact(text: string, player?: any) {
     text,
     regexHashTag,
     (match: string, i: number) => (
-      <Link key={match + i} className='link' to={`/hashtag/${match}`}>
+      <span key={match + i} className='link'>
         #{match}
-      </Link>
+      </span>
     )
   );
 
