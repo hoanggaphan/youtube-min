@@ -67,7 +67,7 @@ export default React.memo(function Subscription(): JSX.Element {
   const [menuWidth, setMenuWidth] = React.useState<number | null>(null);
 
   const { enqueueSnackbar } = useSnackbar();
-  const { data, error, isLoading, mutate } = useSubscription();
+  const { data, error, mutate } = useSubscription();
   const nextPageToken = data?.nextPageToken;
   const subscriptions = data?.items;
 
@@ -144,7 +144,7 @@ export default React.memo(function Subscription(): JSX.Element {
       <Typography align='center' variant='h2' className={classes.title}>
         Kênh đăng ký
       </Typography>
-      {isLoading ? (
+      {!data ? (
         <SubscriptionSkeleton num={10} />
       ) : (
         <ScrollMenu

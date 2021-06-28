@@ -1,7 +1,7 @@
 export function fetchListByVideoId(
   videoId: string,
   pageToken?: string,
-  maxResults: number = 30,
+  maxResults: number = 50,
   order: string = 'relevance'
 ) {
   return gapi.client.youtube.commentThreads.list({
@@ -33,7 +33,7 @@ export function insertByVideoId(videoId: string, text: string) {
 export function fetchRepliesById(
   parentId: string,
   pageToken?: string,
-  maxResults: number = 10
+  maxResults: number = 50
 ) {
   return gapi.client.youtube.comments.list({
     part: ['snippet'],

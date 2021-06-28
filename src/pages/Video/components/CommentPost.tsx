@@ -4,13 +4,14 @@ import Button from '@material-ui/core/Button';
 import Input from '@material-ui/core/Input';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import * as commentAPI from 'api/commentAPI';
-import useComment from 'app/useComment';
+import useCommentPopular from 'app/useCommentPopular';
 import Spinner from 'components/Spinner';
 import { getLastWord } from 'helpers/string';
 import { useAuth } from 'hooks/use-auth';
 import { useSnackbar } from 'notistack';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { CommentContext } from './Comments';
 
 const useStyles = makeStyles((theme: Theme) => {
   return createStyles({
@@ -59,8 +60,9 @@ export default function CommentPost({
   const [show, setShow] = React.useState(false);
   const [value, setValue] = React.useState('');
   const [adding, setAdding] = React.useState(false);
-  const { mutate } = useComment(videoId, true);
+  const { mutate } = useCommentPopular(videoId);
   const { enqueueSnackbar } = useSnackbar();
+  const { state, dispatch } = React.useContext(CommentContext);
 
   const handleChange = (
     e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -74,21 +76,21 @@ export default function CommentPost({
       const res = await commentAPI.insertByVideoId(videoId, value);
       const newComment = res.result;
 
-      mutate((data) => {
-        const newItems = [...data?.items!];
-        const firstComment = data?.items![0];
+      const newData = [...state.data!];
+      const first = newData[0];
+      const firstComment = first.items![0];
 
-        if (
-          firstComment?.snippet?.topLevelComment?.snippet?.authorChannelId
-            ?.value === channelId
-        ) {
-          newItems.splice(1, 0, newComment);
-        } else {
-          newItems.unshift(newComment);
-        }
+      if (
+        firstComment?.snippet?.topLevelComment?.snippet?.authorChannelId
+          ?.value === channelId
+      ) {
+        first.items?.splice(1, 0, newComment);
+      } else {
+        first.items?.unshift(newComment);
+      }
 
-        return { ...data, items: newItems };
-      }, false);
+      newData.splice(0, 1, first);
+      dispatch({ type: 'ADD_FULFILLED', payload: newData });
     } catch (error) {
       enqueueSnackbar('An error occurred while inserting comment', {
         variant: 'error',

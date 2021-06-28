@@ -92,6 +92,13 @@ export default function SubscribeButton({
     }
   };
 
+  // turn off feature subscribe channel
+  const off = () => {
+    enqueueSnackbar('Chức năng này đã bị tắt', {
+      variant: 'warning',
+    });
+  };
+
   if (error) {
     return <div>{error.message}</div>;
   }
@@ -106,7 +113,8 @@ export default function SubscribeButton({
           variant='contained'
           disableElevation
           disableRipple
-          onClick={handleOpen}
+          // onClick={handleOpen}
+          onClick={off}
         >
           Đã đăng ký
         </Button>
@@ -117,7 +125,8 @@ export default function SubscribeButton({
           variant='contained'
           disableElevation
           disableRipple
-          onClick={handleSubscribe}
+          // onClick={handleSubscribe}
+          onClick={off}
         >
           Đăng ký
         </Button>
