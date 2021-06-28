@@ -126,11 +126,11 @@ export default function VideoItem({
   item: VideoItemType;
 }): JSX.Element {
   const classes = useStyles();
-  // console.log(item);
+
   return (
     <div className={classes.container}>
       <div className={classes.videoImgContainer}>
-        <LazyLoad once>
+        <LazyLoad offset={400} once>
           <img
             src={item.snippet?.thumbnails?.medium?.url}
             alt=''
@@ -148,14 +148,17 @@ export default function VideoItem({
         </Typography>
         <Box display='flex' flexDirection='column'>
           <div className={classes.dateViewContainer}>
-            <Typography
-              className={classes.videoViews}
-              component='span'
-              variant='body2'
-              color='textSecondary'
-            >
-              {formatVideoViews(item.snippet?.viewCount) + ' lượt xem'}
-            </Typography>
+            {item.snippet?.viewCount && (
+              <Typography
+                className={classes.videoViews}
+                component='span'
+                variant='body2'
+                color='textSecondary'
+              >
+                {formatVideoViews(item.snippet?.viewCount) + ' lượt xem'}
+              </Typography>
+            )}
+
             <Typography
               className={classes.videoDate}
               component='span'

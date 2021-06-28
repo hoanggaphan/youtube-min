@@ -1,7 +1,7 @@
 export function fetchListById(
   playlistId: string,
   pageToken?: string,
-  maxResults: number = 30
+  maxResults: number = 50
 ) {
   return gapi.client.youtube.playlistItems.list({
     part: ['snippet,contentDetails'],

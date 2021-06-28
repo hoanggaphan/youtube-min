@@ -9,6 +9,8 @@ import ReactDOM from 'react-dom';
 import { SWRConfig } from 'swr';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import SWRDevtools from '@jjordy/swr-devtools';
+import { cache, mutate } from 'swr';
 
 const theme = createMuiTheme({
   overrides: {
@@ -66,6 +68,7 @@ ReactDOM.render(
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Snackbar>
+          <SWRDevtools cache={cache} mutate={mutate} />
           <App />
         </Snackbar>
       </ThemeProvider>

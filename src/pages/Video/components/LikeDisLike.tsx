@@ -75,6 +75,12 @@ export default React.memo(function LikeDisLike({
     }
   };
 
+  const off = () => {
+    enqueueSnackbar('Chức năng này đã bị tắt', {
+      variant: 'warning',
+    });
+  };
+
   return (
     <Box display='flex'>
       <Tooltip
@@ -84,7 +90,8 @@ export default React.memo(function LikeDisLike({
         <Box mr='7.5px' className={classes.likeContainer}>
           {rating === 'like' ? (
             <IconButton
-              onClick={() => handleRate('none')}
+              // onClick={() => handleRate('none')}
+              onClick={off}
               className={classes.iconBtn}
               color='primary'
             >
@@ -92,7 +99,8 @@ export default React.memo(function LikeDisLike({
             </IconButton>
           ) : (
             <IconButton
-              onClick={() => handleRate('like')}
+              // onClick={() => handleRate('like')}
+              onClick={off}
               className={classes.iconBtn}
             >
               <ThumbUpIcon />
@@ -112,7 +120,8 @@ export default React.memo(function LikeDisLike({
         <Box ml='7.5px' pr='6px' className={classes.likeContainer}>
           {rating === 'dislike' ? (
             <IconButton
-              onClick={() => handleRate('none')}
+              // onClick={() => handleRate('none')}
+              onClick={off}
               className={classes.iconBtn}
               color='primary'
             >
@@ -120,7 +129,8 @@ export default React.memo(function LikeDisLike({
             </IconButton>
           ) : (
             <IconButton
-              onClick={() => handleRate('dislike')}
+              // onClick={() => handleRate('dislike')}
+              onClick={off}
               className={classes.iconBtn}
             >
               <ThumbDownIcon />
