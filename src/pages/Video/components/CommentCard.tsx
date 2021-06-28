@@ -33,6 +33,7 @@ const useStyles = makeStyles((theme: Theme) => {
     actionText: {
       padding: '8px 16px',
       cursor: 'pointer',
+      userSelect: "none",
 
       lineHeight: 1,
       fontSize: '13px',
