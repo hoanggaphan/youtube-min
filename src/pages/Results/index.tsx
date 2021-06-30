@@ -1,75 +1,19 @@
 import { createStyles, makeStyles, Theme } from '@material-ui/core';
-import * as channelAPI from 'api/channelAPI';
-import * as searchAPI from 'api/searchAPI';
-import * as videoAPI from 'api/videoAPI';
 import MyContainer from 'components/MyContainer';
+import Spinner from 'components/Spinner';
 import useQuery from 'hooks/useQuery';
 import React from 'react';
 import { Redirect } from 'react-router-dom';
 import { useSWRInfinite } from 'swr';
 import VideoItem from './components/VideoItem';
-import Spinner from 'components/Spinner';
 import VideosSkeleton from './components/VideosSkeleton';
+import InfiniteScroll from 'components/InfiniteScroll';
+import { useSnackbar } from 'notistack';
 
-const fetchSearchResults = async (
-  url: string,
-  q: string,
-  pageToken?: string
-) => {
-  try {
-    const resSearch = await searchAPI.fetchByKeyword(q, pageToken);
-    // ids for call api to get videos views
-    const videoIds = resSearch.result.items?.map(
-      (item: gapi.client.youtube.SearchResult) => item.id?.videoId!
-    )!;
-    // fetch videos views
-    const resVideos = await videoAPI.fetchVideosViews(videoIds);
-    const videosItems = resVideos.result.items!;
-    resSearch.result.items?.forEach(
-      (pItem: gapi.client.youtube.SearchResult) => {
-        const index = videosItems.findIndex(
-          (vItem: gapi.client.youtube.Video) => vItem.id === pItem.id?.videoId!
-        );
-        (pItem as any).snippet.viewCount =
-          videosItems[index].statistics?.viewCount;
-        (pItem as any).snippet.duration =
-          videosItems[index].contentDetails?.duration;
-        return pItem;
-      }
-    );
-    // ids for call api to get channel avatar
-    const channelIds = resSearch.result.items?.map(
-      (item: gapi.client.youtube.SearchResult) => item.snippet?.channelId!
-    )!;
-    // fetch channel avatar
-    const resChannel = await channelAPI.fetchChannelById(channelIds);
-    const channelItems = resChannel.result.items!;
-    resSearch.result.items?.forEach(
-      (pItem: gapi.client.youtube.SearchResult) => {
-        const index = channelItems.findIndex(
-          (vItem: gapi.client.youtube.Channel) =>
-            vItem.id === pItem.snippet?.channelId
-        );
-        (pItem as any).snippet.channelAvatar =
-          channelItems[index].snippet?.thumbnails?.default?.url;
-        return pItem;
-      }
-    );
-    return resSearch.result;
-  } catch (err) {
-    if (err.message) {
-      throw err;
-    }
-    if (err.result.error.message) {
-      throw err.result.error;
-    }
-    err.result.error.message = 'An error occurred while fetching channel';
-    throw err.result.error;
-  }
-};
-
-const fetchDataTest = async () => {
-  const res = await fetch('https://testapi.io/api/hoanggaphan/search');
+const mockData = async () => {
+  const res = await fetch(
+    'https://run.mocky.io/v3/030d5b4c-9d1f-42d6-80da-53bea13184fe'
+  );
   const result = res.json();
   return result;
 };
@@ -97,12 +41,8 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function Results(): JSX.Element {
   const classes = useStyles();
   const query = useQuery();
-
-  const loader = React.useRef<HTMLDivElement | null>(null);
-  const observerLoader = React.useRef<any>(null);
-  const isLoading = React.useRef(false);
-
   const q = query.get('search_query');
+  const { enqueueSnackbar } = useSnackbar();
 
   const { data, error, setSize } = useSWRInfinite(
     (pageIndex, previousPageData) => {
@@ -110,46 +50,16 @@ export default function Results(): JSX.Element {
       if (previousPageData && !previousPageData.nextPageToken) return null;
 
       // first page, we don't have `previousPageData`
-      if (pageIndex === 0) return [`/results`, q];
+      if (pageIndex === 0) return [`/api/results`, q];
 
       // add the cursor to the API endpoint
-      return [
-        `/results?token=${previousPageData?.nextPageToken}`,
-        q,
-        previousPageData?.nextPageToken,
-      ];
+      return [`/api/results`, q, previousPageData?.nextPageToken];
     },
-    fetchSearchResults
+    mockData
   );
-  
+
   React.useEffect(() => {
     document.title = q + ' - Youtube' || '';
-    // eslint-disable-next-line
-  }, []);
-
-  // Lazy Load More Results
-  React.useEffect(() => {
-    const handleObserver = async (entities: IntersectionObserverEntry[]) => {
-      if (entities[0].isIntersecting) {
-        try {
-          if (isLoading.current) return;
-          isLoading.current = true;
-          await setSize((size) => size + 1);
-        } finally {
-          isLoading.current = false;
-        }
-      }
-    };
-
-    if (observerLoader.current) observerLoader.current.disconnect();
-
-    observerLoader.current = new IntersectionObserver(handleObserver, {
-      rootMargin: '0px 0px 430px 0px',
-    });
-
-    if (loader.current) observerLoader.current.observe(loader.current);
-
-    return () => observerLoader.current.disconnect();
     // eslint-disable-next-line
   }, []);
 
@@ -176,28 +86,41 @@ export default function Results(): JSX.Element {
     return <MyContainer>{error.message}</MyContainer>;
   }
 
-  const renderList = () => {
-    return data?.map((video, index) => (
-      <div key={index}>
-        {video.items?.map((item: any) => (
-          <VideoItem key={item.id?.videoId} item={item} />
-        ))}
-      </div>
-    ));
+  const fetchMoreData = async () => {
+    try {
+      await setSize((size) => size + 1);
+    } catch (error) {
+      enqueueSnackbar(error.message, { variant: 'error' });
+    }
   };
 
   return (
     <div className={classes.container}>
       <MyContainer>
-        {data ? renderList() : <VideosSkeleton num={10} />}
-        <div
-          ref={loader}
-          className={`${
-            (!data || !data[data.length - 1].nextPageToken) && classes.none
-          } ${classes.loader}`}
-        >
-          <Spinner />
-        </div>
+        {data ? (
+          <InfiniteScroll
+            next={fetchMoreData}
+            hasMore={!!data[data.length - 1].nextPageToken}
+            loader={
+              <div className={classes.loader}>
+                <Spinner />
+              </div>
+            }
+            options={{
+              rootMargin: '0px 0px 430px 0px',
+            }}
+          >
+            {data?.map((video, index) => (
+              <div key={index}>
+                {video.items?.map((item: any) => (
+                  <VideoItem key={item.id?.videoId} item={item} />
+                ))}
+              </div>
+            ))}
+          </InfiniteScroll>
+        ) : (
+          <VideosSkeleton num={10} />
+        )}
       </MyContainer>
     </div>
   );

@@ -5,7 +5,7 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import MyContainer from 'components/MyContainer';
 import { getLastWord } from 'helpers/string';
-import { useAuth } from 'hooks/use-auth';
+import { useAuth } from 'hooks/useAuth';
 import React from 'react';
 import Subscription from './components/Subscription';
 

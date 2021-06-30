@@ -60,6 +60,7 @@ export default function SubscribeButton({
     fetchStatus
   );
 
+  // eslint-disable-next-line
   const handleOpen = () => {
     setOpen(true);
   };
@@ -81,6 +82,7 @@ export default function SubscribeButton({
     }
   };
 
+  // eslint-disable-next-line
   const handleSubscribe = async () => {
     try {
       const res = await subscriptionAPI.subscribe(channelId);

@@ -1,4 +1,4 @@
-import { useAuth } from 'hooks/use-auth';
+import { useAuth } from 'hooks/useAuth';
 import React from 'react';
 import { Redirect, Route } from 'react-router-dom';
 
