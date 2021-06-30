@@ -1,11 +1,18 @@
 import * as playlistItemsAPI from 'api/playListItemsAPI';
 import * as videoAPI from 'api/videoAPI';
-import useSWR from 'swr';
+import { useSWRInfinite } from 'swr';
 
-const fetchPlaylistItems = async (url: string, playlistId: string) => {
+const fetchPlaylistItems = async (
+  url: string,
+  playlistId: string,
+  nextPageToken?: string
+) => {
   try {
     // fetch videos list
-    const resPlaylistItems = await playlistItemsAPI.fetchListById(playlistId);
+    const resPlaylistItems = await playlistItemsAPI.fetchListById(
+      playlistId,
+      nextPageToken
+    );
 
     // ids for call api to get videos views
     const ids = resPlaylistItems.result.items?.map(
@@ -36,8 +43,20 @@ const fetchPlaylistItems = async (url: string, playlistId: string) => {
 };
 
 function usePlaylistItems(playlistId: string | undefined) {
-  const { data, error, isValidating, mutate } = useSWR(
-    playlistId ? ['api/playlistItems/list', playlistId] : null,
+  const { data, error, isValidating, setSize } = useSWRInfinite(
+    (pageIndex, previousPageData) => {
+      // reached the end
+      if (previousPageData && !previousPageData.nextPageToken) return null;
+
+      // first page, we don't have `previousPageData`
+      if (pageIndex === 0)
+        return playlistId ? [`/api/playlist`, playlistId] : null;
+
+      // add the cursor to the API endpoint
+      return playlistId
+        ? [`/api/playlist`, playlistId, previousPageData?.nextPageToken]
+        : null;
+    },
     fetchPlaylistItems
   );
 
@@ -45,7 +64,7 @@ function usePlaylistItems(playlistId: string | undefined) {
     data,
     error: error,
     isLoading: isValidating,
-    mutate,
+    setSize,
   };
 }
 
