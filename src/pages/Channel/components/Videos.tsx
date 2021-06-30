@@ -1,8 +1,7 @@
 import Box from '@material-ui/core/Box';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import * as playlistItemsAPI from 'api/playListItemsAPI';
-import * as videoAPI from 'api/videoAPI';
 import usePlaylistItems from 'app/usePlaylistItems';
+import InfiniteScroll from 'components/InfiniteScroll';
 import Spinner from 'components/Spinner';
 import { useSnackbar } from 'notistack';
 import React from 'react';
@@ -38,94 +37,30 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const fetchNextPlaylistItems = async (
-  playlistId: string,
-  nextPageToken: string
-) => {
-  try {
-    // fetch videos list
-    const resPlaylistItems = await playlistItemsAPI.fetchListById(
-      playlistId,
-      nextPageToken
-    );
-
-    // ids for call api to get videos views
-    const ids = resPlaylistItems.result.items?.map(
-      (item: gapi.client.youtube.PlaylistItem) =>
-        item.snippet?.resourceId?.videoId!
-    )!;
-
-    // fetch videos views
-    const resVideos = await videoAPI.fetchVideosViews(ids);
-    const videosItems = resVideos.result.items!;
-
-    resPlaylistItems.result.items?.forEach((pItem: any) => {
-      const index = videosItems.findIndex(
-        (vItem: gapi.client.youtube.Video) =>
-          vItem.id === pItem.snippet.resourceId.videoId
-      );
-
-      pItem.snippet.viewCount = videosItems[index].statistics?.viewCount;
-      pItem.snippet.duration = videosItems[index].contentDetails?.duration;
-      return pItem;
-    });
-
-    return resPlaylistItems.result;
-  } catch (error) {
-    // All errors will be handled at component
-    error.result.error.message =
-      'An error occurred while fetching next playlistItems';
-    throw error.result.error;
-  }
-};
-
 export default React.memo(function Videos({
   channelData,
 }: {
   channelData: undefined | gapi.client.youtube.Channel;
 }): JSX.Element {
   const classes = useStyles();
-  const loader = React.useRef<HTMLDivElement | null>(null);
-  const observer = React.useRef<any>(null);
-
   const { enqueueSnackbar } = useSnackbar();
-
   const playlistId = channelData?.contentDetails?.relatedPlaylists?.uploads;
-
-  const { data, error, isLoading, mutate } = usePlaylistItems(
+  const { data, error, setSize } = usePlaylistItems(
     channelData?.contentDetails?.relatedPlaylists?.uploads
   );
-  const playlistItemsData = data?.items!;
-  const nextPageToken = data?.nextPageToken;
 
-  React.useEffect(() => {
-    if (!nextPageToken || !playlistId) return;
+  let nextPageToken: string | undefined;
+  if (data) {
+    nextPageToken = data[data?.length - 1].nextPageToken;
+  }
 
-    const handleObserver = async (entities: IntersectionObserverEntry[]) => {
-      if (entities[0].isIntersecting) {
-        try {
-          const res = await fetchNextPlaylistItems(playlistId, nextPageToken);
-          res.items = [...data?.items!, ...res.items!];
-          await mutate(res, false);
-        } catch (error) {
-          enqueueSnackbar(error.message, { variant: 'error' });
-        }
-      }
-    };
-
-    if (observer.current) observer.current.disconnect();
-
-    observer.current = new IntersectionObserver(handleObserver, {
-      rootMargin: '0px 0px 400px 0px',
-    });
-
-    if (loader.current) {
-      observer.current.observe(loader.current);
+  const fetchMoreData = async () => {
+    try {
+      await setSize((size) => size + 1);
+    } catch (error) {
+      enqueueSnackbar(error.message, { variant: 'error' });
     }
-
-    return () => observer.current.disconnect();
-    // eslint-disable-next-line
-  }, [nextPageToken, playlistId]);
+  };
 
   if (error) {
     return (
@@ -139,7 +74,7 @@ export default React.memo(function Videos({
     );
   }
 
-  if (isLoading || !playlistId) {
+  if (!data || !playlistId) {
     return (
       <Box mb='24px'>
         <div className={classes.grid}>
@@ -149,21 +84,26 @@ export default React.memo(function Videos({
     );
   }
 
-  function renderList() {
-    return playlistItemsData?.map((item: any) => (
-      <VideoItem key={item.id} item={item} />
-    ));
-  }
-
   return (
     <Box mb='24px'>
-      <div className={classes.grid}>{renderList()}</div>
-
-      {nextPageToken && (
-        <div ref={loader} className={classes.loader}>
-          <Spinner />
+      <InfiniteScroll
+        next={fetchMoreData}
+        hasMore={!!nextPageToken}
+        loader={
+          <div className={classes.loader}>
+            <Spinner />
+          </div>
+        }
+        options={{ rootMargin: '0px 0px 400px 0px' }}
+      >
+        <div className={classes.grid}>
+          {data?.map((playlist) =>
+            playlist.items?.map((item: any) => (
+              <VideoItem key={item.id} item={item} />
+            ))
+          )}
         </div>
-      )}
+      </InfiniteScroll>
     </Box>
   );
 });
