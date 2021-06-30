@@ -62,6 +62,7 @@ export default React.memo(function LikeDisLike({
   const dislikeCount = videoData?.statistics?.dislikeCount;
   const { enqueueSnackbar } = useSnackbar();
 
+  // eslint-disable-next-line
   const handleRate = async (type: string) => {
     if (!rating) return;
 

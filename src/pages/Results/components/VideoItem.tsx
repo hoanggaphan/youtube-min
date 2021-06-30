@@ -139,7 +139,10 @@ export default function VideoItem({
           />
         </LazyLoad>
         <div className={classes.videoDuration}>
-          {formatDuration(item.snippet.duration)}
+          {/* MOCK START */}
+          {/* {formatDuration(item.snippet.duration)} */}
+          {formatDuration('PT26M59S')}
+          {/* MOCK END */}
         </div>
       </div>
       <div className={classes.detailContainer}>
@@ -148,7 +151,8 @@ export default function VideoItem({
         </Typography>
         <Box display='flex' flexDirection='column'>
           <div className={classes.dateViewContainer}>
-            {item.snippet?.viewCount && (
+            {/* MOCK START */}
+            {/* {item.snippet?.viewCount && (
               <Typography
                 className={classes.videoViews}
                 component='span'
@@ -157,7 +161,16 @@ export default function VideoItem({
               >
                 {formatVideoViews(item.snippet?.viewCount) + ' lượt xem'}
               </Typography>
-            )}
+            )} */}
+            <Typography
+              className={classes.videoViews}
+              component='span'
+              variant='body2'
+              color='textSecondary'
+            >
+              {formatVideoViews(1000000) + ' lượt xem'}
+            </Typography>
+            {/* MOCK END */}
 
             <Typography
               className={classes.videoDate}
@@ -170,11 +183,14 @@ export default function VideoItem({
           </div>
           <div className={classes.channelContainer}>
             <Avatar
-              src={item?.snippet.channelAvatar}
+              // MOCK START
+              // src={item?.snippet.channelAvatar}
+              src='https://yt3.ggpht.com/ytc/AKedOLQDHzuD5qM6KC54Ya-LVbZMiN8wh1jSx6XNeXssww=s88-c-k-c0x00ffffff-no-rj'
+              // MOCK END
               className={classes.channelAvatar}
             >
-              {item?.snippet?.title &&
-                getLastWord(item.snippet.title).charAt(0)}
+              {item?.snippet?.channelTitle &&
+                getLastWord(item.snippet.channelTitle).charAt(0)}
             </Avatar>
             <Typography
               variant='caption'

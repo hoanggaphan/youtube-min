@@ -4,10 +4,9 @@ import Button from '@material-ui/core/Button';
 import Input from '@material-ui/core/Input';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import * as commentAPI from 'api/commentAPI';
-import useCommentPopular from 'app/useCommentPopular';
 import Spinner from 'components/Spinner';
 import { getLastWord } from 'helpers/string';
-import { useAuth } from 'hooks/use-auth';
+import { useAuth } from 'hooks/useAuth';
 import { useSnackbar } from 'notistack';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -60,7 +59,6 @@ export default function CommentPost({
   const [show, setShow] = React.useState(false);
   const [value, setValue] = React.useState('');
   const [adding, setAdding] = React.useState(false);
-  const { mutate } = useCommentPopular(videoId);
   const { enqueueSnackbar } = useSnackbar();
   const { state, dispatch } = React.useContext(CommentContext);
 
