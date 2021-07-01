@@ -60,17 +60,18 @@ const SubscriptionList = (list: any) => {
 export default React.memo(function Subscription(): JSX.Element {
   const classes = useStyles();
   const history = useHistory();
+  const { enqueueSnackbar } = useSnackbar();
 
   const menuRef = React.useRef<ScrollMenu>(null);
   const isAdding = React.useRef(false);
+
   const [allItemsWidth, setAllItemsWidth] = React.useState<number | null>(null);
   const [menuWidth, setMenuWidth] = React.useState<number | null>(null);
 
-  const { enqueueSnackbar } = useSnackbar();
   const { data, error, mutate } = useSubscription();
   const nextPageToken = data?.nextPageToken;
   const subscriptions = data?.items;
-
+  
   // Get Menu Width, to disable dragging when Items Width < Menu Width
   React.useEffect(() => {
     if (menuRef && menuRef.current) {
@@ -126,7 +127,7 @@ export default React.memo(function Subscription(): JSX.Element {
     );
   }
 
-  if (subscriptions && !subscriptions.length) {
+  if (data && !data?.items?.length) {
     return (
       <>
         <Typography align='center' variant='h2' className={classes.title}>

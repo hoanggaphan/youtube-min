@@ -1,5 +1,6 @@
 import useSWR from 'swr';
 import * as subscriptionAPI from 'api/subscriptionAPI';
+import { useAuth } from 'hooks/useAuth';
 
 const fetchSubscription = async (url: string) => {
   try {
@@ -12,8 +13,10 @@ const fetchSubscription = async (url: string) => {
 };
 
 function useSubscription() {
+  const { user } = useAuth();
+  console.log(user?.id);
   const { data, error, isValidating, mutate } = useSWR(
-    'api/subscription/list',
+    user ? '/api/subscription?uid=' + user.id : null,
     fetchSubscription
   );
 
