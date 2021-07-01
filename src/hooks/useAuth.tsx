@@ -73,10 +73,10 @@ function useProvideAuth() {
    */
   const updateSignInStatus = () => {
     const user = GoogleAuth.currentUser.get();
-
+    
     if (user.isSignedIn()) {
       setIsSignedIn(true);
-
+      
       const userProfile = user.getBasicProfile();
       const newUser = {
         imgUrl: userProfile.getImageUrl(),
@@ -89,6 +89,7 @@ function useProvideAuth() {
       setUser(newUser);
     } else {
       setIsSignedIn(false);
+      setUser(null);
     }
   };
 
