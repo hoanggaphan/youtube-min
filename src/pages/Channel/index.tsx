@@ -95,7 +95,7 @@ export default function Channel(): JSX.Element {
 
   return (
     <MyContainer>
-      {!isLoading ? (
+      {data ? (
         data?.brandingSettings?.image?.bannerExternalUrl && (
           <div
             className={classes.banner}

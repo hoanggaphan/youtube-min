@@ -14,7 +14,6 @@ const fetchSubscription = async (url: string) => {
 
 function useSubscription() {
   const { user } = useAuth();
-  console.log(user?.id);
   const { data, error, isValidating, mutate } = useSWR(
     user ? '/api/subscription?uid=' + user.id : null,
     fetchSubscription
