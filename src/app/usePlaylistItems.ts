@@ -50,11 +50,11 @@ function usePlaylistItems(playlistId: string | undefined) {
 
       // first page, we don't have `previousPageData`
       if (pageIndex === 0)
-        return playlistId ? [`/api/playlist`, playlistId] : null;
+        return playlistId ? [`/api/playlist?pid=`, playlistId] : null;
 
       // add the cursor to the API endpoint
       return playlistId
-        ? [`/api/playlist`, playlistId, previousPageData?.nextPageToken]
+        ? [`/api/playlist?pid=`, playlistId, previousPageData?.nextPageToken]
         : null;
     },
     fetchPlaylistItems

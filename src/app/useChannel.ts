@@ -15,7 +15,7 @@ const fetchChannel = async (url: string, channelId: string) => {
 
 function useChannel(channelId: string | undefined) {
   const { data, error, isValidating, mutate } = useSWR(
-    channelId ? ['/api/channel', channelId] : null,
+    channelId ? ['/api/channel?cid=', channelId] : null,
     fetchChannel
   );
 
