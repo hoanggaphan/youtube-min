@@ -24,9 +24,9 @@ import ViewDate from './components/ViewDate';
 const useStyles = makeStyles((theme: Theme) => {
   return createStyles({
     iframeWrapperPadding: {
-      padding: '0',
+      paddingTop: '12px',
       [theme.breakpoints.up('sm')]: {
-        padding: '24px 24px 0 24px',
+        paddingTop: '24px',
       },
     },
     iframeContainer: {
@@ -49,13 +49,6 @@ const useStyles = makeStyles((theme: Theme) => {
       left: 0,
       width: '100%',
       height: '100%',
-    },
-    contentWrapperPadding: {
-      marginBottom: '50px',
-      padding: '0 12px 0 12px',
-      [theme.breakpoints.up('sm')]: {
-        padding: '0 24px 0 24px',
-      },
     },
     likeDislikeContainer: {
       marginTop: '5px',
@@ -137,28 +130,24 @@ export default function Video(): JSX.Element {
     !channelData
   ) {
     return (
-      <MyContainer>
-        <div className={classes.iframeWrapperPadding}>
-          <div className={classes.iframeContainer}>
-            <Box
-              display='flex'
-              justifyContent='center'
-              alignItems='center'
-              className={classes.iframe}
-            >
-              <ErrorOutlineIcon className={classes.iframeIconError} />
-              <span className={classes.iframeTextError}>
-                Video không có sẵn
-              </span>
-            </Box>
-          </div>
+      <div className={classes.iframeWrapperPadding}>
+        <div className={classes.iframeContainer}>
+          <Box
+            display='flex'
+            justifyContent='center'
+            alignItems='center'
+            className={classes.iframe}
+          >
+            <ErrorOutlineIcon className={classes.iframeIconError} />
+            <span className={classes.iframeTextError}>Video không có sẵn</span>
+          </Box>
         </div>
-      </MyContainer>
+      </div>
     );
   }
 
   return (
-    <MyContainer>
+    <Box mb='50px'>
       <div className={classes.iframeWrapperPadding}>
         <div className={classes.iframeContainer}>
           <iframe
@@ -175,7 +164,7 @@ export default function Video(): JSX.Element {
         </div>
       </div>
 
-      <div className={classes.contentWrapperPadding}>
+      <div>
         {!videoData ? (
           <Box p='20px 0 8px 0'>
             <Skeleton animation={false} width='50%' height='34px' />
@@ -338,6 +327,6 @@ export default function Video(): JSX.Element {
           <Comments videoId={videoId} channelId={channelId!} player={player} />
         )}
       </div>
-    </MyContainer>
+    </Box>
   );
 }

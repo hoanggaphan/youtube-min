@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     channelHeader: {
       display: 'flex',
-      backgroundColor: '#f9f9f9',
+      backgroundColor: '#fff',
       justifyContent: 'space-between',
       flexDirection: 'column',
       padding: '15px 40px 0',
@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     tabs: {
-      backgroundColor: '#f9f9f9',
+      backgroundColor: '#fff',
     },
   })
 );
@@ -94,7 +94,7 @@ export default function Channel(): JSX.Element {
   }
 
   return (
-    <MyContainer>
+    <>
       {data ? (
         data?.brandingSettings?.image?.bannerExternalUrl && (
           <div
@@ -198,6 +198,6 @@ export default function Channel(): JSX.Element {
           );
         }}
       />
-    </MyContainer>
+    </>
   );
 }

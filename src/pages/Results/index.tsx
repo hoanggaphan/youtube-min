@@ -96,32 +96,30 @@ export default function Results(): JSX.Element {
 
   return (
     <div className={classes.container}>
-      <MyContainer>
-        {data ? (
-          <InfiniteScroll
-            next={fetchMoreData}
-            hasMore={!!data[data.length - 1].nextPageToken}
-            loader={
-              <div className={classes.loader}>
-                <Spinner />
-              </div>
-            }
-            options={{
-              rootMargin: '0px 0px 430px 0px',
-            }}
-          >
-            {data?.map((video, index) => (
-              <div key={index}>
-                {video.items?.map((item: any) => (
-                  <VideoItem key={item.id?.videoId} item={item} />
-                ))}
-              </div>
-            ))}
-          </InfiniteScroll>
-        ) : (
-          <VideosSkeleton num={10} />
-        )}
-      </MyContainer>
+      {data ? (
+        <InfiniteScroll
+          next={fetchMoreData}
+          hasMore={!!data[data.length - 1].nextPageToken}
+          loader={
+            <div className={classes.loader}>
+              <Spinner />
+            </div>
+          }
+          options={{
+            rootMargin: '0px 0px 430px 0px',
+          }}
+        >
+          {data?.map((video, index) => (
+            <div key={index}>
+              {video.items?.map((item: any) => (
+                <VideoItem key={item.id?.videoId} item={item} />
+              ))}
+            </div>
+          ))}
+        </InfiniteScroll>
+      ) : (
+        <VideosSkeleton num={10} />
+      )}
     </div>
   );
 }
