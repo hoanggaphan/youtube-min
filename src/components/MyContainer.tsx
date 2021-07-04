@@ -1,18 +1,29 @@
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import React from 'react';
-import Container from '@material-ui/core/Container';
-import { Link } from 'react-router-dom';
 
 type MyContainerProps = {
-  children: any;
+  children: React.ReactNode;
 };
+
+const useStyles = makeStyles((theme: Theme) => {
+  return createStyles({
+    container: {
+      maxWidth: '1118px',
+      width: '100%',
+      margin: '0 auto',
+      padding: '0 12px',
+
+      [theme.breakpoints.up('sm')]: {
+        padding: '0 24px',
+      },
+    },
+  });
+});
 
 export default function MyContainer({
   children,
 }: MyContainerProps): JSX.Element {
-  return (
-    <Container maxWidth='md' disableGutters>
-      <Link to='/home'>Home</Link>
-      {children}
-    </Container>
-  );
+  const classes = useStyles();
+
+  return <div className={classes.container}>{children}</div>;
 }

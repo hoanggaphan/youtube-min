@@ -8,7 +8,7 @@ type ProtectedRouteProps = {
   path: string;
 };
 
-export function ProtectedRoute({
+export default function RouteAuth({
   component: Component,
   path,
   ...rest
