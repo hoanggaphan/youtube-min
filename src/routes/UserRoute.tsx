@@ -2,17 +2,17 @@ import { useAuth } from 'hooks/useAuth';
 import React from 'react';
 import { Redirect, Route } from 'react-router-dom';
 
-type ProtectedRouteProps = {
+type RouteAuthProps = {
   component: any;
   exact?: boolean;
   path: string;
 };
 
-export default function RouteAuth({
+function RouteAuth({
   component: Component,
   path,
   ...rest
-}: ProtectedRouteProps): JSX.Element {
+}: RouteAuthProps): JSX.Element {
   const { isSignedIn } = useAuth();
 
   return (
@@ -27,6 +27,32 @@ export default function RouteAuth({
           return path === '/' ? <Component /> : <Redirect to='/' />;
         }
       }}
+    />
+  );
+}
+
+export default function UserRoute({
+  component: Component,
+  layout: Layout,
+  ...rest
+}: {
+  component: any;
+  layout?: React.ElementType;
+  exact?: boolean;
+  path: string;
+}): JSX.Element {
+  return (
+    <RouteAuth
+      {...rest}
+      component={() =>
+        Layout ? (
+          <Layout>
+            <Component />
+          </Layout>
+        ) : (
+          <Component />
+        )
+      }
     />
   );
 }

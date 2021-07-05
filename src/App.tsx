@@ -10,7 +10,7 @@ import Video from 'pages/Video';
 import React from 'react';
 import { IntlProvider } from 'react-intl';
 import { Redirect, Route, Router, Switch } from 'react-router-dom';
-import RouteAuth from 'routes/RouteAuth';
+import UserRoute from 'routes/UserRoute';
 
 export const history = createBrowserHistory();
 
@@ -22,36 +22,26 @@ history.listen((location, action) => {
 
 const defaultLocale = window.navigator.language;
 
-const RouteWithLayout = ({
-  component: Component,
-  ...rest
-}: {
-  component: any;
-  exact?: boolean;
-  path: string;
-}): JSX.Element => (
-  <RouteAuth
-    {...rest}
-    component={() => (
-      <HeadLayout>
-        <Component />
-      </HeadLayout>
-    )}
-  />
-);
-
 function App() {
   return (
     <IntlProvider locale={defaultLocale}>
       <ProvideAuth>
         <Router history={history}>
           <Switch>
-            <RouteAuth exact path='/' component={Login} />
-            <RouteWithLayout path='/home' component={Home} />
-            <RouteWithLayout path='/video' component={Video} />
-            <RouteWithLayout path='/channel/:id' component={Channel} />
+            <UserRoute exact path='/' component={Login} />
+            <UserRoute path='/home' component={Home} layout={HeadLayout} />
+            <UserRoute path='/video' component={Video} layout={HeadLayout} />
+            <UserRoute
+              path='/channel/:id'
+              component={Channel}
+              layout={HeadLayout}
+            />
             <Redirect from='/channel' to='/home' />
-            <RouteWithLayout path='/results' component={Results} />
+            <UserRoute
+              path='/results'
+              component={Results}
+              layout={HeadLayout}
+            />
             <Route path='*' component={PageNotFound} />
           </Switch>
         </Router>
