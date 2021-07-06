@@ -1,4 +1,5 @@
 import { createStyles, makeStyles, Theme } from '@material-ui/core';
+import InfiniteScroll from 'components/InfiniteScroll';
 import MyContainer from 'components/MyContainer';
 import Spinner from 'components/Spinner';
 import useQuery from 'hooks/useQuery';
@@ -7,8 +8,6 @@ import { Redirect } from 'react-router-dom';
 import { useSWRInfinite } from 'swr';
 import VideoItem from './components/VideoItem';
 import VideosSkeleton from './components/VideosSkeleton';
-import InfiniteScroll from 'components/InfiniteScroll';
-import { useSnackbar } from 'notistack';
 
 const mockData = async () => {
   const res = await fetch(
@@ -20,12 +19,6 @@ const mockData = async () => {
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    container: {
-      padding: '0 12px',
-      [theme.breakpoints.up('sm')]: {
-        padding: '0 24px',
-      },
-    },
     loader: {
       display: 'inline-block',
       textAlign: 'center',
@@ -42,7 +35,6 @@ export default function Results(): JSX.Element {
   const classes = useStyles();
   const query = useQuery();
   const q = query.get('search_query');
-  const { enqueueSnackbar } = useSnackbar();
 
   const { data, error, setSize } = useSWRInfinite(
     (pageIndex, previousPageData) => {
@@ -60,8 +52,7 @@ export default function Results(): JSX.Element {
 
   React.useEffect(() => {
     document.title = q + ' - Youtube' || '';
-    // eslint-disable-next-line
-  }, []);
+  }, [q]);
 
   if (!q) {
     return <Redirect to='/home' />;
@@ -87,15 +78,11 @@ export default function Results(): JSX.Element {
   }
 
   const fetchMoreData = async () => {
-    try {
-      await setSize((size) => size + 1);
-    } catch (error) {
-      enqueueSnackbar(error.message, { variant: 'error' });
-    }
+    await setSize((size) => size + 1);
   };
 
   return (
-    <div className={classes.container}>
+    <>
       {data ? (
         <InfiniteScroll
           next={fetchMoreData}
@@ -120,6 +107,6 @@ export default function Results(): JSX.Element {
       ) : (
         <VideosSkeleton num={10} />
       )}
-    </div>
+    </>
   );
 }
