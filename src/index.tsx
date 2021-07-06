@@ -11,6 +11,7 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import SWRDevtools from '@jjordy/swr-devtools';
 import { cache, mutate } from 'swr';
+import ProvideGlobal from 'hooks/useGlobal';
 
 const theme = createMuiTheme({
   overrides: {
@@ -22,6 +23,7 @@ const theme = createMuiTheme({
         },
         body: {
           overflowX: 'hidden',
+          overflowY: 'scroll',
           backgroundColor: '#f9f9f9',
         },
         '::-webkit-scrollbar': {
@@ -64,15 +66,17 @@ const swrConfigs = {
 
 ReactDOM.render(
   <React.StrictMode>
-    <SWRConfig value={swrConfigs}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Snackbar>
-          <SWRDevtools cache={cache} mutate={mutate} />
-          <App />
-        </Snackbar>
-      </ThemeProvider>
-    </SWRConfig>
+    <ProvideGlobal>
+      <SWRConfig value={swrConfigs}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Snackbar>
+            <SWRDevtools cache={cache} mutate={mutate} />
+            <App />
+          </Snackbar>
+        </ThemeProvider>
+      </SWRConfig>
+    </ProvideGlobal>
   </React.StrictMode>,
   document.getElementById('root')
 );

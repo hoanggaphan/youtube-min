@@ -4,6 +4,7 @@ import HeadLayout from 'layouts/HeadLayout';
 import Channel from 'pages/Channel';
 import Home from 'pages/Home';
 import Login from 'pages/Login';
+import Note from 'pages/Note';
 import PageNotFound from 'pages/NotFound';
 import Results from 'pages/Results';
 import Video from 'pages/Video';
@@ -42,6 +43,8 @@ function App() {
               component={Results}
               layout={HeadLayout}
             />
+            <Route path='/note' component={Note} />
+
             <Route path='*' component={PageNotFound} />
           </Switch>
         </Router>
