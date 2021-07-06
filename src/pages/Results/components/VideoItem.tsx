@@ -11,9 +11,14 @@ import { getLastWord } from 'helpers/string';
 import React from 'react';
 import { lineClamp } from 'styles/utilities';
 import LazyLoad from 'react-lazyload';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
+    link: {
+      textDecoration: 'none',
+      color: 'inherit',
+    },
     container: {
       marginTop: '16px',
       display: 'flex',
@@ -126,33 +131,33 @@ export default function VideoItem({
   item: VideoItemType;
 }): JSX.Element {
   const classes = useStyles();
-
   return (
-    <div className={classes.container}>
-      <div className={classes.videoImgContainer}>
-        <LazyLoad offset={400} once>
-          <img
-            src={item.snippet?.thumbnails?.medium?.url}
-            alt=''
-            width='360'
-            className={classes.videoImg}
-          />
-        </LazyLoad>
-        <div className={classes.videoDuration}>
-          {/* MOCK START */}
-          {/* {formatDuration(item.snippet.duration)} */}
-          {formatDuration('PT26M59S')}
-          {/* MOCK END */}
-        </div>
-      </div>
-      <div className={classes.detailContainer}>
-        <Typography variant='h5' className={classes.videoTitle}>
-          {item.snippet?.title}
-        </Typography>
-        <Box display='flex' flexDirection='column'>
-          <div className={classes.dateViewContainer}>
+    <Link className={classes.link} to={`/video?v=${item.id?.videoId}`}>
+      <div className={classes.container}>
+        <div className={classes.videoImgContainer}>
+          <LazyLoad offset={400} once>
+            <img
+              src={item.snippet?.thumbnails?.medium?.url}
+              alt=''
+              width='360'
+              className={classes.videoImg}
+            />
+          </LazyLoad>
+          <div className={classes.videoDuration}>
             {/* MOCK START */}
-            {/* {item.snippet?.viewCount && (
+            {/* {formatDuration(item.snippet.duration)} */}
+            {formatDuration('PT26M59S')}
+            {/* MOCK END */}
+          </div>
+        </div>
+        <div className={classes.detailContainer}>
+          <Typography variant='h5' className={classes.videoTitle}>
+            {item.snippet?.title}
+          </Typography>
+          <Box display='flex' flexDirection='column'>
+            <div className={classes.dateViewContainer}>
+              {/* MOCK START */}
+              {/* {item.snippet?.viewCount && (
               <Typography
                 className={classes.videoViews}
                 component='span'
@@ -162,51 +167,52 @@ export default function VideoItem({
                 {formatVideoViews(item.snippet?.viewCount) + ' lượt xem'}
               </Typography>
             )} */}
-            <Typography
-              className={classes.videoViews}
-              component='span'
-              variant='body2'
-              color='textSecondary'
-            >
-              {formatVideoViews(1000000) + ' lượt xem'}
-            </Typography>
-            {/* MOCK END */}
+              <Typography
+                className={classes.videoViews}
+                component='span'
+                variant='body2'
+                color='textSecondary'
+              >
+                {formatVideoViews(1000000) + ' lượt xem'}
+              </Typography>
+              {/* MOCK END */}
 
-            <Typography
-              className={classes.videoDate}
-              component='span'
-              variant='body2'
-              color='textSecondary'
-            >
-              {formatDateView(item.snippet?.publishedAt || '')}
+              <Typography
+                className={classes.videoDate}
+                component='span'
+                variant='body2'
+                color='textSecondary'
+              >
+                {formatDateView(item.snippet?.publishedAt || '')}
+              </Typography>
+            </div>
+            <div className={classes.channelContainer}>
+              <Avatar
+                // MOCK START
+                // src={item?.snippet.channelAvatar}
+                src='https://yt3.ggpht.com/ytc/AKedOLQDHzuD5qM6KC54Ya-LVbZMiN8wh1jSx6XNeXssww=s88-c-k-c0x00ffffff-no-rj'
+                // MOCK END
+                className={classes.channelAvatar}
+              >
+                {item?.snippet?.channelTitle &&
+                  getLastWord(item.snippet.channelTitle).charAt(0)}
+              </Avatar>
+              <Typography
+                variant='caption'
+                color='textSecondary'
+                className={classes.channelTitle}
+              >
+                {item.snippet.channelTitle}
+              </Typography>
+            </div>
+          </Box>
+          {item.snippet.description && (
+            <Typography variant='caption' className={classes.videoDes}>
+              {item.snippet.description}
             </Typography>
-          </div>
-          <div className={classes.channelContainer}>
-            <Avatar
-              // MOCK START
-              // src={item?.snippet.channelAvatar}
-              src='https://yt3.ggpht.com/ytc/AKedOLQDHzuD5qM6KC54Ya-LVbZMiN8wh1jSx6XNeXssww=s88-c-k-c0x00ffffff-no-rj'
-              // MOCK END
-              className={classes.channelAvatar}
-            >
-              {item?.snippet?.channelTitle &&
-                getLastWord(item.snippet.channelTitle).charAt(0)}
-            </Avatar>
-            <Typography
-              variant='caption'
-              color='textSecondary'
-              className={classes.channelTitle}
-            >
-              {item.snippet.channelTitle}
-            </Typography>
-          </div>
-        </Box>
-        {item.snippet.description && (
-          <Typography variant='caption' className={classes.videoDes}>
-            {item.snippet.description}
-          </Typography>
-        )}
+          )}
+        </div>
       </div>
-    </div>
+    </Link>
   );
 }

@@ -1,10 +1,16 @@
 import { createStyles, makeStyles, Theme } from '@material-ui/core';
+import Collapse from '@material-ui/core/Collapse';
+import IconButton from '@material-ui/core/IconButton';
+import Typography from '@material-ui/core/Typography';
+import CloseIcon from '@material-ui/icons/Close';
+import { Alert, AlertTitle } from '@material-ui/lab';
 import InfiniteScroll from 'components/InfiniteScroll';
 import MyContainer from 'components/MyContainer';
 import Spinner from 'components/Spinner';
+import { globalContext } from 'hooks/useGlobal';
 import useQuery from 'hooks/useQuery';
 import React from 'react';
-import { Redirect } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { useSWRInfinite } from 'swr';
 import VideoItem from './components/VideoItem';
 import VideosSkeleton from './components/VideosSkeleton';
@@ -28,6 +34,10 @@ const useStyles = makeStyles((theme: Theme) =>
     none: {
       display: 'none',
     },
+    link: {
+      color: 'black',
+      fontWeight: 500,
+    },
   })
 );
 
@@ -35,6 +45,7 @@ export default function Results(): JSX.Element {
   const classes = useStyles();
   const query = useQuery();
   const q = query.get('search_query');
+  const { state, dispatch } = React.useContext(globalContext);
 
   const { data, error, setSize } = useSWRInfinite(
     (pageIndex, previousPageData) => {
@@ -83,6 +94,31 @@ export default function Results(): JSX.Element {
 
   return (
     <>
+      <Collapse in={state.alert.results}>
+        <Alert
+          severity='warning'
+          action={
+            <IconButton
+              aria-label='close'
+              size='small'
+              onClick={() => {
+                dispatch({ type: 'TOGGLE_ALERT_RESULTS' });
+              }}
+            >
+              <CloseIcon fontSize='inherit' />
+            </IconButton>
+          }
+        >
+          <AlertTitle>Lưu ý</AlertTitle>
+          <Typography variant='caption'>
+            Đây chỉ là trang Demo sử dụng dữ liệu tĩnh - Vui lòng đọc thêm{' '}
+            <Link className={classes.link} to='/note'>
+              ở đây
+            </Link>
+          </Typography>
+        </Alert>
+      </Collapse>
+
       {data ? (
         <InfiniteScroll
           next={fetchMoreData}
