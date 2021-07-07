@@ -160,12 +160,19 @@ export default function Channel(): JSX.Element {
         textColor='primary'
         centered
       >
-        <Tab label='Video' value={url} component={Link} to={url} />
+        <Tab
+          label='Video'
+          value={url}
+          component={Link}
+          to={url}
+          disableRipple
+        />
         <Tab
           label='Giới thiệu'
           value={`${url}/about`}
           component={Link}
           to={`${url}/about`}
+          disableRipple
         />
       </Tabs>
 
