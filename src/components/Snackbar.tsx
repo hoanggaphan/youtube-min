@@ -28,7 +28,7 @@ export default function Snackbar({
   return (
     <SnackbarProvider
       ref={notistackRef}
-      classes={{ root: 'classes.root' }}
+      classes={{ root: classes.root }}
       dense
       preventDuplicate
       action={(key) => (
