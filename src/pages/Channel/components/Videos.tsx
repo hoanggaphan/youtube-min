@@ -55,30 +55,34 @@ export default React.memo(function Videos({
 
   if (!data || !playlistId) {
     return (
-      <div className={classes.grid}>
-        <VideosSkeleton num={10} />
-      </div>
+      <Box mb='24px'>
+        <div className={classes.grid}>
+          <VideosSkeleton num={10} />
+        </div>
+      </Box>
     );
   }
 
   return (
-    <InfiniteScroll
-      next={fetchMoreData}
-      hasMore={!!nextPageToken}
-      loader={
-        <div className={classes.loader}>
-          <Spinner />
+    <Box mb='24px'>
+      <InfiniteScroll
+        next={fetchMoreData}
+        hasMore={!!nextPageToken}
+        loader={
+          <div className={classes.loader}>
+            <Spinner />
+          </div>
+        }
+        options={{ rootMargin: '0px 0px 400px 0px' }}
+      >
+        <div className={classes.grid}>
+          {data?.map((playlist) =>
+            playlist.items?.map((item: any) => (
+              <VideoItem key={item.id} item={item} />
+            ))
+          )}
         </div>
-      }
-      options={{ rootMargin: '0px 0px 400px 0px' }}
-    >
-      <div className={classes.grid}>
-        {data?.map((playlist) =>
-          playlist.items?.map((item: any) => (
-            <VideoItem key={item.id} item={item} />
-          ))
-        )}
-      </div>
-    </InfiniteScroll>
+      </InfiniteScroll>
+    </Box>
   );
 });
