@@ -1,3 +1,4 @@
+import Snackbar from 'components/Snackbar';
 import { createBrowserHistory } from 'history';
 import { ProvideAuth } from 'hooks/useAuth';
 import HeadLayout from 'layouts/HeadLayout';
@@ -27,27 +28,29 @@ function App() {
   return (
     <IntlProvider locale={defaultLocale}>
       <ProvideAuth>
-        <Router history={history}>
-          <Switch>
-            <UserRoute exact path='/' component={Login} />
-            <UserRoute path='/home' component={Home} layout={HeadLayout} />
-            <UserRoute path='/video' component={Video} layout={HeadLayout} />
-            <UserRoute
-              path='/channel/:id'
-              component={Channel}
-              layout={HeadLayout}
-            />
-            <Redirect from='/channel' to='/home' />
-            <UserRoute
-              path='/results'
-              component={Results}
-              layout={HeadLayout}
-            />
-            <Route path='/note' component={Note} />
+        <Snackbar>
+          <Router history={history}>
+            <Switch>
+              <UserRoute exact path='/' component={Login} />
+              <UserRoute path='/home' component={Home} layout={HeadLayout} />
+              <UserRoute path='/video' component={Video} layout={HeadLayout} />
+              <UserRoute
+                path='/channel/:id'
+                component={Channel}
+                layout={HeadLayout}
+              />
+              <Redirect from='/channel' to='/home' />
+              <UserRoute
+                path='/results'
+                component={Results}
+                layout={HeadLayout}
+              />
+              <Route path='/note' component={Note} />
 
-            <Route path='*' component={PageNotFound} />
-          </Switch>
-        </Router>
+              <Route path='*' component={PageNotFound} />
+            </Switch>
+          </Router>
+        </Snackbar>
       </ProvideAuth>
     </IntlProvider>
   );
