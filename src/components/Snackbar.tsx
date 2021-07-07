@@ -5,6 +5,7 @@ import React from 'react';
 
 const useStyles = makeStyles((theme: Theme) => {
   return createStyles({
+    root: {},
     button: {
       color: 'inherit',
       fontSize: '13px',
@@ -27,6 +28,7 @@ export default function Snackbar({
   return (
     <SnackbarProvider
       ref={notistackRef}
+      classes={{ root: classes.root }}
       dense
       preventDuplicate
       action={(key) => (
