@@ -3,7 +3,6 @@ import {
   ThemeProvider,
   unstable_createMuiStrictModeTheme as createMuiTheme,
 } from '@material-ui/core/styles';
-import Snackbar from 'components/Snackbar';
 import ProvideGlobal from 'hooks/useGlobal';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -68,9 +67,7 @@ ReactDOM.render(
       <SWRConfig value={swrConfigs}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <Snackbar>
-            <App />
-          </Snackbar>
+          <App />
         </ThemeProvider>
       </SWRConfig>
     </ProvideGlobal>
