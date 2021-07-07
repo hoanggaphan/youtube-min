@@ -24,6 +24,7 @@ const useStyles = makeStyles((theme: Theme) =>
       backgroundRepeat: 'no-repeat',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
+      backgroundColor: '#dedede',
 
       [theme.breakpoints.up('lg')]: {
         height: 'calc((100vw - 240px) / 6.2 - 1px)',
@@ -92,7 +93,7 @@ export default function Channel(): JSX.Element {
   if (!isLoading && !data) {
     return <PageNotFound />;
   }
-
+  
   return (
     <>
       {data ? (
@@ -111,12 +112,13 @@ export default function Channel(): JSX.Element {
       <Box className={classes.channelHeader}>
         <Box display='flex' alignItems='center'>
           <Box mr='25px'>
-            {data?.snippet?.title ? (
+            {data ? (
               <Avatar
-                src={data.snippet.thumbnails?.default?.url}
+                src={data?.snippet?.thumbnails?.default?.url}
                 className={classes.avatar}
               >
-                {getLastWord(data.snippet.title).charAt(0)}
+                {data?.snippet?.title &&
+                  getLastWord(data.snippet.title).charAt(0)}
               </Avatar>
             ) : (
               <Skeleton animation={false} variant='circle'>
@@ -132,13 +134,15 @@ export default function Channel(): JSX.Element {
             ) : (
               <Skeleton animation={false} variant='text' width={150} />
             )}
-            {!data?.statistics?.subscriberCount ? (
+            {!data ? (
               <Skeleton animation={false} variant='text' width={100} />
             ) : (
-              <Typography variant='body2' color='textSecondary'>
-                {formatSubscriptionCount(data.statistics.subscriberCount) +
-                  ' người đăng ký'}
-              </Typography>
+              data?.statistics?.subscriberCount && (
+                <Typography variant='body2' color='textSecondary'>
+                  {formatSubscriptionCount(data.statistics.subscriberCount) +
+                    ' người đăng ký'}
+                </Typography>
+              )
             )}
           </div>
         </Box>
