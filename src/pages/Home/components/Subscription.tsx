@@ -1,5 +1,10 @@
 import Box from '@material-ui/core/Box';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import {
+  createStyles,
+  makeStyles,
+  Theme,
+  useTheme,
+} from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
@@ -9,9 +14,10 @@ import { useSnackbar } from 'notistack';
 import React from 'react';
 import ScrollMenu from 'react-horizontal-scrolling-menu';
 import { useHistory } from 'react-router';
-import Arrow from './Arrow';
 import SubscriptionItem from './SubscriptionItem';
 import SubscriptionSkeleton from './SubscriptionSkeleton';
+import IconButton from '@material-ui/core/IconButton';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -20,30 +26,46 @@ const useStyles = makeStyles((theme: Theme) =>
       opacity: '0',
     },
     menu: {
-      marginTop: '40px',
+      marginTop: '20px',
       position: 'relative',
+      [theme.breakpoints.up('sm')]: {
+        marginTop: '40px',
+      },
     },
     menuItem: {
       outline: 'none',
       userSelect: 'none',
     },
     title: {
-      marginTop: '50px',
+      fontSize: '2rem',
+      marginTop: '25px',
 
-      [theme.breakpoints.down('sm')]: {
+      [theme.breakpoints.up('sm')]: {
         fontSize: '2.7rem',
-        marginTop: '25px',
+        marginTop: '50px',
       },
     },
   })
 );
 
-const ArrowLeft = Arrow({
-  icon: <NavigateBeforeIcon fontSize='large' />,
-});
-const ArrowRight = Arrow({
-  icon: <NavigateNextIcon fontSize='large' />,
-});
+const ArrowLeft = (): JSX.Element => {
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up('sm'));
+  return (
+    <IconButton size='small'>
+      <NavigateBeforeIcon fontSize={matches ? 'large' : 'default'} />
+    </IconButton>
+  );
+};
+const ArrowRight = (): JSX.Element => {
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up('sm'));
+  return (
+    <IconButton size='small'>
+      <NavigateNextIcon fontSize={matches ? 'large' : 'default'} />
+    </IconButton>
+  );
+};
 
 const SubscriptionList = (list: any) => {
   return list.map((sub: any) => {
@@ -71,7 +93,7 @@ export default React.memo(function Subscription(): JSX.Element {
   const { data, error, mutate } = useSubscription();
   const nextPageToken = data?.nextPageToken;
   const subscriptions = data?.items;
-  
+
   // Get Menu Width, to disable dragging when Items Width < Menu Width
   React.useEffect(() => {
     if (menuRef && menuRef.current) {
@@ -156,8 +178,8 @@ export default React.memo(function Subscription(): JSX.Element {
           menuClass={classes.menu}
           itemClass={classes.menuItem}
           arrowDisabledClass={classes.arrowDisabled}
-          arrowLeft={ArrowLeft}
-          arrowRight={ArrowRight}
+          arrowLeft={<ArrowLeft />}
+          arrowRight={<ArrowRight />}
           alignCenter={false}
           hideArrows
           hideSingleArrow

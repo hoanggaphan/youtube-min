@@ -1,13 +1,19 @@
 import Avatar from '@material-ui/core/Avatar';
-import { createStyles, makeStyles } from '@material-ui/core/styles';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import React from 'react';
 
-const useStyles = makeStyles(() =>
+const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     avatar: {
-      margin: '0 10px',
-      width: '80px',
-      height: '80px',
+      margin: '0 5px',
+      width: '50px',
+      height: '50px',
+
+      [theme.breakpoints.up('sm')]: {
+        margin: '0 10px',
+        width: '80px',
+        height: '80px',
+      },
 
       cursor: 'pointer',
       '-webkit-user-drag': 'none',
