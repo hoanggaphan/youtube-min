@@ -30,10 +30,13 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     videoImgContainer: {
+      minWidth: '160px',
+      maxWidth: '360px',
+      backgroundColor: 'rgba(0,0,0,.1)',
+
       position: 'relative',
       flex: 1,
-      maxWidth: '360px',
-      minWidth: '160px',
+
       '&::before': {
         content: '""',
         display: 'block',
@@ -113,6 +116,8 @@ const useStyles = makeStyles((theme: Theme) =>
     channelAvatar: {
       width: '24px',
       height: '24px',
+      backgroundColor: 'rgba(0,0,0,.11)',
+
       [theme.breakpoints.down('xs')]: {
         display: 'none',
       },

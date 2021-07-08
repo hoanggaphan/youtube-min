@@ -78,6 +78,7 @@ const useStyles = makeStyles((theme: Theme) => {
       width: '48px',
       height: '48px',
       marginRight: '16px',
+      backgroundColor: 'rgba(0,0,0,.11)',
     },
   });
 });

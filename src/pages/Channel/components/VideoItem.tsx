@@ -67,7 +67,7 @@ export default function VideoItem({ item }: { item: any }): JSX.Element {
       key={item.id}
       className={classes.gridItem}
     >
-      <Box position='relative' maxHeight='118px'>
+      <Box position='relative' maxHeight='118px' bgcolor='rgba(0,0,0,.1)'>
         <LazyLoad height={118} offset={400} once>
           <img
             src={item.snippet.thumbnails.medium.url}

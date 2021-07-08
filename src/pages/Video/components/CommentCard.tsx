@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme: Theme) => {
     actionText: {
       padding: '8px 16px',
       cursor: 'pointer',
-      userSelect: "none",
+      userSelect: 'none',
 
       lineHeight: 1,
       fontSize: '13px',
@@ -45,6 +45,9 @@ const useStyles = makeStyles((theme: Theme) => {
     },
     colorPrimary: {
       color: theme.palette.primary.main,
+    },
+    avatar: {
+      backgroundColor: 'rgba(0,0,0,.11)',
     },
   });
 });
@@ -80,6 +83,7 @@ export default function CommentCard({
           offset={400}
         >
           <Avatar
+            className={classes.avatar}
             component={Box}
             width={size}
             height={size}

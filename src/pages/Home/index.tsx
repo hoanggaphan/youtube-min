@@ -91,7 +91,7 @@ export default function Home(): JSX.Element {
       <Box pt='24px'>
         <Avatar
           src={user?.imgUrl}
-          alt='avatar'
+          alt=''
           className={`${classes.large} ${classes.center}`}
         >
           {user && getLastWord(user.firstName).charAt(0)}

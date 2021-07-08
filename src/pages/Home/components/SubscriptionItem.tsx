@@ -8,6 +8,7 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: '0 5px',
       width: '50px',
       height: '50px',
+      backgroundColor: 'rgba(0,0,0,.11)',
 
       [theme.breakpoints.up('sm')]: {
         margin: '0 10px',
@@ -37,7 +38,7 @@ export default function SubscriptionItem({
   const classes = useStyles();
 
   return (
-    <Avatar src={url} alt={text} className={classes.avatar}>
+    <Avatar src={url} alt='' className={classes.avatar}>
       {text}
     </Avatar>
   );
