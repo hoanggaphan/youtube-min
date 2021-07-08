@@ -44,6 +44,9 @@ const useStyles = makeStyles((theme: Theme) => {
     none: {
       display: 'none',
     },
+    avatar: {
+      backgroundColor: 'rgba(0,0,0,.11)',
+    },
   });
 });
 
@@ -123,7 +126,7 @@ export default function CommentPost({
 
       <Box display='flex' className={`${adding && classes.none}`}>
         <Box mr='16px'>
-          <Avatar src={user?.imgUrl}>
+          <Avatar className={classes.avatar} src={user?.imgUrl}>
             {user && getLastWord(user.firstName).charAt(0)}
           </Avatar>
         </Box>

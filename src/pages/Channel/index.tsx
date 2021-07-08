@@ -46,6 +46,7 @@ const useStyles = makeStyles((theme: Theme) =>
       width: '80px',
       height: '80px',
       fontSize: theme.spacing(5),
+      backgroundColor: 'rgba(0,0,0,.11)',
     },
     title: {
       fontSize: '18px',

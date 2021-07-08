@@ -47,6 +47,7 @@ const useStyles = makeStyles((theme: Theme) => {
       width: '32px',
       height: '32px',
       cursor: 'pointer',
+      backgroundColor: 'rgba(0,0,0,.11)',
     },
     link: {
       textDecoration: 'none',
@@ -77,7 +78,7 @@ export default function Header(): JSX.Element {
                 <Avatar
                   {...bindTrigger(popupState)}
                   src={user?.imgUrl}
-                  alt='avatar'
+                  alt=''
                   className={`${classes.avatar}`}
                 >
                   {user && getLastWord(user.firstName).charAt(0)}
