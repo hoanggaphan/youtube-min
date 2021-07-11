@@ -38,11 +38,10 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     title: {
       fontSize: '2rem',
-      marginTop: '25px',
+      marginTop: '70px',
 
       [theme.breakpoints.up('sm')]: {
         fontSize: '2.7rem',
-        marginTop: '50px',
       },
     },
   })
