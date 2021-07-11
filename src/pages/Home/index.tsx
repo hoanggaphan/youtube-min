@@ -12,6 +12,7 @@ import { useAuth } from 'hooks/useAuth';
 import { globalContext } from 'hooks/useGlobal';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import PopularVideos from './components/PopularVideos';
 import Subscription from './components/Subscription';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -121,6 +122,7 @@ export default function Home(): JSX.Element {
         </Box>
 
         <Subscription />
+        <PopularVideos />
       </Box>
     </>
   );
