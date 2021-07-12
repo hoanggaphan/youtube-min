@@ -89,7 +89,7 @@ export default function Home(): JSX.Element {
           </Typography>
         </Alert>
       </Collapse>
-      <Box pt='24px'>
+      <Box pt='24px' mb='50px'>
         <Avatar
           src={user?.imgUrl}
           alt=''
