@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme: Theme) =>
       userSelect: 'none',
     },
     title: {
-      fontSize: '2rem',
+      fontSize: '2.5rem',
       marginTop: '70px',
 
       [theme.breakpoints.up('sm')]: {
