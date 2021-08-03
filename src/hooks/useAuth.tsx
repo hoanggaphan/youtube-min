@@ -73,10 +73,11 @@ function useProvideAuth() {
    */
   const updateSignInStatus = () => {
     const user = GoogleAuth.currentUser.get();
+    const isAuthorized = user.hasGrantedScopes(SCOPE);
     
-    if (user.isSignedIn()) {
+    if (isAuthorized) {
       setIsSignedIn(true);
-      
+
       const userProfile = user.getBasicProfile();
       const newUser = {
         imgUrl: userProfile.getImageUrl(),
