@@ -4,6 +4,7 @@ import { ProvideAuth } from 'hooks/useAuth';
 import HeadLayout from 'layouts/HeadLayout';
 import Channel from 'pages/Channel';
 import Home from 'pages/Home';
+import HowLogin from 'pages/HowLogin';
 import Login from 'pages/Login';
 import Note from 'pages/Note';
 import PageNotFound from 'pages/NotFound';
@@ -46,6 +47,7 @@ function App() {
                 layout={HeadLayout}
               />
               <Route path='/note' component={Note} />
+              <Route path='/how-login' component={HowLogin} />
 
               <Route path='*' component={PageNotFound} />
             </Switch>

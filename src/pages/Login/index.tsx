@@ -4,11 +4,16 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { useAuth } from 'hooks/useAuth';
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     button: {
-      margin: theme.spacing(1),
+      marginTop: theme.spacing(1),
+      marginBottom: theme.spacing(1),
+    },
+    link: {
+      display: 'block',
     },
   })
 );
@@ -32,19 +37,26 @@ export default function Login(): JSX.Element {
       justifyContent='center'
       marginTop='-15vh'
     >
-      <Typography variant='h3' gutterBottom>
-        Đăng Nhập
-      </Typography>
-      <Button
-        onClick={handleLogin}
-        variant='contained'
-        size='large'
-        color='secondary'
-        className={classes.button}
-        startIcon={<i className='fab fa-google'></i>}
-      >
-        Đăng nhập với google
-      </Button>
+      <Box>
+        <Typography align='center' variant='h3' gutterBottom>
+          Đăng Nhập
+        </Typography>
+
+        <Button
+          onClick={handleLogin}
+          variant='contained'
+          size='large'
+          color='secondary'
+          className={classes.button}
+          startIcon={<i className='fab fa-google'></i>}
+        >
+          Đăng nhập với google
+        </Button>
+
+        <Link to='/how-login' className={classes.link}>
+          Hướng dẫn đăng nhập
+        </Link>
+      </Box>
     </Box>
   );
 }
