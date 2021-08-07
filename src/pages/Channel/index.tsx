@@ -147,14 +147,12 @@ export default function Channel(): JSX.Element {
             )}
           </div>
         </Box>
-        {channelId && data?.snippet?.title && (
-          <Box my='10px'>
-            <SubscribeButton
-              channelId={channelId}
-              channelTitle={data.snippet.title}
-            />
-          </Box>
-        )}
+        <Box my='10px'>
+          <SubscribeButton
+            channelId={channelId}
+            channelTitle={data?.snippet?.title}
+          />
+        </Box>
       </Box>
 
       <Tabs

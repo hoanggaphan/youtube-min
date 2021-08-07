@@ -4,7 +4,6 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import Skeleton from '@material-ui/lab/Skeleton';
 import * as subscriptionAPI from 'api/subscriptionAPI';
 import { useSnackbar } from 'notistack';
 import React from 'react';
@@ -12,7 +11,7 @@ import useSWR from 'swr';
 
 type SubscribeButtonProps = {
   channelId: string;
-  channelTitle: string;
+  channelTitle: string | undefined;
 };
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -31,6 +30,14 @@ const useStyles = makeStyles((theme: Theme) =>
       transition: 'none',
       '&:hover': {
         backgroundColor: theme.palette.secondary.main,
+      },
+    },
+    skeleton: {
+      height: '36px',
+      borderRadius: '4px',
+      backgroundColor: 'rgba(0, 0, 0, 0.11)',
+      [theme.breakpoints.up('sm')]: {
+        width: '117px',
       },
     },
   })
@@ -105,7 +112,7 @@ export default function SubscribeButton({
     return <div>{error.message}</div>;
   }
 
-  if (!data) return <Skeleton animation={false} height='50px' width='100px' />;
+  if (!data) return <div className={classes.skeleton} />;
 
   return (
     <>
