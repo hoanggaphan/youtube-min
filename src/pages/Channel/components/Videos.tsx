@@ -11,9 +11,26 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     grid: {
       display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, 210px)',
       gap: '24px 4px',
       justifyContent: 'center',
+      gridTemplateColumns: '250px',
+
+      '@media (min-width: 400px)': {
+        gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+        justifyContent: 'flex-start',
+      },
+
+      [theme.breakpoints.up('sm')]: {
+        gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+      },
+
+      '@media (min-width: 870px)': {
+        gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+      },
+
+      [theme.breakpoints.up('md')]: {
+        gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
+      },
     },
 
     loader: {

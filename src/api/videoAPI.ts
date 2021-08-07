@@ -9,7 +9,7 @@ export function fetchVideosPopular() {
   return gapi.client.youtube.videos.list({
     part: ['snippet, contentDetails, statistics'],
     chart: 'mostPopular',
-    maxResults: 8,
+    maxResults: 16,
     regionCode: 'VN',
   });
 }

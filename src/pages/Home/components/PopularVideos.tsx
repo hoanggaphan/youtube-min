@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme: Theme) =>
       marginTop: '25px',
 
       '@media (min-width: 500px)': {
-        gridTemplateColumns: 'repeat(2, 1fr)',
+        gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
       },
 
       [theme.breakpoints.up('sm')]: {
@@ -29,11 +29,11 @@ const useStyles = makeStyles((theme: Theme) =>
       },
 
       '@media (min-width: 890px)': {
-        gridTemplateColumns: 'repeat(3, 1fr)',
+        gridTemplateColumns: 'repeat(3,  minmax(0, 1fr))',
       },
 
       '@media (min-width: 1144px)': {
-        gridTemplateColumns: 'repeat(4, 1fr)',
+        gridTemplateColumns: 'repeat(4,  minmax(0, 1fr))',
       },
     },
     gridImgContainer: {
@@ -41,7 +41,6 @@ const useStyles = makeStyles((theme: Theme) =>
       '&::before': {
         display: 'block',
         content: "''",
-        width: '100%',
         paddingTop: '56.25%',
         backgroundColor: 'rgba(0,0,0,.11)',
       },
@@ -191,7 +190,7 @@ export default function PopularVideos(): JSX.Element {
             key={item.id}
           >
             <div className={classes.gridImgContainer}>
-              <img src={item.snippet?.thumbnails?.standard?.url} alt='' />
+              <img src={item.snippet?.thumbnails?.medium?.url} alt='' />
             </div>
             <Box mt='12px'>
               <Box display='flex' gridColumnGap='12px'>

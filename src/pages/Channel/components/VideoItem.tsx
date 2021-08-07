@@ -1,4 +1,3 @@
-import Box from '@material-ui/core/Box';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import {
@@ -7,14 +6,31 @@ import {
   formatVideoViews,
 } from 'helpers/format';
 import React from 'react';
-import { Link } from 'react-router-dom';
 import LazyLoad from 'react-lazyload';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    gridItem: {
+    link: {
       textDecoration: 'none',
       color: 'unset',
+    },
+    gridItem: {
+      position: 'relative',
+      backgroundColor: 'rgba(0,0,0,.1)',
+
+      '&::before': {
+        content: "''",
+        display: 'block',
+        paddingTop: '56.25%',
+      },
+    },
+    img: {
+      position: 'absolute',
+      top: '0',
+      left: '0',
+      width: '100%',
+      height: '100%',
     },
     title: {
       fontSize: '16px',
@@ -65,21 +81,20 @@ export default function VideoItem({ item }: { item: any }): JSX.Element {
     <Link
       to={`/video?v=${item.contentDetails.videoId}`}
       key={item.id}
-      className={classes.gridItem}
+      className={classes.link}
     >
-      <Box position='relative' maxHeight='118px' bgcolor='rgba(0,0,0,.1)'>
-        <LazyLoad height={118} offset={400} once>
+      <div className={classes.gridItem}>
+        <LazyLoad offset={400} once>
           <img
+            className={classes.img}
             src={item.snippet.thumbnails.medium.url}
             alt=''
-            width='210'
-            height='118'
           />
         </LazyLoad>
         <div className={classes.duration}>
           {formatDuration(item.snippet.duration)}
         </div>
-      </Box>
+      </div>
       <h3
         className={`${classes.title} ${classes.textEllipsis}`}
         title={item.snippet.title}
