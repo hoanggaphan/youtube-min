@@ -1,12 +1,13 @@
+import SWRDevtools from '@jjordy/swr-devtools';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import {
   ThemeProvider,
-  unstable_createMuiStrictModeTheme as createMuiTheme,
+  unstable_createMuiStrictModeTheme as createMuiTheme
 } from '@material-ui/core/styles';
 import ProvideGlobal from 'hooks/useGlobal';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { SWRConfig } from 'swr';
+import { cache, mutate, SWRConfig } from 'swr';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
@@ -67,6 +68,7 @@ ReactDOM.render(
       <SWRConfig value={swrConfigs}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
+          <SWRDevtools cache={cache} mutate={mutate} />
           <App />
         </ThemeProvider>
       </SWRConfig>

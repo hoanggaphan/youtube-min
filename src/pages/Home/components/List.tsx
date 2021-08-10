@@ -2,14 +2,12 @@ import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import * as videoAPI from 'api/videoAPI';
-import * as channelAPI from 'api/channelAPI';
+import Skeleton from '@material-ui/lab/Skeleton';
+import { videosState } from 'app/useVideos';
 import { formatDateView, formatVideoViews } from 'helpers/format';
 import { getLastWord } from 'helpers/string';
 import React from 'react';
-import useSWR from 'swr';
 import { Link } from 'react-router-dom';
-import Skeleton from '@material-ui/lab/Skeleton';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -99,46 +97,21 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const fetcher = async () => {
-  try {
-    const resVideo = await videoAPI.fetchVideosPopular();
-
-    // ids for call api to get channel avatar
-    const ids = resVideo.result.items?.map(
-      (item: gapi.client.youtube.Video) => item.snippet?.channelId!
-    )!;
-
-    const resChannel = await channelAPI.fetchChannelById(ids);
-    const channelItems = resChannel.result.items!;
-
-    resVideo.result.items?.forEach((vItem: any) => {
-      const index = channelItems.findIndex(
-        (cItem: gapi.client.youtube.Channel) =>
-          cItem.id === vItem.snippet.channelId
-      );
-
-      vItem.snippet.channelAvatar =
-        channelItems[index].snippet?.thumbnails?.default?.url;
-      return vItem;
-    });
-
-    return resVideo.result;
-  } catch (err) {
-    err.result.error.message =
-      'An error occurred while fetching videos popular';
-    throw err.result.error;
-  }
-};
-
-export default function PopularVideos(): JSX.Element {
+export default function List({
+  title,
+  result,
+}: {
+  title: string;
+  result: videosState;
+}): JSX.Element {
   const classes = useStyles();
-  const { data, error } = useSWR('/api/videos?chart=popular', fetcher);
+  const { data, error } = result;
 
   if (error) {
     return (
       <div>
         <Typography align='center' variant='h2' className={classes.title}>
-          Video thịnh hành
+          {title}
         </Typography>
         <div>{error.message}</div>
       </div>
@@ -149,7 +122,7 @@ export default function PopularVideos(): JSX.Element {
     return (
       <div>
         <Typography align='center' variant='h2' className={classes.title}>
-          Video thịnh hành
+          {title}
         </Typography>
         <div className={classes.grid}>
           {[...new Array(8)].map((item, index) => (
@@ -180,66 +153,68 @@ export default function PopularVideos(): JSX.Element {
   return (
     <div>
       <Typography align='center' variant='h2' className={classes.title}>
-        Video thịnh hành
+        {title}
       </Typography>
       <div className={classes.grid}>
-        {data?.items?.map((item: any) => (
-          <Link
-            className={classes.link}
-            to={`/video?v=${item.id}`}
-            key={item.id}
-          >
-            <div className={classes.gridImgContainer}>
-              <img src={item.snippet?.thumbnails?.medium?.url} alt='' />
-            </div>
-            <Box mt='12px'>
-              <Box display='flex' gridColumnGap='12px'>
-                <Avatar
-                  src={item?.snippet?.channelAvatar}
-                  className={classes.channelAvatar}
-                >
-                  {item?.snippet?.channelTitle &&
-                    getLastWord(item.snippet.channelTitle).charAt(0)}
-                </Avatar>
-                <div>
-                  <span
-                    className={`${classes.videoTitle} ${classes.textEllipsis}`}
-                    title={item.snippet?.title}
-                  >
-                    {item.snippet?.title}
-                  </span>
-                  <Typography
-                    component='span'
-                    variant='body2'
-                    color='textSecondary'
-                    noWrap
-                  >
-                    {item.snippet?.channelTitle}
-                  </Typography>
-                  <Box display='flex' flexWrap='wrap'>
-                    <Typography
-                      className={classes.videoViews}
-                      component='span'
-                      variant='body2'
-                      color='textSecondary'
-                    >
-                      {formatVideoViews(item.statistics?.viewCount!) +
-                        ' lượt xem'}
-                    </Typography>
-
-                    <Typography
-                      component='span'
-                      variant='body2'
-                      color='textSecondary'
-                    >
-                      {formatDateView(item.snippet?.publishedAt || '')}
-                    </Typography>
-                  </Box>
+        {data.items?.length
+          ? data?.items?.map((item: any) => (
+              <Link
+                className={classes.link}
+                to={`/video?v=${item.id}`}
+                key={item.id}
+              >
+                <div className={classes.gridImgContainer}>
+                  <img src={item.snippet?.thumbnails?.medium?.url} alt='' />
                 </div>
-              </Box>
-            </Box>
-          </Link>
-        ))}
+                <Box mt='12px'>
+                  <Box display='flex' gridColumnGap='12px'>
+                    <Avatar
+                      src={item?.snippet?.channelAvatar}
+                      className={classes.channelAvatar}
+                    >
+                      {item?.snippet?.channelTitle &&
+                        getLastWord(item.snippet.channelTitle).charAt(0)}
+                    </Avatar>
+                    <div>
+                      <span
+                        className={`${classes.videoTitle} ${classes.textEllipsis}`}
+                        title={item.snippet?.title}
+                      >
+                        {item.snippet?.title}
+                      </span>
+                      <Typography
+                        component='span'
+                        variant='body2'
+                        color='textSecondary'
+                        noWrap
+                      >
+                        {item.snippet?.channelTitle}
+                      </Typography>
+                      <Box display='flex' flexWrap='wrap'>
+                        <Typography
+                          className={classes.videoViews}
+                          component='span'
+                          variant='body2'
+                          color='textSecondary'
+                        >
+                          {formatVideoViews(item.statistics?.viewCount!) +
+                            ' lượt xem'}
+                        </Typography>
+
+                        <Typography
+                          component='span'
+                          variant='body2'
+                          color='textSecondary'
+                        >
+                          {formatDateView(item.snippet?.publishedAt || '')}
+                        </Typography>
+                      </Box>
+                    </div>
+                  </Box>
+                </Box>
+              </Link>
+            ))
+          : 'Không có video nào'}
       </div>
     </div>
   );
