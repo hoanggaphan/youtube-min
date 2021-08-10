@@ -52,6 +52,10 @@ export default function Note(): JSX.Element {
             ứng dụng sẽ trả về lỗi, cần đợi ngày hôm sau để sử dụng lại.
           </Typography>
           <Typography variant='body1'>
+            Do đó dự án này sẻ ko sử có đủ tính năng như youtube để tránh hết
+            hạn ngạch khi nhiều user sử dụng.
+          </Typography>
+          <Typography variant='body1'>
             Để biết thêm chi tiết vui lòng tham khảo{' '}
             <a
               href='https://developers.google.com/youtube/v3/determine_quota_cost'

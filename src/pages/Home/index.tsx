@@ -7,12 +7,14 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import CloseIcon from '@material-ui/icons/Close';
 import { Alert, AlertTitle } from '@material-ui/lab';
+import * as videoAPI from 'api/videoAPI';
+import useVideos from 'app/useVideos';
 import { getLastWord } from 'helpers/string';
 import { useAuth } from 'hooks/useAuth';
 import { globalContext } from 'hooks/useGlobal';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import PopularVideos from './components/PopularVideos';
+import List from './components/List';
 import Subscription from './components/Subscription';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -40,10 +42,24 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+const fetchPopular = videoAPI.fetchMostPopularVideos;
+const fetchLiked = videoAPI.fetchMyRatingVideos;
+const fetchDisliked = () => videoAPI.fetchMyRatingVideos('dislike', 5);
+
 export default function Home(): JSX.Element {
   const { user, revokeAccess, signOut } = useAuth();
   const classes = useStyles();
   const { state, dispatch } = React.useContext(globalContext);
+
+  const resPopular = useVideos('chart=mostPopular', fetchPopular);
+  const resLiked = useVideos(
+    user ? `myRating=like&id=${user.id}` : null,
+    fetchLiked
+  );
+  const resDisliked = useVideos(
+    user ? `myRating=dislike&id=${user.id}` : null,
+    fetchDisliked
+  );
 
   React.useEffect(() => {
     document.title = 'Mini YouTube';
@@ -122,7 +138,10 @@ export default function Home(): JSX.Element {
         </Box>
 
         <Subscription />
-        <PopularVideos />
+
+        <List title='Video thịnh hành' result={resPopular} />
+        <List title='Video đã thích' result={resLiked} />
+        <List title='Video không thích' result={resDisliked} />
       </Box>
     </>
   );
