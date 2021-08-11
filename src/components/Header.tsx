@@ -68,7 +68,7 @@ export default function Header(): JSX.Element {
     <header className={`${classes.header} mui-fixed`}>
       <div className={classes.container}>
         <Box display='flex' justifyContent='space-between' alignItems='center'>
-          <Link to='/home'>
+          <Link to='/'>
             <img src='/youtubelogo_30.png' alt='navbar logo' />
           </Link>
 
