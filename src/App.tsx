@@ -13,6 +13,7 @@ import Video from 'pages/Video';
 import React from 'react';
 import { IntlProvider } from 'react-intl';
 import { Redirect, Route, Router, Switch } from 'react-router-dom';
+import LoginRoute from 'routes/LoginRoute';
 import UserRoute from 'routes/UserRoute';
 
 export const history = createBrowserHistory();
@@ -32,15 +33,15 @@ function App() {
         <Snackbar>
           <Router history={history}>
             <Switch>
-              <UserRoute exact path='/' component={Login} />
-              <UserRoute path='/home' component={Home} layout={HeadLayout} />
+              <UserRoute exact path='/' component={Home} layout={HeadLayout} />
+              <LoginRoute path='/login' component={Login} />
               <UserRoute path='/video' component={Video} layout={HeadLayout} />
               <UserRoute
                 path='/channel/:id'
                 component={Channel}
                 layout={HeadLayout}
               />
-              <Redirect from='/channel' to='/home' />
+              <Redirect from='/channel' to='/' />
               <UserRoute
                 path='/results'
                 component={Results}

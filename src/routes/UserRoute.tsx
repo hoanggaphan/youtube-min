@@ -22,9 +22,9 @@ function RouteAuth({
         if (isSignedIn === null) {
           return <p>Loading...</p>;
         } else if (isSignedIn) {
-          return path === '/' ? <Redirect to='/home' /> : <Component />;
+          return <Component />;
         } else {
-          return path === '/' ? <Component /> : <Redirect to='/' />;
+          return <Redirect to='/login' />;
         }
       }}
     />

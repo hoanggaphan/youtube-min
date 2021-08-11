@@ -113,7 +113,7 @@ export default function Video(): JSX.Element {
   }, [videoTitle]);
 
   if (!videoId) {
-    return <Redirect to='/home' />;
+    return <Redirect to='/' />;
   }
 
   if (channelError) {

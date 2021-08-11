@@ -66,7 +66,7 @@ export default function Results(): JSX.Element {
   }, [q]);
 
   if (!q) {
-    return <Redirect to='/home' />;
+    return <Redirect to='/' />;
   }
 
   if (error) {
