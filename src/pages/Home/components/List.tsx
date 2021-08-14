@@ -100,9 +100,11 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function List({
   title,
   result,
+  skeletons,
 }: {
   title: string;
   result: videosState;
+  skeletons: number;
 }): JSX.Element {
   const classes = useStyles();
   const { data, error } = result;
@@ -125,7 +127,7 @@ export default function List({
           {title}
         </Typography>
         <div className={classes.grid}>
-          {[...new Array(8)].map((item, index) => (
+          {[...new Array(skeletons)].map((item, index) => (
             <div key={index}>
               <div className={classes.gridImgContainer}></div>
               <Box mt='12px'>
@@ -155,67 +157,69 @@ export default function List({
       <Typography align='center' variant='h2' className={classes.title}>
         {title}
       </Typography>
-      <div className={classes.grid}>
-        {data.items?.length
-          ? data?.items?.map((item: any) => (
-              <Link
-                className={classes.link}
-                to={`/video?v=${item.id}`}
-                key={item.id}
-              >
-                <div className={classes.gridImgContainer}>
-                  <img src={item.snippet?.thumbnails?.medium?.url} alt='' />
-                </div>
-                <Box mt='12px'>
-                  <Box display='flex' gridColumnGap='12px'>
-                    <Avatar
-                      src={item?.snippet?.channelAvatar}
-                      className={classes.channelAvatar}
+      {data.items?.length ? (
+        <div className={classes.grid}>
+          {data?.items?.map((item: any) => (
+            <Link
+              className={classes.link}
+              to={`/video?v=${item.id}`}
+              key={item.id}
+            >
+              <div className={classes.gridImgContainer}>
+                <img src={item.snippet?.thumbnails?.medium?.url} alt='' />
+              </div>
+              <Box mt='12px'>
+                <Box display='flex' gridColumnGap='12px'>
+                  <Avatar
+                    src={item?.snippet?.channelAvatar}
+                    className={classes.channelAvatar}
+                  >
+                    {item?.snippet?.channelTitle &&
+                      getLastWord(item.snippet.channelTitle).charAt(0)}
+                  </Avatar>
+                  <div>
+                    <span
+                      className={`${classes.videoTitle} ${classes.textEllipsis}`}
+                      title={item.snippet?.title}
                     >
-                      {item?.snippet?.channelTitle &&
-                        getLastWord(item.snippet.channelTitle).charAt(0)}
-                    </Avatar>
-                    <div>
-                      <span
-                        className={`${classes.videoTitle} ${classes.textEllipsis}`}
-                        title={item.snippet?.title}
+                      {item.snippet?.title}
+                    </span>
+                    <Typography
+                      component='span'
+                      variant='body2'
+                      color='textSecondary'
+                      noWrap
+                    >
+                      {item.snippet?.channelTitle}
+                    </Typography>
+                    <Box display='flex' flexWrap='wrap'>
+                      <Typography
+                        className={classes.videoViews}
+                        component='span'
+                        variant='body2'
+                        color='textSecondary'
                       >
-                        {item.snippet?.title}
-                      </span>
+                        {formatVideoViews(item.statistics?.viewCount!) +
+                          ' lượt xem'}
+                      </Typography>
+
                       <Typography
                         component='span'
                         variant='body2'
                         color='textSecondary'
-                        noWrap
                       >
-                        {item.snippet?.channelTitle}
+                        {formatDateView(item.snippet?.publishedAt || '')}
                       </Typography>
-                      <Box display='flex' flexWrap='wrap'>
-                        <Typography
-                          className={classes.videoViews}
-                          component='span'
-                          variant='body2'
-                          color='textSecondary'
-                        >
-                          {formatVideoViews(item.statistics?.viewCount!) +
-                            ' lượt xem'}
-                        </Typography>
-
-                        <Typography
-                          component='span'
-                          variant='body2'
-                          color='textSecondary'
-                        >
-                          {formatDateView(item.snippet?.publishedAt || '')}
-                        </Typography>
-                      </Box>
-                    </div>
-                  </Box>
+                    </Box>
+                  </div>
                 </Box>
-              </Link>
-            ))
-          : 'Không có video nào'}
-      </div>
+              </Box>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <div>Không có video nào</div>
+      )}
     </div>
   );
 }

@@ -42,9 +42,14 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const fetchPopular = videoAPI.fetchMostPopularVideos;
-const fetchLiked = videoAPI.fetchMyRatingVideos;
-const fetchDisliked = () => videoAPI.fetchMyRatingVideos('dislike', 5);
+const popularNum = 8;
+const likedNum = 4;
+const disLikedNum = 4;
+const fetchPopular = () => videoAPI.fetchMostPopularVideos(popularNum);
+const fetchLiked = () => videoAPI.fetchMyRatingVideos('like', likedNum);
+// Because API returns wrong result, (num + 1) will fix the above error
+const fetchDisliked = () =>
+  videoAPI.fetchMyRatingVideos('dislike', disLikedNum + 1);
 
 export default function Home(): JSX.Element {
   const { user, revokeAccess, signOut } = useAuth();
@@ -139,9 +144,17 @@ export default function Home(): JSX.Element {
 
         <Subscription />
 
-        <List title='Video thịnh hành' result={resPopular} />
-        <List title='Video đã thích' result={resLiked} />
-        <List title='Video không thích' result={resDisliked} />
+        <List
+          title='Video thịnh hành'
+          result={resPopular}
+          skeletons={popularNum}
+        />
+        <List title='Video đã thích' result={resLiked} skeletons={likedNum} />
+        <List
+          title='Video không thích'
+          result={resDisliked}
+          skeletons={disLikedNum}
+        />
       </Box>
     </>
   );
