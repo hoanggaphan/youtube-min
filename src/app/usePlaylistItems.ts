@@ -30,8 +30,11 @@ const fetchPlaylistItems = async (
           vItem.id === pItem.snippet.resourceId.videoId
       );
 
-      pItem.snippet.viewCount = videosItems[index].statistics?.viewCount;
-      pItem.snippet.duration = videosItems[index].contentDetails?.duration;
+      if (index !== -1) {
+        pItem.snippet.viewCount = videosItems[index].statistics?.viewCount;
+        pItem.snippet.duration = videosItems[index].contentDetails?.duration;
+      }
+
       return pItem;
     });
 

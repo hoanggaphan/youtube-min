@@ -6,7 +6,7 @@ const fetcher = async (
   fetchVideos: () => gapi.client.Request<gapi.client.youtube.VideoListResponse>
 ) => {
   try {
-    const resVideo = await fetchVideos();
+    const resVideo: any = await fetchVideos();
 
     if (resVideo.result.items?.length === 0) {
       return resVideo.result;
@@ -19,15 +19,17 @@ const fetcher = async (
 
     const resChannel = await channelAPI.fetchChannelById(ids);
     const channelItems = resChannel.result.items!;
-
     resVideo.result.items?.forEach((vItem: any) => {
       const index = channelItems.findIndex(
         (cItem: gapi.client.youtube.Channel) =>
           cItem.id === vItem.snippet.channelId
       );
 
-      vItem.snippet.channelAvatar =
-        channelItems[index].snippet?.thumbnails?.default?.url;
+      if (index !== -1) {
+        vItem.snippet.channelAvatar =
+          channelItems[index].snippet?.thumbnails?.default?.url;
+      }
+
       return vItem;
     });
 
@@ -39,7 +41,10 @@ const fetcher = async (
   }
 };
 
-function useVideos(queryParams: string | null, fetchVideos: () => void) {
+function useVideos(
+  queryParams: string | null,
+  fetchVideos: () => gapi.client.Request<gapi.client.youtube.VideoListResponse>
+) {
   const { data, error, isValidating, mutate } = useSWR(
     queryParams ? [`/api/videos?${queryParams}`, fetchVideos] : null,
     fetcher
