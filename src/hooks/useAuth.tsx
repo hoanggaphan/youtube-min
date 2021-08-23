@@ -29,33 +29,13 @@ export function useAuth() {
 
 let GoogleAuth: any;
 const SCOPE = 'https://www.googleapis.com/auth/youtube.force-ssl';
-
-function initClient(updateSignInStatus: () => void) {
-  const discoveryUrls = [
-    'https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest',
-  ];
-
-  gapi.client
-    .init({
-      apiKey: process.env.REACT_APP_GG_API_KEY,
-      clientId: process.env.REACT_APP_GG_CLIENT_ID,
-      discoveryDocs: discoveryUrls,
-      scope: SCOPE,
-    })
-    .then(function () {
-      GoogleAuth = gapi.auth2.getAuthInstance();
-
-      // Listen for sign-in states changes.
-      GoogleAuth.isSignedIn.listen(updateSignInStatus);
-
-      // Handle initial sign-in state. (Determine if user is already signed in.)
-      updateSignInStatus();
-    });
-}
+const DISCOVERY_URLS = [
+  'https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest',
+];
 
 function useProvideAuth() {
-  // null is initial state _ true is sign-in _ false is sign-out.
-  const [isSignedIn, setIsSignedIn] = React.useState<boolean | null>(null);
+  // initializing state when app is loading module
+  const [initialized, setInitialized] = React.useState<boolean>(false);
 
   // save user profile
   const [user, setUser] = React.useState<UserType | null>(null);
@@ -65,7 +45,26 @@ function useProvideAuth() {
    * Call the initClient function after the modules load.
    */
   React.useEffect(() => {
-    gapi.load('client:auth2', () => initClient(updateSignInStatus));
+    gapi.load('client:auth2', () => {
+      gapi.client
+        .init({
+          apiKey: process.env.REACT_APP_GG_API_KEY,
+          clientId: process.env.REACT_APP_GG_CLIENT_ID,
+          discoveryDocs: DISCOVERY_URLS,
+          scope: SCOPE,
+        })
+        .then(function () {
+          setInitialized(true);
+
+          GoogleAuth = gapi.auth2.getAuthInstance();
+
+          // Listen for sign-in states changes.
+          GoogleAuth.isSignedIn.listen(updateSignInStatus);
+
+          // Handle initial sign-in state. (Determine if user is already signed in.)
+          updateSignInStatus();
+        });
+    });
   }, []);
 
   /**
@@ -74,10 +73,8 @@ function useProvideAuth() {
   const updateSignInStatus = () => {
     const user = GoogleAuth.currentUser.get();
     const isAuthorized = user.hasGrantedScopes(SCOPE);
-    
-    if (isAuthorized) {
-      setIsSignedIn(true);
 
+    if (isAuthorized) {
       const userProfile = user.getBasicProfile();
       const newUser = {
         imgUrl: userProfile.getImageUrl(),
@@ -89,7 +86,6 @@ function useProvideAuth() {
       };
       setUser(newUser);
     } else {
-      setIsSignedIn(false);
       setUser(null);
     }
   };
@@ -99,8 +95,8 @@ function useProvideAuth() {
   const revokeAccess = () => GoogleAuth.disconnect();
 
   return {
+    initialized,
     user,
-    isSignedIn,
     signIn,
     signOut,
     revokeAccess,

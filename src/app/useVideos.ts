@@ -6,7 +6,7 @@ const fetcher = async (
   fetchVideos: () => gapi.client.Request<gapi.client.youtube.VideoListResponse>
 ) => {
   try {
-    const resVideo: any = await fetchVideos();
+    const resVideo = await fetchVideos();
 
     if (resVideo.result.items?.length === 0) {
       return resVideo.result;

@@ -1,6 +1,6 @@
 import Snackbar from 'components/Snackbar';
 import { createBrowserHistory } from 'history';
-import { ProvideAuth } from 'hooks/useAuth';
+import { useAuth } from 'hooks/useAuth';
 import HeadLayout from 'layouts/HeadLayout';
 import Channel from 'pages/Channel';
 import Home from 'pages/Home';
@@ -12,9 +12,9 @@ import Results from 'pages/Results';
 import Video from 'pages/Video';
 import React from 'react';
 import { IntlProvider } from 'react-intl';
-import { Redirect, Route, Router, Switch } from 'react-router-dom';
-import LoginRoute from 'routes/LoginRoute';
-import UserRoute from 'routes/UserRoute';
+import { Redirect, Router, Switch } from 'react-router-dom';
+import PrivateRoute from 'routes/PrivateRoute';
+import PublicRoute from 'routes/PublicRoute';
 
 export const history = createBrowserHistory();
 
@@ -27,34 +27,58 @@ history.listen((location, action) => {
 const defaultLocale = window.navigator.language;
 
 function App() {
+  const { initialized } = useAuth();
+
   return (
     <IntlProvider locale={defaultLocale}>
-      <ProvideAuth>
+      {initialized ? (
         <Snackbar>
           <Router history={history}>
             <Switch>
-              <UserRoute exact path='/' component={Home} layout={HeadLayout} />
-              <LoginRoute path='/login' component={Login} />
-              <UserRoute path='/video' component={Video} layout={HeadLayout} />
-              <UserRoute
+              <PublicRoute
+                restricted={false}
+                exact
+                path='/'
+                component={Home}
+                layout={HeadLayout}
+              />
+              <PublicRoute restricted={false} path='/note' component={Note} />
+              <PublicRoute
+                restricted={false}
+                path='/how-login'
+                component={HowLogin}
+              />
+
+              <PublicRoute restricted={true} path='/login' component={Login} />
+
+              <PrivateRoute
+                path='/video'
+                component={Video}
+                layout={HeadLayout}
+              />
+              <PrivateRoute
                 path='/channel/:id'
                 component={Channel}
                 layout={HeadLayout}
               />
               <Redirect from='/channel' to='/' />
-              <UserRoute
+              <PrivateRoute
                 path='/results'
                 component={Results}
                 layout={HeadLayout}
               />
-              <Route path='/note' component={Note} />
-              <Route path='/how-login' component={HowLogin} />
 
-              <Route path='*' component={PageNotFound} />
+              <PublicRoute
+                restricted={false}
+                path='*'
+                component={PageNotFound}
+              />
             </Switch>
           </Router>
         </Snackbar>
-      </ProvideAuth>
+      ) : (
+        <p>Loading...</p>
+      )}
     </IntlProvider>
   );
 }
