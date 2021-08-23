@@ -42,14 +42,17 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const popularNum = 8;
-const likedNum = 4;
-const disLikedNum = 4;
-const fetchPopular = () => videoAPI.fetchMostPopularVideos(popularNum);
-const fetchLiked = () => videoAPI.fetchMyRatingVideos('like', likedNum);
-// Because API returns wrong result, (num + 1) will fix the above error
+const number = {
+  popular: 8,
+  liked: 4,
+  disLiked: 4,
+}
+const fetchPopular = () => videoAPI.fetchMostPopularVideos(number.popular);
+const fetchLiked = () => videoAPI.fetchMyRatingVideos('like', number.liked);
+
+// Because API returns wrong result, (num + 1) will fix the under error
 const fetchDisliked = () =>
-  videoAPI.fetchMyRatingVideos('dislike', disLikedNum + 1);
+  videoAPI.fetchMyRatingVideos('dislike', number.disLiked + 1);
 
 export default function Home(): JSX.Element {
   const { user, revokeAccess, signOut } = useAuth();
@@ -111,50 +114,63 @@ export default function Home(): JSX.Element {
         </Alert>
       </Collapse>
       <Box pt='24px' mb='50px'>
-        <Avatar
-          src={user?.imgUrl}
-          alt=''
-          className={`${classes.large} ${classes.center}`}
-        >
-          {user && getLastWord(user.firstName).charAt(0)}
-        </Avatar>
-        <Typography
-          align='center'
-          variant='h3'
-          className={`${classes.mt2} ${classes.name}`}
-        >
-          {user?.fullName}
-        </Typography>
-        <Typography
-          align='center'
-          variant='h3'
-          className={`${classes.mt2} ${classes.name}`}
-        >
-          {user?.email}
-        </Typography>
+        {user && (
+          <>
+            <Avatar
+              src={user?.imgUrl}
+              alt=''
+              className={`${classes.large} ${classes.center}`}
+            >
+              {user && getLastWord(user.firstName).charAt(0)}
+            </Avatar>
+            <Typography
+              align='center'
+              variant='h3'
+              className={`${classes.mt2} ${classes.name}`}
+            >
+              {user?.fullName}
+            </Typography>
+            <Typography
+              align='center'
+              variant='h3'
+              className={`${classes.mt2} ${classes.name}`}
+            >
+              {user?.email}
+            </Typography>
 
-        <Box m='0 auto' width='fit-content' className={classes.mt2}>
-          <Button onClick={revokeAccess} size='large' color='primary'>
-            thu hồi quyền truy cập
-          </Button>
-          <Button onClick={handleSignOut} size='large' color='primary'>
-            đăng xuất
-          </Button>
-        </Box>
+            <Box m='0 auto' width='fit-content' className={classes.mt2}>
+              <Button onClick={revokeAccess} size='large' color='primary'>
+                thu hồi quyền truy cập
+              </Button>
+              <Button onClick={handleSignOut} size='large' color='primary'>
+                đăng xuất
+              </Button>
+            </Box>
 
-        <Subscription />
+            <Subscription />
+          </>
+        )}
 
         <List
           title='Video thịnh hành'
           result={resPopular}
-          skeletons={popularNum}
+          skeletons={number.popular}
         />
-        <List title='Video đã thích' result={resLiked} skeletons={likedNum} />
-        <List
-          title='Video không thích'
-          result={resDisliked}
-          skeletons={disLikedNum}
-        />
+
+        {user && (
+          <>
+            <List
+              title='Video đã thích'
+              result={resLiked}
+              skeletons={number.liked}
+            />
+            <List
+              title='Video không thích'
+              result={resDisliked}
+              skeletons={number.disLiked}
+            />
+          </>
+        )}
       </Box>
     </>
   );

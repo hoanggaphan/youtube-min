@@ -2,8 +2,9 @@ import SWRDevtools from '@jjordy/swr-devtools';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import {
   ThemeProvider,
-  unstable_createMuiStrictModeTheme as createMuiTheme
+  unstable_createMuiStrictModeTheme as createMuiTheme,
 } from '@material-ui/core/styles';
+import { ProvideAuth } from 'hooks/useAuth';
 import ProvideGlobal from 'hooks/useGlobal';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -65,13 +66,15 @@ const swrConfigs = {
 ReactDOM.render(
   <React.StrictMode>
     <ProvideGlobal>
-      <SWRConfig value={swrConfigs}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <SWRDevtools cache={cache} mutate={mutate} />
-          <App />
-        </ThemeProvider>
-      </SWRConfig>
+      <ProvideAuth>
+        <SWRConfig value={swrConfigs}>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <SWRDevtools cache={cache} mutate={mutate} />
+            <App />
+          </ThemeProvider>
+        </SWRConfig>
+      </ProvideAuth>
     </ProvideGlobal>
   </React.StrictMode>,
   document.getElementById('root')
