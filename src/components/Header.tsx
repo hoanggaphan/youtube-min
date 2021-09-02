@@ -2,14 +2,15 @@ import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
-import MenuItem from '@material-ui/core/MenuItem';
-import MenuList from '@material-ui/core/MenuList';
 import Popover from '@material-ui/core/Popover';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import ReportProblemOutlinedIcon from '@material-ui/icons/ReportProblemOutlined';
 import SearchIcon from '@material-ui/icons/Search';
 import SyncDisabledIcon from '@material-ui/icons/SyncDisabled';
 import { getLastWord } from 'helpers/string';
@@ -98,70 +99,77 @@ export default function Header(): JSX.Element {
                         vertical: 'top',
                         horizontal: 'right',
                       }}
+                      transitionDuration={0}
                     >
-                      <Box>
-                        <Box p={2}>
-                          <Box display='flex' gridColumnGap='16px'>
-                            <Avatar src={user?.imgUrl} alt='avatar'>
-                              {user && getLastWord(user.firstName).charAt(0)}
-                            </Avatar>
-                            <Box>
-                              <Typography
-                                variant='subtitle2'
-                                className={classes.name}
-                              >
-                                {user?.fullName}
-                              </Typography>
-                              <Typography variant='caption'>
-                                {user?.email}
-                              </Typography>
-                            </Box>
+                      <Box p={2}>
+                        <Box display='flex' gridColumnGap='16px'>
+                          <Avatar src={user?.imgUrl} alt='avatar'>
+                            {user && getLastWord(user.firstName).charAt(0)}
+                          </Avatar>
+                          <Box>
+                            <Typography
+                              variant='subtitle2'
+                              className={classes.name}
+                            >
+                              {user?.fullName}
+                            </Typography>
+                            <Typography variant='caption'>
+                              {user?.email}
+                            </Typography>
                           </Box>
                         </Box>
-                        <Divider />
-                        <MenuList>
-                          <Link
-                            to='/results?search_query=one+piece'
-                            className={classes.link}
-                          >
-                            <MenuItem>
-                              <ListItemIcon className={classes.listItemIcon}>
-                                <SearchIcon />
-                              </ListItemIcon>
-                              <Typography variant='body2'>
-                                Demo kết quả tìm kiếm
-                              </Typography>
-                            </MenuItem>
-                          </Link>
-                          <MenuItem onClick={revokeAccess}>
+                      </Box>
+                      <Divider />
+                      <List>
+                        <Link to='/note' className={classes.link}>
+                          <ListItem button>
                             <ListItemIcon className={classes.listItemIcon}>
-                              <SyncDisabledIcon />
+                              <ReportProblemOutlinedIcon />
+                            </ListItemIcon>
+                            <Typography variant='body2'>Lưu ý</Typography>
+                          </ListItem>
+                        </Link>
+                        <Link
+                          to='/results?search_query=one+piece'
+                          className={classes.link}
+                        >
+                          <ListItem button>
+                            <ListItemIcon className={classes.listItemIcon}>
+                              <SearchIcon />
                             </ListItemIcon>
                             <Typography variant='body2'>
-                              Thu hồi quyền truy cập
+                              Demo kết quả tìm kiếm
                             </Typography>
-                          </MenuItem>
-                          <MenuItem onClick={signOut}>
-                            <ListItemIcon className={classes.listItemIcon}>
-                              <ExitToAppIcon />
-                            </ListItemIcon>
-                            <Typography variant='body2'>Đăng xuất</Typography>
-                          </MenuItem>
-                        </MenuList>
-                      </Box>
+                          </ListItem>
+                        </Link>
+                        <ListItem button onClick={revokeAccess}>
+                          <ListItemIcon className={classes.listItemIcon}>
+                            <SyncDisabledIcon />
+                          </ListItemIcon>
+                          <Typography variant='body2'>
+                            Thu hồi quyền truy cập
+                          </Typography>
+                        </ListItem>
+                        <ListItem button onClick={signOut}>
+                          <ListItemIcon className={classes.listItemIcon}>
+                            <ExitToAppIcon />
+                          </ListItemIcon>
+                          <Typography variant='body2'>Đăng xuất</Typography>
+                        </ListItem>
+                      </List>
                     </Popover>
                   </>
                 ) : (
                   <>
-                    <Link to='/login' className={classes.link}>
-                      <Button
-                        color='primary'
-                        variant='outlined'
-                        startIcon={<AccountCircleIcon />}
-                      >
-                        Đăng nhập
-                      </Button>
-                    </Link>
+                    <Button
+                      color='primary'
+                      variant='outlined'
+                      startIcon={<AccountCircleIcon />}
+                      component={Link}
+                      to='/login'
+                    >
+                      Đăng nhập
+                    </Button>
                   </>
                 )}
               </>

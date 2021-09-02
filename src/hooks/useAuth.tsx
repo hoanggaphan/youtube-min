@@ -45,6 +45,7 @@ function useProvideAuth() {
    * Call the initClient function after the modules load.
    */
   React.useEffect(() => {
+    // load module
     gapi.load('client:auth2', () => {
       gapi.client
         .init({
@@ -54,8 +55,6 @@ function useProvideAuth() {
           scope: SCOPE,
         })
         .then(function () {
-          setInitialized(true);
-
           GoogleAuth = gapi.auth2.getAuthInstance();
 
           // Listen for sign-in states changes.
@@ -63,6 +62,9 @@ function useProvideAuth() {
 
           // Handle initial sign-in state. (Determine if user is already signed in.)
           updateSignInStatus();
+
+          // This state use for app first loaded
+          setInitialized(true);
         });
     });
   }, []);

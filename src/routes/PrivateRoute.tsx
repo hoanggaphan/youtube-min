@@ -13,7 +13,7 @@ export default function PrivateRoute({
   path: string;
 }): JSX.Element {
   const { user } = useAuth();
-
+  
   function renderComponent(Layout?: React.ElementType) {
     return Layout ? (
       <Layout>

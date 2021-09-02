@@ -17,7 +17,7 @@ export default function PublicRoute({
   const { user } = useAuth();
   // restricted = false meaning public route
   // restricted = true meaning restricted route
-
+  
   function renderComponent(Layout?: React.ElementType) {
     return Layout ? (
       <Layout>

@@ -102,7 +102,6 @@ export default function CommentHeader() {
           vertical: 'top',
           horizontal: 'left',
         }}
-        disablePortal
       >
         <List component='nav'>
           <ListItem
