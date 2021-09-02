@@ -16,7 +16,6 @@ export default function Note(): JSX.Element {
 
           <ul>
             <li>
-              {' '}
               Dự án này sử dụng{' '}
               <a
                 href='https://developers.google.com/youtube'
@@ -25,7 +24,8 @@ export default function Note(): JSX.Element {
               >
                 YouTube Data API
               </a>{' '}
-              có mức hạn ngạch mặc định là 10.000 đơn vị mỗi ngày.
+              của googgle và được cấp mức hạn ngạch mặc định là 10.000 đơn vị
+              mỗi ngày.
             </li>
             <li>
               {' '}
@@ -48,12 +48,13 @@ export default function Note(): JSX.Element {
 
           <Typography variant='body1'>
             Giả sử hôm nay có 10 người truy cập ứng dụng và sử dụng tính năng
-            tải video thì mức đơn vị đã sử dụng là: 10 x 1600 = 16.000. Khi đó
-            ứng dụng sẽ trả về lỗi, cần đợi ngày hôm sau để sử dụng lại.
+            tải video thì mức đơn vị ứng dụng đã sử dụng là: 10 x 1600 = 16.000.
+            Sau khi sử dụng vượt mức hạn ngạch ứng dụng sẽ trả về lỗi, cần đợi
+            ngày hôm sau để sử dụng lại.
           </Typography>
           <Typography variant='body1'>
-            Do đó dự án này sẻ ko sử có đủ tính năng như youtube để tránh hết
-            hạn ngạch khi nhiều user sử dụng.
+            Do đó dự án này sẻ ko có đủ tính năng như youtube để tránh sử dụng
+            vượt mức hạn ngạch khi nhiều user truy cập sử dụng.
           </Typography>
           <Typography variant='body1'>
             Để biết thêm chi tiết vui lòng tham khảo{' '}

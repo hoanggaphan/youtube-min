@@ -3,10 +3,18 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
+import Divider from '@material-ui/core/Divider';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import Popover from '@material-ui/core/Popover';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import * as subscriptionAPI from 'api/subscriptionAPI';
+import { useAuth } from 'hooks/useAuth';
+import PopupState, { bindPopover, bindTrigger } from 'material-ui-popup-state';
 import { useSnackbar } from 'notistack';
 import React from 'react';
+import { Link } from 'react-router-dom';
 import useSWR from 'swr';
 
 type SubscribeButtonProps = {
@@ -30,6 +38,13 @@ const useStyles = makeStyles((theme: Theme) =>
       transition: 'none',
       '&:hover': {
         backgroundColor: theme.palette.secondary.main,
+      },
+    },
+    loginBtn: {
+      padding: '0',
+
+      '&:hover': {
+        backgroundColor: 'unset',
       },
     },
     skeleton: {
@@ -61,9 +76,10 @@ export default function SubscribeButton({
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
+  const { user } = useAuth();
 
   const { data, error, mutate } = useSWR(
-    ['api/subscription/status', channelId],
+    user ? ['api/subscription/status', channelId] : null,
     fetchStatus
   );
 
@@ -111,6 +127,64 @@ export default function SubscribeButton({
   if (error) {
     return <div>{error.message}</div>;
   }
+
+  if (!user)
+    return (
+      <PopupState variant='popover' popupId='demo-popup-popover'>
+        {(popupState) => (
+          <div>
+            <Button
+              className={classes.registerBtn}
+              color='secondary'
+              variant='contained'
+              disableElevation
+              disableRipple
+              {...bindTrigger(popupState)}
+            >
+              Đăng ký
+            </Button>
+
+            <Popover
+              {...bindPopover(popupState)}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              transitionDuration={0} // Fix break layout
+            >
+              <List component='nav' aria-label='subscription box'>
+                <ListItem>
+                  <ListItemText primary='Bạn muốn đăng ký kênh này?' />
+                </ListItem>
+                <ListItem>
+                  <ListItemText secondary='Đăng nhập để đăng ký kênh này.' />
+                </ListItem>
+              </List>
+              <Divider />
+              <List component='nav' aria-label='secondary mailbox'>
+                <ListItem>
+                  <Button
+                    className={classes.loginBtn}
+                    color='primary'
+                    disableRipple
+                    disableFocusRipple
+                    disableElevation
+                    component={Link}
+                    to='/login'
+                  >
+                    Đăng nhập
+                  </Button>
+                </ListItem>
+              </List>
+            </Popover>
+          </div>
+        )}
+      </PopupState>
+    );
 
   if (!data) return <div className={classes.skeleton} />;
 
