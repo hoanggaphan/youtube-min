@@ -107,7 +107,7 @@ export default function Video(): JSX.Element {
     error: channelError,
     isLoading: channelIsValidating,
   } = useChannel(channelId);
-
+  
   React.useEffect(() => {
     document.title = videoTitle + ' - Mini YouTube';
   }, [videoTitle]);

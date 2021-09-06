@@ -48,9 +48,7 @@ function App() {
                 path='/how-login'
                 component={HowLogin}
               />
-
               <PublicRoute restricted={true} path='/login' component={Login} />
-
               <PublicRoute
                 restricted={false}
                 path='/channel/:id'
@@ -58,12 +56,13 @@ function App() {
                 layout={HeadLayout}
               />
               <Redirect from='/channel' to='/' />
-              
-              <PrivateRoute
+              <PublicRoute
+                restricted={false}
                 path='/video'
                 component={Video}
                 layout={HeadLayout}
               />
+
               <PrivateRoute
                 path='/results'
                 component={Results}

@@ -8,8 +8,7 @@ const fetchChannel = async (url: string, channelId: string) => {
       return res.result.items[0];
     }
   } catch (err) {
-    err.result.error.message = 'An error occurred while fetching channel';
-    throw err.result.error;
+    throw new Error('An error occurred while fetching channel');
   }
 };
 

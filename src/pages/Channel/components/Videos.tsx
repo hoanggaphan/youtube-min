@@ -61,13 +61,11 @@ export default React.memo(function Videos({
   };
 
   if (error) {
-    if (error.code === 404 && error.errors[0].reason === 'playlistNotFound') {
-      return (
-        <Box mb='24px'>
-          <Box textAlign='center'>Kênh này không có video nào.</Box>
-        </Box>
-      );
-    }
+    return (
+      <Box mb='24px'>
+        <Box textAlign='center'>{error.message}</Box>
+      </Box>
+    );
   }
 
   if (!data || !playlistId) {

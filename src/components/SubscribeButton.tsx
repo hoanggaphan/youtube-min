@@ -63,9 +63,7 @@ const fetchStatus = async (url: string, channelId: string) => {
     const response = await subscriptionAPI.fetchStatus(channelId);
     return response.result.items;
   } catch (error) {
-    error.result.error.message =
-      'An error occurred while checking exist subscription';
-    throw error.result.error;
+    throw new Error('An error occurred while checking exist subscription');
   }
 };
 

@@ -35,9 +35,7 @@ const fetcher = async (
 
     return resVideo.result;
   } catch (err) {
-    err.result.error.message =
-      'An error occurred while fetching videos popular';
-    throw err.result.error;
+    throw new Error('An error occurred while fetching videos');
   }
 };
 
