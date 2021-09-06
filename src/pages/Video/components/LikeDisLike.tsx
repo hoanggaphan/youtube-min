@@ -6,6 +6,7 @@ import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import * as videoAPI from 'api/videoAPI';
 import { formatLikeCount } from 'helpers/format';
+import { useAuth } from 'hooks/useAuth';
 import useQuery from 'hooks/useQuery';
 import { useSnackbar } from 'notistack';
 import React from 'react';
@@ -39,8 +40,7 @@ const fetchVideoRating = async (url: string, videoId: string) => {
     return response.result.items![0];
   } catch (error) {
     // All errors will be handled at component
-    error.result.error.message = 'An error occurred while getting rate video';
-    throw error.result.error;
+    throw new Error('An error occurred while getting rate video');
   }
 };
 
@@ -52,8 +52,11 @@ export default React.memo(function LikeDisLike({
   const classes = useStyles();
   const query = useQuery();
   const id = query.get('v') || '';
+
+  const { user } = useAuth();
+
   const { data, mutate } = useSWR(
-    ['api/video/getRating', id],
+    user ? ['api/video/getRating', id] : null,
     fetchVideoRating
   );
 
@@ -89,24 +92,32 @@ export default React.memo(function LikeDisLike({
         placement='bottom'
       >
         <Box mr='7.5px' className={classes.likeContainer}>
-          {rating === 'like' ? (
-            <IconButton
-              // onClick={() => handleRate('none')}
-              onClick={off}
-              className={classes.iconBtn}
-              color='primary'
-            >
-              <ThumbUpIcon />
-            </IconButton>
+          {user ? (
+            rating === 'like' ? (
+              <IconButton
+                // onClick={() => handleRate('none')}
+                onClick={off}
+                className={classes.iconBtn}
+                color='primary'
+              >
+                <ThumbUpIcon />
+              </IconButton>
+            ) : (
+              <IconButton
+                // onClick={() => handleRate('like')}
+                onClick={off}
+                className={classes.iconBtn}
+              >
+                <ThumbUpIcon />
+              </IconButton>
+            )
           ) : (
-            <IconButton
-              // onClick={() => handleRate('like')}
-              onClick={off}
-              className={classes.iconBtn}
-            >
+            // show popover khi user off click
+            <IconButton className={classes.iconBtn}>
               <ThumbUpIcon />
             </IconButton>
           )}
+
           <span className={classes.likeCountText}>
             {likeCount && formatLikeCount(likeCount)}
           </span>
@@ -119,21 +130,27 @@ export default React.memo(function LikeDisLike({
         placement='bottom'
       >
         <Box ml='7.5px' pr='6px' className={classes.likeContainer}>
-          {rating === 'dislike' ? (
-            <IconButton
-              // onClick={() => handleRate('none')}
-              onClick={off}
-              className={classes.iconBtn}
-              color='primary'
-            >
-              <ThumbDownIcon />
-            </IconButton>
+          {user ? (
+            rating === 'dislike' ? (
+              <IconButton
+                // onClick={() => handleRate('none')}
+                onClick={off}
+                className={classes.iconBtn}
+                color='primary'
+              >
+                <ThumbDownIcon />
+              </IconButton>
+            ) : (
+              <IconButton
+                // onClick={() => handleRate('dislike')}
+                onClick={off}
+                className={classes.iconBtn}
+              >
+                <ThumbDownIcon />
+              </IconButton>
+            )
           ) : (
-            <IconButton
-              // onClick={() => handleRate('dislike')}
-              onClick={off}
-              className={classes.iconBtn}
-            >
+            <IconButton className={classes.iconBtn}>
               <ThumbDownIcon />
             </IconButton>
           )}

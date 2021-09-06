@@ -9,8 +9,7 @@ const fetchVideo = async (url: string, videoId: string) => {
     }
   } catch (err) {
     // All errors will be handled at component
-    err.result.error.message = 'An error occurred while fetching video';
-    throw err.result.error;
+    throw new Error('An error occurred while fetching video');
   }
 };
 

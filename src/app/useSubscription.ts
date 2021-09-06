@@ -7,8 +7,7 @@ const fetchSubscription = async (url: string) => {
     const res = await subscriptionAPI.fetchList();
     return res.result;
   } catch (err) {
-    err.result.error.message = 'An error occurred while fetching subscription';
-    throw err.result.error;
+    throw new Error('An error occurred while fetching subscription');
   }
 };
 

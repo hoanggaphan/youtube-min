@@ -40,8 +40,15 @@ const fetchPlaylistItems = async (
 
     return resPlaylistItems.result;
   } catch (err) {
-    err.result.error.message = 'An error occurred while fetching playlistItems';
-    throw err.result.error;
+    const result = (err as any).result.error;
+    
+    if (result.code === 404 && result.errors[0].reason === 'playlistNotFound') {
+      throw new Error('Kênh này không có video nào.');
+    }
+
+    throw new Error('An error occurred while fetching playlistItems');
+    // err.result.error.message = 'An error occurred while fetching playlistItems';
+    // throw err.result.error;
   }
 };
 
@@ -65,7 +72,7 @@ function usePlaylistItems(playlistId: string | undefined) {
 
   return {
     data,
-    error: error,
+    error,
     isLoading: isValidating,
     setSize,
   };
