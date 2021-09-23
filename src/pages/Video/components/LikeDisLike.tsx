@@ -164,7 +164,7 @@ export default React.memo(function LikeDisLike({
               <ThumbDownIcon />
             </IconButton>
             <span className={classes.likeCountText}>
-              {likeCount && formatLikeCount(likeCount)}
+              {dislikeCount && formatLikeCount(dislikeCount)}
             </span>
           </Box>
         </Tooltip>

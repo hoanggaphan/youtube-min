@@ -4,6 +4,7 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { useAuth } from 'hooks/useAuth';
 import React from 'react';
+import { useHistory, useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -21,8 +22,16 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function Login(): JSX.Element {
   const classes = useStyles();
   const auth = useAuth();
+  const history = useHistory();
+  const location = useLocation<any>();
 
-  const handleLogin = () => auth.signIn();
+  const { from } = location.state || { from: { pathname: '/' } };
+
+  const handleLogin = () => {
+    auth.signIn().then(() => {
+      history.replace(from);
+    });
+  };
 
   React.useEffect(() => {
     document.title = 'Đăng nhập';
