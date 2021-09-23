@@ -1,4 +1,4 @@
-import { useAuth } from 'hooks/useAuth';
+import { isLogin } from 'hooks/useAuth';
 import React from 'react';
 import { Redirect, Route } from 'react-router-dom';
 
@@ -12,24 +12,24 @@ export default function PrivateRoute({
   exact?: boolean;
   path: string;
 }): JSX.Element {
-  const { user } = useAuth();
-  
-  function renderComponent(Layout?: React.ElementType) {
-    return Layout ? (
-      <Layout>
-        <Component />
-      </Layout>
-    ) : (
-      <Component />
-    );
-  }
-
   return (
     <Route
       {...rest}
-      component={() =>
-        user ? renderComponent(Layout) : <Redirect to='/login' />
-      }
+      render={({ location, ...routeProps }) => {
+        if (!isLogin())
+          return (
+            <Redirect to={{ pathname: '/login', state: { from: location } }} />
+          );
+
+        if (Layout)
+          return (
+            <Layout>
+              <Component {...routeProps} />
+            </Layout>
+          );
+
+        return <Component {...routeProps} />;
+      }}
     />
   );
 }

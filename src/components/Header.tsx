@@ -17,6 +17,7 @@ import { getLastWord } from 'helpers/string';
 import { useAuth } from 'hooks/useAuth';
 import PopupState, { bindPopover, bindTrigger } from 'material-ui-popup-state';
 import React from 'react';
+import { useHistory, useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) => {
@@ -66,6 +67,8 @@ const useStyles = makeStyles((theme: Theme) => {
 export default function Header(): JSX.Element {
   const classes = useStyles();
   const { user, revokeAccess, signOut } = useAuth();
+  const history = useHistory();
+  const location = useLocation();
 
   return (
     <header className={`${classes.header} mui-fixed`}>
@@ -165,8 +168,12 @@ export default function Header(): JSX.Element {
                       color='primary'
                       variant='outlined'
                       startIcon={<AccountCircleIcon />}
-                      component={Link}
-                      to='/login'
+                      onClick={() => {
+                        history.push({
+                          pathname: '/login',
+                          state: { from: location },
+                        });
+                      }}
                     >
                       Đăng nhập
                     </Button>
