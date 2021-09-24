@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const number = {
-  popular: 8,
+  popular: 16,
   liked: 4,
   disLiked: 4,
 }
