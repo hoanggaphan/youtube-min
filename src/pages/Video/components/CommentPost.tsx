@@ -10,6 +10,7 @@ import { useAuth } from 'hooks/useAuth';
 import { useSnackbar } from 'notistack';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { useHistory, useLocation } from 'react-router';
 import { CommentContext } from './Comments';
 
 const useStyles = makeStyles((theme: Theme) => {
@@ -20,6 +21,18 @@ const useStyles = makeStyles((theme: Theme) => {
       },
       '&:after': {
         borderBottom: '2.5px solid black',
+      },
+      '& input': {
+        fontSize: '14px',
+        paddingTop: '0',
+      },
+    },
+    inputDisable: {
+      '&:hover:not(.Mui-disabled):before': {
+        borderBottom: '1px solid rgba(0, 0, 0, 0.42)',
+      },
+      '&:after': {
+        borderBottom: 'unset',
       },
       '& input': {
         fontSize: '14px',
@@ -64,6 +77,9 @@ export default function CommentPost({
   const [adding, setAdding] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const { state, dispatch } = React.useContext(CommentContext);
+
+  const history = useHistory();
+  const location = useLocation();
 
   const handleChange = (
     e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -132,15 +148,31 @@ export default function CommentPost({
         </Box>
 
         <Box width='100%'>
-          <Input
-            value={value}
-            onChange={handleChange}
-            onFocus={handleFocus}
-            className={classes.input}
-            placeholder='Bình luẩn công khai...'
-            multiline
-            fullWidth
-          />
+          {user ? (
+            <Input
+              value={value}
+              onChange={handleChange}
+              onFocus={handleFocus}
+              className={classes.input}
+              placeholder='Bình luẩn công khai...'
+              multiline
+              fullWidth
+            />
+          ) : (
+            <Input
+              className={classes.inputDisable}
+              placeholder='Bình luẩn công khai...'
+              multiline
+              fullWidth
+              readOnly
+              onClick={() => {
+                history.push({
+                  pathname: '/login',
+                  state: { from: location },
+                });
+              }}
+            />
+          )}
 
           {show && (
             <Box

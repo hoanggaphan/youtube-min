@@ -170,7 +170,7 @@ export default React.memo(function LikeDisLike({
         </Tooltip>
       ) : (
         <WithLoginPopup
-          title={'Bạn thích video này?'}
+          title={'Bạn không thích video này?'}
           content={'Đăng nhập để thể hiện ý kiến của bạn.'}
         >
           <Tooltip
