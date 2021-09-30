@@ -4,10 +4,11 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { videosState } from 'app/useVideos';
+import StyledTooltip from 'components/StyledTooltip';
 import { formatDateView, formatVideoViews } from 'helpers/format';
 import { getLastWord } from 'helpers/string';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -54,7 +55,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     title: {
       fontSize: '2.5rem',
-      marginTop: '70px',
       [theme.breakpoints.up('sm')]: {
         fontSize: '2.7rem',
       },
@@ -90,9 +90,20 @@ const useStyles = makeStyles((theme: Theme) =>
       backgroundColor: 'rgba(0,0,0,.11)',
     },
 
+    channelTitle: {
+      transition: '.1s',
+
+      '&:hover': {
+        color: theme.palette.grey['700'],
+      },
+    },
+
     link: {
       textDecoration: 'none',
       color: 'inherit',
+    },
+    cursor: {
+      cursor: 'pointer',
     },
   })
 );
@@ -108,6 +119,7 @@ export default function List({
 }): JSX.Element {
   const classes = useStyles();
   const { data, error } = result;
+  const history = useHistory();
 
   if (error) {
     return (
@@ -160,23 +172,36 @@ export default function List({
       {data.items?.length ? (
         <div className={classes.grid}>
           {data?.items?.map((item: any) => (
-            <Link
-              className={classes.link}
-              to={`/video?v=${item.id}`}
+            <Box
+              onClick={() => {
+                history.push(`/video?v=${item.id}`);
+              }}
               key={item.id}
+              className={classes.cursor}
             >
               <div className={classes.gridImgContainer}>
                 <img src={item.snippet?.thumbnails?.medium?.url} alt='' />
               </div>
               <Box mt='12px'>
                 <Box display='flex' gridColumnGap='12px'>
-                  <Avatar
-                    src={item?.snippet?.channelAvatar}
-                    className={classes.channelAvatar}
+                  <Link
+                    onClick={(e: React.MouseEvent<HTMLElement>) => {
+                      e.stopPropagation();
+                      history.push(`/channel/${item?.snippet?.channelId}`);
+                    }}
+                    to={`/channel/${item?.snippet?.channelId}`}
+                    title={item.snippet?.channelTitle}
+                    className={classes.link}
                   >
-                    {item?.snippet?.channelTitle &&
-                      getLastWord(item.snippet.channelTitle).charAt(0)}
-                  </Avatar>
+                    <Avatar
+                      src={item?.snippet?.channelAvatar}
+                      className={classes.channelAvatar}
+                    >
+                      {item?.snippet?.channelTitle &&
+                        getLastWord(item.snippet.channelTitle).charAt(0)}
+                    </Avatar>
+                  </Link>
+
                   <div>
                     <span
                       className={`${classes.videoTitle} ${classes.textEllipsis}`}
@@ -184,14 +209,30 @@ export default function List({
                     >
                       {item.snippet?.title}
                     </span>
-                    <Typography
-                      component='span'
-                      variant='body2'
-                      color='textSecondary'
-                      noWrap
+
+                    <StyledTooltip
+                      title={item.snippet?.channelTitle}
+                      placement='top'
                     >
-                      {item.snippet?.channelTitle}
-                    </Typography>
+                      <Link
+                        onClick={(e: React.MouseEvent<HTMLElement>) => {
+                          e.stopPropagation();
+                          history.push(`/channel/${item?.snippet?.channelId}`);
+                        }}
+                        to={`/channel/${item?.snippet?.channelId}`}
+                        className={classes.link}
+                      >
+                        <Typography
+                          component='span'
+                          variant='body2'
+                          color='textSecondary'
+                          className={classes.channelTitle}
+                        >
+                          {item.snippet?.channelTitle}
+                        </Typography>
+                      </Link>
+                    </StyledTooltip>
+
                     <Box display='flex' flexWrap='wrap'>
                       <Typography
                         className={classes.videoViews}
@@ -214,7 +255,7 @@ export default function List({
                   </div>
                 </Box>
               </Box>
-            </Link>
+            </Box>
           ))}
         </div>
       ) : (

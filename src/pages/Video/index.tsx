@@ -1,7 +1,6 @@
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import Skeleton from '@material-ui/lab/Skeleton';
@@ -9,6 +8,7 @@ import useChannel from 'app/useChannel';
 import useVideo from 'app/useVideo';
 import FormattedString from 'components/FormattedString';
 import MyContainer from 'components/MyContainer';
+import StyledTooltip from 'components/StyledTooltip';
 import SubscribeButton from 'components/SubscribeButton';
 import { formatNumberWithDots, formatSubscriptionCount } from 'helpers/format';
 import { getLastWord } from 'helpers/string';
@@ -16,6 +16,7 @@ import useIframeAPI from 'hooks/useIframeAPI';
 import useQuery from 'hooks/useQuery';
 import React from 'react';
 import { Redirect } from 'react-router';
+import { Link } from 'react-router-dom';
 import Collapsed from './components/Collapsed';
 import Comments from './components/Comments';
 import LikeDisLike from './components/LikeDisLike';
@@ -77,11 +78,18 @@ const useStyles = makeStyles((theme: Theme) => {
     avatar: {
       width: '48px',
       height: '48px',
-      marginRight: '16px',
       backgroundColor: 'rgba(0,0,0,.11)',
+    },
+    textDecoration: {
+      textDecoration: 'none',
     },
   });
 });
+
+const calculatePercent = (likeNum: number, disLikeNum: number) => {
+  if (likeNum === 0 && disLikeNum === 0) return 50;
+  return (likeNum / (likeNum + disLikeNum)) * 100;
+};
 
 export default function Video(): JSX.Element {
   const classes = useStyles();
@@ -107,7 +115,7 @@ export default function Video(): JSX.Element {
     error: channelError,
     isLoading: channelIsValidating,
   } = useChannel(channelId);
-  
+
   React.useEffect(() => {
     document.title = videoTitle + ' - Mini YouTube';
   }, [videoTitle]);
@@ -155,7 +163,7 @@ export default function Video(): JSX.Element {
             id='ytb-player'
             className={classes.iframe}
             title='Youtube video player'
-            src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1${
+            src={`https://www.youtube.com/embed/${videoId}${
               start && '&start=' + start
             }`}
             allow='autoplay'
@@ -228,7 +236,7 @@ export default function Video(): JSX.Element {
                 {videoData && <LikeDisLike videoData={videoData} />}
 
                 {likeCount && dislikeCount && (
-                  <Tooltip
+                  <StyledTooltip
                     title={
                       <span className={classes.tooltipText}>
                         {formatNumberWithDots(likeCount)} /{' '}
@@ -237,16 +245,19 @@ export default function Video(): JSX.Element {
                     }
                     placement='top'
                   >
-                    <Box
-                      width='100%'
-                      pt='6px'
-                      pb='28px'
-                      position='absolute'
-                      left='0'
-                    >
-                      <Box height='2px' bgcolor='#737373'></Box>
+                    <Box width='100%' pt='6px' pb="24px" position='absolute' left='0'>
+                      <Box height='2px' bgcolor='#737373'>
+                        <Box
+                          height='2px'
+                          width={`${calculatePercent(
+                            +likeCount,
+                            +dislikeCount
+                          )}%`}
+                          bgcolor='#030303'
+                        />
+                      </Box>
                     </Box>
-                  </Tooltip>
+                  </StyledTooltip>
                 )}
               </Box>
             </div>
@@ -285,18 +296,34 @@ export default function Video(): JSX.Element {
               minHeight='50px'
             >
               <Box display='flex' flex='1' alignItems='center'>
-                <Avatar
-                  src={channelData?.snippet?.thumbnails?.default?.url}
-                  className={classes.avatar}
-                >
-                  {channelData?.snippet?.title &&
-                    getLastWord(channelData.snippet.title).charAt(0)}
-                </Avatar>
+                <Box mr='16px'>
+                  <Link to={`/channel/${channelId}`}>
+                    <Avatar
+                      src={channelData?.snippet?.thumbnails?.default?.url}
+                      className={classes.avatar}
+                    >
+                      {channelData?.snippet?.title &&
+                        getLastWord(channelData.snippet.title).charAt(0)}
+                    </Avatar>
+                  </Link>
+                </Box>
 
                 <div>
-                  <Typography variant='subtitle2'>
-                    {channelData?.snippet?.title}
-                  </Typography>
+                  <StyledTooltip
+                    title={channelData?.snippet?.title}
+                    placement='top'
+                  >
+                    <Typography
+                      className={classes.textDecoration}
+                      variant='subtitle2'
+                      display='block'
+                      component={Link}
+                      to={`/channel/${channelId}`}
+                      color='inherit'
+                    >
+                      {channelData?.snippet?.title}
+                    </Typography>
+                  </StyledTooltip>
                   <Typography variant='caption'>
                     {channelData?.statistics?.subscriberCount &&
                       `${formatSubscriptionCount(

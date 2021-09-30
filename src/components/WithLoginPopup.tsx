@@ -7,7 +7,7 @@ import Popover from '@material-ui/core/Popover';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import PopupState, { bindPopover, bindTrigger } from 'material-ui-popup-state';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -29,6 +29,8 @@ interface Props {
 
 export default function WithLoginPopup({ children, title, content }: Props) {
   const classes = useStyles();
+  const location = useLocation();
+  const history = useHistory();
 
   return (
     <PopupState variant='popover' popupId='subscribe-popup-popover'>
@@ -65,8 +67,12 @@ export default function WithLoginPopup({ children, title, content }: Props) {
                   disableRipple
                   disableFocusRipple
                   disableElevation
-                  component={Link}
-                  to='/login'
+                  onClick={() => {
+                    history.push({
+                      pathname: '/login',
+                      state: { from: location },
+                    });
+                  }}
                 >
                   Đăng nhập
                 </Button>

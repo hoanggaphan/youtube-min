@@ -123,15 +123,18 @@ export default React.memo(function Comments({
   const { data, err, isSorting, index } = state;
 
   React.useEffect(() => {
-    isMounted() &&
-      commentAPI
-        .fetchListByVideoId(videoId)
-        .then((res) =>
+    commentAPI
+      .fetchListByVideoId(videoId)
+      .then(
+        (res) =>
+          isMounted() &&
           dispatch({ type: 'FETCH_FULFILLED', payload: res.result })
-        )
-        .catch((err) =>
+      )
+      .catch(
+        (err) =>
+          isMounted() &&
           dispatch({ type: 'FETCH_REJECTED', err: err.result.error })
-        );
+      );
     // eslint-disable-next-line
   }, []);
 

@@ -77,6 +77,16 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function VideoItem({ item }: { item: any }): JSX.Element {
   const classes = useStyles();
 
+  /**
+   * Check video is deleted but
+   * not updated via api
+   */
+  if (
+    item.snippet.title === 'Deleted video' &&
+    Object.keys(item.snippet.thumbnails).length === 0
+  )
+    return <></>;
+
   return (
     <Link
       to={`/video?v=${item.contentDetails.videoId}`}
@@ -87,7 +97,7 @@ export default function VideoItem({ item }: { item: any }): JSX.Element {
         <LazyLoad offset={400} once>
           <img
             className={classes.img}
-            src={item.snippet.thumbnails.medium.url}
+            src={item.snippet.thumbnails.medium?.url}
             alt=''
           />
         </LazyLoad>

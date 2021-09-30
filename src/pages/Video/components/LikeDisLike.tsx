@@ -1,10 +1,10 @@
 import Box from '@material-ui/core/Box';
 import IconButton from '@material-ui/core/IconButton';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import Tooltip from '@material-ui/core/Tooltip';
 import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import * as videoAPI from 'api/videoAPI';
+import StyledTooltip from 'components/StyledTooltip';
 import WithLoginPopup from 'components/WithLoginPopup';
 import { formatLikeCount } from 'helpers/format';
 import { useAuth } from 'hooks/useAuth';
@@ -12,6 +12,8 @@ import useQuery from 'hooks/useQuery';
 import { useSnackbar } from 'notistack';
 import React from 'react';
 import useSWR from 'swr';
+import ThumbUpOutlinedIcon from '@material-ui/icons/ThumbUpOutlined';
+import ThumbDownOutlinedIcon from '@material-ui/icons/ThumbDownOutlined';
 
 const useStyles = makeStyles((theme: Theme) => {
   return createStyles({
@@ -25,6 +27,8 @@ const useStyles = makeStyles((theme: Theme) => {
     },
     likeCountText: {
       fontWeight: 500,
+      textTransform: 'uppercase',
+      userSelect: 'none',
     },
     tooltipText: {
       fontSize: '12px',
@@ -96,84 +100,34 @@ export default React.memo(function LikeDisLike({
   return (
     <Box display='flex'>
       {user ? (
-        <Tooltip
-          title={
-            <span className={classes.tooltipText}>Tôi thích video này</span>
-          }
-          placement='bottom'
-        >
-          <Box mr='7.5px'>
-            <div className={classes.likeContainer}>
-              <IconButton
-                onClick={off}
-                // onClick={() => handleRate(rating === 'like' ? 'none' : 'like')}
-                color={rating === 'like' ? 'primary' : 'default'}
-                className={classes.iconBtn}
-              >
-                <ThumbUpIcon />
-              </IconButton>
-              <span className={classes.likeCountText}>
-                {likeCount && formatLikeCount(likeCount)}
-              </span>
-            </div>
-          </Box>
-        </Tooltip>
-      ) : (
-        <WithLoginPopup
-          title={'Bạn thích video này?'}
-          content={'Đăng nhập để thể hiện ý kiến của bạn.'}
-        >
-          <Tooltip
+        <>
+          <StyledTooltip
             title={
               <span className={classes.tooltipText}>Tôi thích video này</span>
             }
             placement='bottom'
           >
             <Box mr='7.5px'>
-              <div className={classes.likeContainer}>
+              <div
+                onClick={off}
+                // onClick={() => handleRate(rating === 'like' ? 'none' : 'like')}
+                className={classes.likeContainer}
+              >
                 <IconButton className={classes.iconBtn}>
-                  <ThumbUpIcon />
+                  {rating === 'like' ? (
+                    <ThumbUpIcon />
+                  ) : (
+                    <ThumbUpOutlinedIcon />
+                  )}
                 </IconButton>
                 <span className={classes.likeCountText}>
-                  {likeCount && formatLikeCount(likeCount)}
+                  {likeCount ? formatLikeCount(likeCount) : 'Thích'}
                 </span>
               </div>
             </Box>
-          </Tooltip>
-        </WithLoginPopup>
-      )}
+          </StyledTooltip>
 
-      {user ? (
-        <Tooltip
-          title={
-            <span className={classes.tooltipText}>
-              Tôi không thích video này
-            </span>
-          }
-          placement='bottom'
-        >
-          <Box ml='7.5px' pr='6px' className={classes.likeContainer}>
-            <IconButton
-              onClick={off}
-              // onClick={() =>
-              //   handleRate(rating === 'dislike' ? 'none' : 'dislike')
-              // }
-              className={classes.iconBtn}
-              color={rating === 'dislike' ? 'primary' : 'default'}
-            >
-              <ThumbDownIcon />
-            </IconButton>
-            <span className={classes.likeCountText}>
-              {dislikeCount && formatLikeCount(dislikeCount)}
-            </span>
-          </Box>
-        </Tooltip>
-      ) : (
-        <WithLoginPopup
-          title={'Bạn không thích video này?'}
-          content={'Đăng nhập để thể hiện ý kiến của bạn.'}
-        >
-          <Tooltip
+          <StyledTooltip
             title={
               <span className={classes.tooltipText}>
                 Tôi không thích video này
@@ -181,18 +135,80 @@ export default React.memo(function LikeDisLike({
             }
             placement='bottom'
           >
-            <Box ml='7.5px' pr='6px'>
-              <div className={classes.likeContainer}>
-                <IconButton className={classes.iconBtn}>
+            <Box
+              onClick={off}
+              className={classes.likeContainer}
+              // onClick={() =>
+              //   handleRate(rating === 'dislike' ? 'none' : 'dislike')
+              // }
+              ml='7.5px'
+              pr='6px'
+            >
+              <IconButton className={classes.iconBtn}>
+                {rating === 'dislike' ? (
                   <ThumbDownIcon />
-                </IconButton>
-                <span className={classes.likeCountText}>
-                  {dislikeCount && formatLikeCount(dislikeCount)}
-                </span>
-              </div>
+                ) : (
+                  <ThumbDownOutlinedIcon />
+                )}
+              </IconButton>
+              <span className={classes.likeCountText}>
+                {dislikeCount ? formatLikeCount(dislikeCount) : 'Không thích'}
+              </span>
             </Box>
-          </Tooltip>
-        </WithLoginPopup>
+          </StyledTooltip>
+        </>
+      ) : (
+        <>
+          <WithLoginPopup
+            title={'Bạn thích video này?'}
+            content={'Đăng nhập để thể hiện ý kiến của bạn.'}
+          >
+            <StyledTooltip
+              title={
+                <span className={classes.tooltipText}>Tôi thích video này</span>
+              }
+              placement='bottom'
+            >
+              <Box mr='7.5px'>
+                <div className={classes.likeContainer}>
+                  <IconButton className={classes.iconBtn}>
+                    <ThumbUpOutlinedIcon />
+                  </IconButton>
+                  <span className={classes.likeCountText}>
+                    {likeCount ? formatLikeCount(likeCount) : 'Thích'}
+                  </span>
+                </div>
+              </Box>
+            </StyledTooltip>
+          </WithLoginPopup>
+
+          <WithLoginPopup
+            title={'Bạn không thích video này?'}
+            content={'Đăng nhập để thể hiện ý kiến của bạn.'}
+          >
+            <StyledTooltip
+              title={
+                <span className={classes.tooltipText}>
+                  Tôi không thích video này
+                </span>
+              }
+              placement='bottom'
+            >
+              <Box ml='7.5px' pr='6px'>
+                <div className={classes.likeContainer}>
+                  <IconButton className={classes.iconBtn}>
+                    <ThumbDownOutlinedIcon />
+                  </IconButton>
+                  <span className={classes.likeCountText}>
+                    {dislikeCount
+                      ? formatLikeCount(dislikeCount)
+                      : 'Không thích'}
+                  </span>
+                </div>
+              </Box>
+            </StyledTooltip>
+          </WithLoginPopup>
+        </>
       )}
     </Box>
   );
