@@ -1,21 +1,11 @@
-import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
-import Collapse from '@material-ui/core/Collapse';
-import IconButton from '@material-ui/core/IconButton';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import CloseIcon from '@material-ui/icons/Close';
-import { Alert, AlertTitle } from '@material-ui/lab';
 import * as videoAPI from 'api/videoAPI';
 import useVideos from 'app/useVideos';
-import { getLastWord } from 'helpers/string';
 import { useAuth } from 'hooks/useAuth';
 import { globalContext } from 'hooks/useGlobal';
 import React from 'react';
-import { Link } from 'react-router-dom';
 import List from './components/List';
-import Subscription from './components/Subscription';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -46,7 +36,7 @@ const number = {
   popular: 16,
   liked: 4,
   disLiked: 4,
-}
+};
 const fetchPopular = () => videoAPI.fetchMostPopularVideos(number.popular);
 const fetchLiked = () => videoAPI.fetchMyRatingVideos('like', number.liked);
 
@@ -74,13 +64,9 @@ export default function Home(): JSX.Element {
     // eslint-disable-next-line
   }, []);
 
-  const handleSignOut = () => {
-    signOut();
-  };
-
   return (
     <>
-      <Collapse in={state.alert.home}>
+      {/* <Collapse in={state.alert.home}>
         <Alert
           severity='warning'
           action={
@@ -112,65 +98,14 @@ export default function Home(): JSX.Element {
             </Link>
           </Typography>
         </Alert>
-      </Collapse>
-      <Box pt='24px' mb='50px'>
-        {user && (
-          <>
-            <Avatar
-              src={user?.imgUrl}
-              alt=''
-              className={`${classes.large} ${classes.center}`}
-            >
-              {user && getLastWord(user.firstName).charAt(0)}
-            </Avatar>
-            <Typography
-              align='center'
-              variant='h3'
-              className={`${classes.mt2} ${classes.name}`}
-            >
-              {user?.fullName}
-            </Typography>
-            <Typography
-              align='center'
-              variant='h3'
-              className={`${classes.mt2} ${classes.name}`}
-            >
-              {user?.email}
-            </Typography>
+      </Collapse> */}
 
-            <Box m='0 auto' width='fit-content' className={classes.mt2}>
-              <Button onClick={revokeAccess} size='large' color='primary'>
-                thu hồi quyền truy cập
-              </Button>
-              <Button onClick={handleSignOut} size='large' color='primary'>
-                đăng xuất
-              </Button>
-            </Box>
-
-            <Subscription />
-          </>
-        )}
-
+      <Box mb='50px'>
         <List
           title='Video thịnh hành'
           result={resPopular}
           skeletons={number.popular}
         />
-
-        {user && (
-          <>
-            <List
-              title='Video đã thích'
-              result={resLiked}
-              skeletons={number.liked}
-            />
-            <List
-              title='Video không thích'
-              result={resDisliked}
-              skeletons={number.disLiked}
-            />
-          </>
-        )}
       </Box>
     </>
   );

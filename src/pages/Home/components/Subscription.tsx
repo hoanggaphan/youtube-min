@@ -1,4 +1,5 @@
 import Box from '@material-ui/core/Box';
+import IconButton from '@material-ui/core/IconButton';
 import {
   createStyles,
   makeStyles,
@@ -6,36 +7,90 @@ import {
   useTheme,
 } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
-import * as subscriptionAPI from 'api/subscriptionAPI';
 import useSubscription from 'app/useSubscription';
-import { useSnackbar } from 'notistack';
+import useDrag from 'hooks/useDrag';
 import React from 'react';
-import ScrollMenu from 'react-horizontal-scrolling-menu';
+import { ScrollMenu, VisibilityContext } from 'react-horizontal-scrolling-menu';
 import { useHistory } from 'react-router';
 import SubscriptionItem from './SubscriptionItem';
 import SubscriptionSkeleton from './SubscriptionSkeleton';
-import IconButton from '@material-ui/core/IconButton';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    arrowDisabled: {
-      visibility: 'hidden',
-      opacity: '0',
-    },
-    menu: {
+    menuWrapper: {
       marginTop: '20px',
       position: 'relative',
       [theme.breakpoints.up('sm')]: {
         marginTop: '40px',
       },
     },
-    menuItem: {
+    scrollContainer: {
+      msOverflowStyle: 'none' /* IE and Edge */,
+      scrollbarWidth: 'none' /* Firefox */,
+
+      '&::-webkit-scrollbar': {
+        display: 'none',
+      },
+    },
+
+    arrowLeft: {
+      width: '40px',
+      height: '40px',
+
+      position: 'absolute',
+      top: '50%',
+      left: '0',
+      transform: 'translate(-20px, -50%)',
+      zIndex: 1,
+
+      backgroundColor: 'white',
+      borderRadius: ' 50%',
+      boxShadow: '0 4px 4px rgb(0 0 0 / 30%), 0 0 4px rgb(0 0 0 / 20%)',
+      transition: 'none',
+
+      '&:hover': {
+        backgroundColor: 'white',
+      },
+
+      '&[disabled]': {
+        visibility: 'hidden',
+        opacity: '0',
+      },
+    },
+
+    arrowRight: {
+      width: '40px',
+      height: '40px',
+
+      position: 'absolute',
+      top: '50%',
+      right: '0',
+      transform: 'translate(20px, -50%)',
+      zIndex: 1,
+
+      backgroundColor: 'white',
+      borderRadius: ' 50%',
+      boxShadow: '0 4px 4px rgb(0 0 0 / 30%), 0 0 4px rgb(0 0 0 / 20%)',
+      transition: 'none',
+
+      '&:hover': {
+        backgroundColor: 'white',
+      },
+
+      '&[disabled]': {
+        visibility: 'hidden',
+        opacity: '0',
+      },
+    },
+
+    item: {
       outline: 'none',
       userSelect: 'none',
     },
+
     title: {
       fontSize: '2.5rem',
       marginTop: '70px',
@@ -48,91 +103,66 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const ArrowLeft = (): JSX.Element => {
+  const classes = useStyles();
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up('sm'));
+  const { scrollPrev } = React.useContext(VisibilityContext);
+
   return (
-    <IconButton size='small'>
+    <IconButton
+      disabled={false}
+      onClick={() => scrollPrev()}
+      className={classes.arrowLeft}
+      size='small'
+    >
       <NavigateBeforeIcon fontSize={matches ? 'large' : 'default'} />
     </IconButton>
   );
 };
 const ArrowRight = (): JSX.Element => {
+  const classes = useStyles({ arrow: 'right' });
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up('sm'));
+  const { scrollNext } = React.useContext(VisibilityContext);
+
   return (
-    <IconButton size='small'>
+    <IconButton
+      disabled={false}
+      onClick={() => scrollNext()}
+      className={classes.arrowRight}
+      size='small'
+    >
       <NavigateNextIcon fontSize={matches ? 'large' : 'default'} />
     </IconButton>
   );
 };
 
-const SubscriptionList = (list: any) => {
-  return list.map((sub: any) => {
-    return (
-      <SubscriptionItem
-        key={sub.snippet.resourceId.channelId}
-        url={sub.snippet.thumbnails.default.url}
-        text={sub.snippet.title}
-      />
-    );
-  });
-};
+type scrollVisibilityApiType = React.ContextType<typeof VisibilityContext>;
 
 export default React.memo(function Subscription(): JSX.Element {
   const classes = useStyles();
   const history = useHistory();
-  const { enqueueSnackbar } = useSnackbar();
 
-  const menuRef = React.useRef<ScrollMenu>(null);
-  const isAdding = React.useRef(false);
+  const { data, error } = useSubscription();
+  const subscriptions = data?.items!;
 
-  const [allItemsWidth, setAllItemsWidth] = React.useState<number | null>(null);
-  const [menuWidth, setMenuWidth] = React.useState<number | null>(null);
+  const { dragStart, dragStop, dragMove, dragging } = useDrag();
 
-  const { data, error, mutate } = useSubscription();
-  const nextPageToken = data?.nextPageToken;
-  const subscriptions = data?.items;
-
-  // Get Menu Width, to disable dragging when Items Width < Menu Width
-  React.useEffect(() => {
-    if (menuRef && menuRef.current) {
-      const { allItemsWidth, menuWidth } = menuRef.current.getWidth(
-        SubscriptionList(subscriptions)
-      );
-      setAllItemsWidth(allItemsWidth);
-      setMenuWidth(menuWidth);
-    }
-  }, [subscriptions]);
-
-  const handleItemSelected = (key: string | number | null) =>
-    history.push(`/channel/${key}`);
-
-  const handleLazyLoad = async () => {
-    if (!subscriptions || isAdding.current) return;
-
-    // nextPageToken check subscriptions list from api has ended or not
-    if (nextPageToken && menuRef.current) {
-      const { isScrollNeeded } = menuRef.current;
-
-      //  if have 30 items, check that 25-rd item (30-5 = 25) visible
-      const last_item_will_be_visible_soon = isScrollNeeded({
-        itemId: `menuItem-${subscriptions.length - 14}`,
+  const handleDrag =
+    ({ scrollContainer }: scrollVisibilityApiType) =>
+    (ev: React.MouseEvent) =>
+      dragMove(ev, (newPos) => {
+        if (scrollContainer.current) {
+          const currentScroll = scrollContainer.current.scrollLeft;
+          scrollContainer.current.scrollLeft = currentScroll + newPos;
+        }
       });
 
-      // if 25-rd visible, it will fetch data
-      if (last_item_will_be_visible_soon) {
-        try {
-          isAdding.current = true;
-          const res = await subscriptionAPI.fetchList(nextPageToken);
-          res.result.items = [...subscriptions, ...res.result.items!];
-          mutate(res.result, false);
-        } catch (error) {
-          enqueueSnackbar('An error occurred while fetching next subscription');
-        } finally {
-          isAdding.current = false;
-        }
-      }
+  const handleItemClick = (itemId: string) => () => {
+    if (dragging) {
+      return false;
     }
+    history.push(`/channel/${itemId}`);
   };
 
   if (error) {
@@ -170,21 +200,27 @@ export default React.memo(function Subscription(): JSX.Element {
         <SubscriptionSkeleton num={10} />
       ) : (
         <ScrollMenu
-          ref={menuRef}
-          dragging={!!allItemsWidth && !!menuWidth && allItemsWidth > menuWidth}
-          wheel={false}
-          data={SubscriptionList(subscriptions)}
-          menuClass={classes.menu}
-          itemClass={classes.menuItem}
-          arrowDisabledClass={classes.arrowDisabled}
-          arrowLeft={<ArrowLeft />}
-          arrowRight={<ArrowRight />}
-          alignCenter={false}
-          hideArrows
-          hideSingleArrow
-          onUpdate={handleLazyLoad}
-          onSelect={handleItemSelected}
-        />
+          wrapperClassName={classes.menuWrapper}
+          scrollContainerClassName={classes.scrollContainer}
+          itemClassName={classes.item}
+          onMouseDown={() => dragStart}
+          onMouseUp={() => dragStop}
+          onMouseMove={handleDrag}
+          LeftArrow={ArrowLeft}
+          RightArrow={ArrowRight}
+        >
+          {subscriptions.map((sub: any) => {
+            return (
+              <SubscriptionItem
+                key={sub.snippet.resourceId.channelId}
+                itemId={sub.snippet.resourceId.channelId} // NOTE: itemId is required for track items
+                url={sub.snippet.thumbnails.default.url}
+                text={sub.snippet.title}
+                onClick={handleItemClick(sub.snippet.resourceId.channelId)}
+              />
+            );
+          })}
+        </ScrollMenu>
       )}
     </>
   );

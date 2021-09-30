@@ -5,15 +5,15 @@ import React from 'react';
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     avatar: {
-      margin: '0 5px',
       width: '50px',
       height: '50px',
       backgroundColor: 'rgba(0,0,0,.11)',
+      margin: '0 5px',
 
       [theme.breakpoints.up('sm')]: {
-        margin: '0 10px',
         width: '80px',
         height: '80px',
+        margin: '0 10px',
       },
 
       cursor: 'pointer',
@@ -29,16 +29,25 @@ const useStyles = makeStyles((theme: Theme) =>
 type SubscriptionItemProps = {
   url: string;
   text: string;
+  itemId: string;
+  onClick: Function;
 };
 
 export default function SubscriptionItem({
   url,
   text,
+  itemId,
+  onClick,
 }: SubscriptionItemProps): JSX.Element {
   const classes = useStyles();
 
   return (
-    <Avatar src={url} alt='' className={classes.avatar}>
+    <Avatar
+      onClick={() => onClick()}
+      src={url}
+      alt=''
+      className={classes.avatar}
+    >
       {text}
     </Avatar>
   );
