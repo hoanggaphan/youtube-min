@@ -22,7 +22,7 @@ const theme = createMuiTheme({
         body: {
           overflowX: 'hidden',
           overflowY: 'scroll',
-          backgroundColor: '#f9f9f9',
+          backgroundColor: '#f1f1f1',
         },
         '::-webkit-scrollbar': {
           width: '16px',

@@ -5,12 +5,16 @@ export function fetchVideoById(id: string) {
   });
 }
 
-export function fetchMostPopularVideos(maxResults: number = 8) {
+export function fetchPopularVideos(
+  maxResults: number = 8,
+  videoCategoryId?: string
+) {
   return gapi.client.youtube.videos.list({
     part: ['snippet, contentDetails, statistics'],
     chart: 'mostPopular',
     maxResults,
     regionCode: 'VN',
+    videoCategoryId,
   });
 }
 
