@@ -3,7 +3,7 @@ import { createBrowserHistory } from 'history';
 import { ProvideAuth, useInitClient } from 'hooks/useAuth';
 import HeadLayout from 'layouts/HeadLayout';
 import Channel from 'pages/Channel';
-import Home from 'pages/Home';
+import Trending from 'pages/Trending';
 import HowLogin from 'pages/HowLogin';
 import Login from 'pages/Login';
 import Note from 'pages/Note';
@@ -35,10 +35,10 @@ function App() {
           <ProvideAuth>
             <Router history={history}>
               <Switch>
+                <Redirect exact from='/' to='/trending' />
                 <PublicRoute
-                  exact
-                  path='/'
-                  component={Home}
+                  path='/trending'
+                  component={Trending}
                   layout={HeadLayout}
                 />
                 <PublicRoute path='/note' component={Note} />

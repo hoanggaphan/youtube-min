@@ -12,8 +12,7 @@ import { formatSubscriptionCount } from 'helpers/format';
 import { getLastWord } from 'helpers/string';
 import PageNotFound from 'pages/NotFound';
 import React from 'react';
-import { Route, useLocation, useParams, useRouteMatch } from 'react-router';
-import { Link } from 'react-router-dom';
+import { useParams } from 'react-router';
 import About from './components/About';
 import Videos from './components/Videos';
 
@@ -32,7 +31,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     channelHeader: {
       display: 'flex',
-      backgroundColor: '#fff',
+      backgroundColor: '#f9f9f9',
       justifyContent: 'space-between',
       flexDirection: 'column',
       padding: '15px 40px 0',
@@ -55,7 +54,7 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     tabs: {
-      backgroundColor: '#fff',
+      backgroundColor: '#f9f9f9',
     },
   })
 );
@@ -66,22 +65,12 @@ const urlImageCropped =
 export default function Channel(): JSX.Element {
   const classes = useStyles();
   const { id: channelId } = useParams<{ id: string }>();
-  const { url } = useRouteMatch();
-  const { pathname } = useLocation();
-  const [value, setValue] = React.useState(pathname);
+  const [value, setValue] = React.useState('video');
   const { data, error, isLoading } = useChannel(channelId);
 
   const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
     setValue(newValue);
   };
-
-  // check value of active tab when url changed
-  React.useEffect(() => {
-    if (value !== pathname) {
-      setValue(pathname);
-    }
-    // eslint-disable-next-line
-  }, [pathname]);
 
   React.useEffect(() => {
     document.title = data?.snippet?.title + ' - Mini YouTube';
@@ -163,44 +152,22 @@ export default function Channel(): JSX.Element {
         textColor='primary'
         centered
       >
-        <Tab label='Video' value={url} component={Link} to={url} />
-        <Tab
-          label='Giới thiệu'
-          value={`${url}/about`}
-          component={Link}
-          to={`${url}/about`}
-        />
+        <Tab label='Video' value='video' />
+        <Tab label='Giới thiệu' value='about' />
       </Tabs>
 
-      <Route
-        exact
-        path={url}
-        children={({ match }) => {
-          return (
-            <Box
-              pt='25px'
-              style={{ display: match?.path === url ? 'block' : 'none' }}
-            >
-              <Videos channelData={data} />
-            </Box>
-          );
+      <Box pt='25px' style={{ display: value === 'video' ? 'block' : 'none' }}>
+        <Videos channelData={data} />
+      </Box>
+
+      <Box
+        pt='25px'
+        style={{
+          display: value === 'about' ? 'block' : 'none',
         }}
-      />
-      <Route
-        path={`${url}/about`}
-        children={({ match }) => {
-          return (
-            <Box
-              pt='25px'
-              style={{
-                display: match?.path === `${url}/about` ? 'block' : 'none',
-              }}
-            >
-              <About channelData={data} />
-            </Box>
-          );
-        }}
-      />
+      >
+        <About channelData={data} />
+      </Box>
     </>
   );
 }
