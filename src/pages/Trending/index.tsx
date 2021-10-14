@@ -39,6 +39,12 @@ const useStyles = makeStyles((theme: Theme) =>
         fontSize: '2.7rem',
       },
     },
+    sticky: {
+      // position: "-webkit-sticky",
+      position: 'sticky',
+      top: '56px',
+      zIndex: theme.zIndex.appBar,
+    },
   })
 );
 
@@ -184,12 +190,11 @@ export default function Home(): JSX.Element {
       </Box>
 
       <Tabs
-        className={classes.tabs}
+        className={`${classes.sticky} ${classes.tabs}`}
         value={value}
         onChange={handleChange}
         indicatorColor='primary'
         textColor='primary'
-        // centered
         variant='scrollable'
         scrollButtons='auto'
       >
