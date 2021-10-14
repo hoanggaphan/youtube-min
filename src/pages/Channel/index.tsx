@@ -20,10 +20,9 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     banner: {
       height: 'calc(100vw / 6.2 - 1px)', // height info got from youtube css
-      backgroundRepeat: 'no-repeat',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundColor: '#dedede',
+      width: '100%',
+      background: '#dedede no-repeat fixed center 56px ',
+      backgroundSize: 'contain',
 
       [theme.breakpoints.up('lg')]: {
         height: 'calc((100vw - 240px) / 6.2 - 1px)',
@@ -56,19 +55,39 @@ const useStyles = makeStyles((theme: Theme) =>
     tabs: {
       backgroundColor: '#f9f9f9',
     },
+    sticky: {
+      // position: "-webkit-sticky",
+      position: 'sticky',
+      top: '56px',
+      zIndex: theme.zIndex.appBar,
+    },
   })
 );
 
 const urlImageCropped =
   '=w1707-fcrop64=1,00005a57ffffa5a8-k-c0xffffffff-no-nd-rj';
 
+const TabPanel = (props: {
+  children: React.ReactNode;
+  value: number;
+  index: number;
+}) => {
+  const { children, value, index } = props;
+
+  return (
+    <Box mt='25px' style={{ display: value === index ? 'block' : 'none' }}>
+      {children}
+    </Box>
+  );
+};
+
 export default function Channel(): JSX.Element {
   const classes = useStyles();
   const { id: channelId } = useParams<{ id: string }>();
-  const [value, setValue] = React.useState('video');
+  const [value, setValue] = React.useState(0);
   const { data, error, isLoading } = useChannel(channelId);
 
-  const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
+  const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setValue(newValue);
   };
 
@@ -86,18 +105,12 @@ export default function Channel(): JSX.Element {
 
   return (
     <>
-      {data ? (
-        data?.brandingSettings?.image?.bannerExternalUrl && (
-          <div
-            className={classes.banner}
-            style={{
-              backgroundImage: `url(${data.brandingSettings.image.bannerExternalUrl}${urlImageCropped})`,
-            }}
-          />
-        )
-      ) : (
-        <Skeleton animation={false} variant='rect' className={classes.banner} />
-      )}
+      <div
+        className={classes.banner}
+        style={{
+          backgroundImage: `url(${data?.brandingSettings?.image?.bannerExternalUrl}${urlImageCropped})`,
+        }}
+      />
 
       <Box className={classes.channelHeader}>
         <Box display='flex' alignItems='center'>
@@ -145,29 +158,24 @@ export default function Channel(): JSX.Element {
       </Box>
 
       <Tabs
-        className={classes.tabs}
+        className={`${classes.sticky} ${classes.tabs}`}
         value={value}
         onChange={handleChange}
         indicatorColor='primary'
         textColor='primary'
         centered
       >
-        <Tab label='Video' value='video' />
-        <Tab label='Giới thiệu' value='about' />
+        <Tab label='Video' value={0} />
+        <Tab label='Giới thiệu' value={1} />
       </Tabs>
 
-      <Box pt='25px' style={{ display: value === 'video' ? 'block' : 'none' }}>
+      <TabPanel value={value} index={0}>
         <Videos channelData={data} />
-      </Box>
+      </TabPanel>
 
-      <Box
-        pt='25px'
-        style={{
-          display: value === 'about' ? 'block' : 'none',
-        }}
-      >
+      <TabPanel value={value} index={1}>
         <About channelData={data} />
-      </Box>
+      </TabPanel>
     </>
   );
 }
