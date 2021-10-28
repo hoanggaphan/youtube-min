@@ -49,11 +49,12 @@ export default function Note(): JSX.Element {
           <Typography variant='body1'>
             Giả sử hôm nay có 10 người truy cập ứng dụng và sử dụng tính năng
             tải video thì mức đơn vị ứng dụng đã sử dụng là: 10 x 1600 = 16.000.
-            Sau khi sử dụng vượt mức hạn ngạch ứng dụng sẽ trả về lỗi, cần đợi
-            ngày hôm sau để sử dụng lại.
+            Do <b>16000 {'>'} 10000</b> vượt mức hạn ngạch ứng dụng sẽ trả về
+            lỗi, cần đợi ngày hôm sau để sử dụng lại.
           </Typography>
+          <br />
           <Typography variant='body1'>
-            Do đó dự án này sẻ ko có đủ tính năng như youtube để tránh sử dụng
+            Vì vậy dự án này sẻ ko có đủ tính năng như youtube để tránh sử dụng
             vượt mức hạn ngạch khi nhiều user truy cập sử dụng.
           </Typography>
           <Typography variant='body1'>
