@@ -17,10 +17,9 @@ export default function HowLogin() {
           Hướng dẫn đăng nhập
         </Typography>
 
-        <img src='/tur1.png' width={400} alt='' />
-        <img src='/tur2.png' width={400} alt='' />
-        <img src='/tur3.png' width={400} alt='' />
-        <img src='/tur4.png' width={400} alt='' />
+        <img src='/tur1.jpg' width={400} alt='tur 1' />
+        <img src='/tur2.jpg' width={400} alt='tur 2' />
+        <img src='/tur3.jpg' width={400} alt='tur 3' />
 
         <Box mt='15px'>
           <Link to='/'>Đăng nhập</Link>
