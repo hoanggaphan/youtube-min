@@ -4,11 +4,10 @@ import { ProvideAuth, useInitClient } from 'hooks/useAuth';
 import BasicLayout from 'layouts/BasicLayout';
 import React, { Suspense } from 'react';
 import { IntlProvider } from 'react-intl';
-import { Redirect, Router, Switch, Route } from 'react-router-dom';
-import PublicRoute from 'routes/PublicRoute';
-import Trending from 'pages/Trending';
-
+import { Redirect, Route, Router, Switch } from 'react-router-dom';
 import TopBarProgress from 'react-topbar-progress-indicator';
+import PublicRoute from 'routes/PublicRoute';
+
 TopBarProgress.config({
   barColors: {
     '0': '#ff0000',
@@ -17,6 +16,7 @@ TopBarProgress.config({
   shadowBlur: 5,
 });
 
+const Trending = React.lazy(() => import('pages/Trending'));
 const Channel = React.lazy(() => import('pages/Channel'));
 const HowLogin = React.lazy(() => import('pages/HowLogin'));
 const Login = React.lazy(() => import('pages/Login'));
@@ -48,17 +48,17 @@ function App() {
                 <Route path={['/note', '/how-login', '/login']}>
                   {/* Use separate suspense for each layout */}
                   {/* <Layout1> */}
-                    <Suspense fallback={<TopBarProgress />}>
-                      <Switch>
-                        <PublicRoute path='/note' component={Note} />
-                        <PublicRoute path='/how-login' component={HowLogin} />
-                        <PublicRoute
-                          restricted={true}
-                          path='/login'
-                          component={Login}
-                        />
-                      </Switch>
-                    </Suspense>
+                  <Suspense fallback={<TopBarProgress />}>
+                    <Switch>
+                      <PublicRoute path='/note' component={Note} />
+                      <PublicRoute path='/how-login' component={HowLogin} />
+                      <PublicRoute
+                        restricted={true}
+                        path='/login'
+                        component={Login}
+                      />
+                    </Switch>
+                  </Suspense>
                   {/* </Layout1> */}
                 </Route>
 
