@@ -18,6 +18,7 @@ const theme = createMuiTheme({
         img: {
           display: 'inline-block',
           maxWidth: '100%',
+          verticalAlign: 'middle',
         },
         body: {
           overflowX: 'hidden',

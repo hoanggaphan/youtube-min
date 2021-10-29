@@ -75,7 +75,12 @@ export default function Header(): JSX.Element {
       <div className={classes.container}>
         <Box display='flex' justifyContent='space-between' alignItems='center'>
           <Link to='/'>
-            <img src='/youtubelogo_30.png' alt='navbar logo' />
+            <img
+              width={120}
+              height={27}
+              src='/youtubelogo_30.png'
+              alt='navbar logo'
+            />
           </Link>
 
           <PopupState variant='popover' popupId='header-popup-popover'>

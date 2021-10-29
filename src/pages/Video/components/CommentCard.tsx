@@ -1,18 +1,19 @@
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
-import Link from '@material-ui/core/Link';
+import IconButton from '@material-ui/core/IconButton';
+import MuiLink from '@material-ui/core/Link';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import ThumbDownIcon from '@material-ui/icons/ThumbDown';
+import ThumbUpIcon from '@material-ui/icons/ThumbUp';
+import Skeleton from '@material-ui/lab/Skeleton';
 import FormattedString from 'components/FormattedString';
 import { formatDateView, formatLikeCount } from 'helpers/format';
 import { getLastWord } from 'helpers/string';
 import React from 'react';
-import Collapsed from './Collapsed';
-import IconButton from '@material-ui/core/IconButton';
-import ThumbDownIcon from '@material-ui/icons/ThumbDown';
-import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import LazyLoad from 'react-lazyload';
-import Skeleton from '@material-ui/lab/Skeleton';
+import { Link } from 'react-router-dom';
+import Collapsed from './Collapsed';
 
 const useStyles = makeStyles((theme: Theme) => {
   return createStyles({
@@ -47,7 +48,14 @@ const useStyles = makeStyles((theme: Theme) => {
       color: theme.palette.primary.main,
     },
     avatar: {
-      backgroundColor: 'rgba(0,0,0,.11)',
+      textDecoration: 'none',
+      '& img': {
+        backgroundColor: 'rgba(0,0,0,.11)',
+      },
+    },
+    link: {
+      textDecoration: 'none',
+      color: 'inherit',
     },
   });
 });
@@ -56,9 +64,9 @@ const StyledBtn = ({ text }: { text: string }) => {
   const classes = useStyles();
 
   return (
-    <Link className={classes.btnMore} component='button' color='inherit'>
+    <MuiLink className={classes.btnMore} component='button' color='inherit'>
       {text}
-    </Link>
+    </MuiLink>
   );
 };
 
@@ -74,29 +82,40 @@ export default function CommentCard({
   const classes = useStyles();
   const snippet = item.snippet.topLevelComment?.snippet || item.snippet; // use for comment or sub comment
 
+  console.log(snippet.authorChannelId.value);
+
   return (
     <Box display='flex'>
-      <Box mr='16px'>
+      <Box mr='16px' alignSelf='flex-start'>
         <LazyLoad
           placeholder={<Skeleton variant='circle' width={size} height={size} />}
           once
           offset={400}
         >
-          <Avatar
+          <Link
             className={classes.avatar}
-            component={Box}
-            width={size}
-            height={size}
-            src={snippet.authorProfileImageUrl}
+            to={`/channel/${snippet.authorChannelId.value}`}
           >
-            {getLastWord(snippet.authorDisplayName).charAt(0)}
-          </Avatar>
+            <Avatar
+              component={Box}
+              width={size}
+              height={size}
+              src={snippet.authorProfileImageUrl}
+            >
+              {getLastWord(snippet.authorDisplayName).charAt(0)}
+            </Avatar>
+          </Link>
         </LazyLoad>
       </Box>
 
       <Box>
         <Box display='flex'>
-          <Typography variant='subtitle2' component='span'>
+          <Typography
+            className={classes.link}
+            variant='subtitle2'
+            component={Link}
+            to={`/channel/${snippet.authorChannelId.value}`}
+          >
             {snippet.authorDisplayName}
           </Typography>
           <Box ml='5px'>

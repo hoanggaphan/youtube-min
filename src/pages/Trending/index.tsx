@@ -182,7 +182,12 @@ export default function Home(): JSX.Element {
         bgcolor='#f9f9f9'
       >
         <Box mr='24px'>
-          <img width={80} src='/trending_avatar.png' alt='' />
+          <img
+            width={80}
+            height={80}
+            src='/trending_avatar.png'
+            alt='trending logo'
+          />
         </Box>
         <Typography align='center' variant='h2' className={classes.title}>
           Thịnh hành
