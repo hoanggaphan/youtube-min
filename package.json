@@ -16,12 +16,12 @@
     "notistack": "^1.0.9",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-horizontal-scrolling-menu": "^2.3.2",
     "react-intl": "^5.17.2",
     "react-lazyload": "^3.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "react-string-replace": "^0.4.4",
+    "react-topbar-progress-indicator": "^4.1.0",
     "swr": "^0.5.6",
     "typescript": "~3.8.2",
     "xregexp": "^5.0.2"

@@ -23,6 +23,7 @@ const useStyles = makeStyles((theme: Theme) =>
         bottom: 0,
         left: 0,
 
+        pointerEvents: "none",
         margin: '-4px',
         borderRadius: '4px',
       },
