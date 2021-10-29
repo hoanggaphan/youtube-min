@@ -14,6 +14,28 @@ const useStyles = makeStyles((theme: Theme) =>
     link: {
       textDecoration: 'none',
       color: 'unset',
+      position: 'relative',
+
+      '& .interaction': {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+
+        margin: '-4px',
+        borderRadius: '4px',
+      },
+
+      '& .interaction-fill': {
+        backgroundColor: '#000',
+        opacity: '0',
+        transition: 'opacity .2s',
+      },
+      '&:active .interaction-fill': {
+        opacity: '.1',
+        transition: 'opacity 0s',
+      },
     },
     gridItem: {
       position: 'relative',
@@ -129,6 +151,7 @@ export default function VideoItem({ item }: { item: any }): JSX.Element {
           {formatDateView(item.contentDetails.videoPublishedAt)}
         </Typography>
       </div>
+      <div className='interaction interaction-fill'></div>
     </Link>
   );
 }
