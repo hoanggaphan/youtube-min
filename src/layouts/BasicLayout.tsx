@@ -3,7 +3,7 @@ import MyContainer from 'components/MyContainer';
 import Header from 'components/Header';
 import React from 'react';
 
-export default function HeadLayout({
+export default function BasicLayout({
   children,
 }: {
   children: React.ReactNode;

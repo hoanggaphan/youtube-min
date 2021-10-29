@@ -4,11 +4,9 @@ import { Redirect, Route } from 'react-router-dom';
 
 export default function PrivateRoute({
   component: Component,
-  layout: Layout,
   ...rest
 }: {
   component: any;
-  layout?: React.ElementType;
   exact?: boolean;
   path: string;
 }): JSX.Element {
@@ -19,13 +17,6 @@ export default function PrivateRoute({
         if (!isLogin())
           return (
             <Redirect to={{ pathname: '/login', state: { from: location } }} />
-          );
-
-        if (Layout)
-          return (
-            <Layout>
-              <Component {...routeProps} />
-            </Layout>
           );
 
         return <Component {...routeProps} />;
