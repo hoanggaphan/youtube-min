@@ -96,8 +96,30 @@ const useStyles = makeStyles((theme: Theme) =>
       alignSelf: 'flex-start',
     },
 
-    cursor: {
+    item: {
       cursor: 'pointer',
+      position: 'relative',
+
+      '& .interaction': {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+
+        margin: '-4px',
+        borderRadius: '4px',
+      },
+
+      '& .interaction-fill': {
+        backgroundColor: '#000',
+        opacity: '0',
+        transition: 'opacity .2s',
+      },
+      '&:active .interaction-fill': {
+        opacity: '.1',
+        transition: 'opacity 0s',
+      },
     },
   })
 );
@@ -156,7 +178,7 @@ export default function List({
             history.push(`/video?v=${item.id}`);
           }}
           key={item.id}
-          className={classes.cursor}
+          className={`${classes.item} `}
         >
           <div className={classes.gridImgContainer}>
             <LazyLoad offset={400} once>
@@ -249,6 +271,7 @@ export default function List({
               </div>
             </Box>
           </Box>
+          <div className='interaction interaction-fill'></div>
         </Box>
       ))}
     </div>
