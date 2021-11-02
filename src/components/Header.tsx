@@ -5,7 +5,6 @@ import Divider from '@material-ui/core/Divider';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
-import Popover from '@material-ui/core/Popover';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
@@ -15,10 +14,10 @@ import SearchIcon from '@material-ui/icons/Search';
 import SyncDisabledIcon from '@material-ui/icons/SyncDisabled';
 import { getLastWord } from 'helpers/string';
 import { useAuth } from 'hooks/useAuth';
-import PopupState, { bindPopover, bindTrigger } from 'material-ui-popup-state';
 import React from 'react';
 import { useHistory, useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
+import MyPopover from './MyPopover';
 
 const useStyles = makeStyles((theme: Theme) => {
   return createStyles({
@@ -53,10 +52,6 @@ const useStyles = makeStyles((theme: Theme) => {
       cursor: 'pointer',
       backgroundColor: 'rgba(0,0,0,.11)',
     },
-    link: {
-      textDecoration: 'none',
-      color: 'inherit',
-    },
     listItemIcon: {
       minWidth: 'unset',
       marginRight: '16px',
@@ -69,6 +64,18 @@ export default function Header(): JSX.Element {
   const { user, revokeAccess, signOut } = useAuth();
   const history = useHistory();
   const location = useLocation();
+
+  const [anchorEl, setAnchorEl] = React.useState<HTMLDivElement | null>(null);
+
+  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
 
   return (
     <header className={`${classes.header} mui-fixed`}>
@@ -83,110 +90,114 @@ export default function Header(): JSX.Element {
             />
           </Link>
 
-          <PopupState variant='popover' popupId='header-popup-popover'>
-            {(popupState) => (
-              <>
-                {user ? (
-                  <>
-                    <Avatar
-                      {...bindTrigger(popupState)}
-                      src={user?.imgUrl}
-                      alt=''
-                      className={`${classes.avatar}`}
-                    >
+          {user ? (
+            <>
+              <Avatar
+                onClick={handleClick}
+                src={user?.imgUrl}
+                alt=''
+                className={`${classes.avatar}`}
+              >
+                {user && getLastWord(user.firstName).charAt(0)}
+              </Avatar>
+              <MyPopover
+                open={open}
+                anchorEl={anchorEl}
+                onClose={handleClose}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'right',
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                transitionDuration={0}
+              >
+                <Box p={2}>
+                  <Box display='flex' gridColumnGap='16px'>
+                    <Avatar src={user?.imgUrl} alt='avatar'>
                       {user && getLastWord(user.firstName).charAt(0)}
                     </Avatar>
+                    <Box>
+                      <Typography variant='subtitle2' className={classes.name}>
+                        {user?.fullName}
+                      </Typography>
+                      <Typography variant='caption'>{user?.email}</Typography>
+                    </Box>
+                  </Box>
+                </Box>
+                <Divider />
+                <List>
+                  <ListItem
+                    button
+                    onClick={() => {
+                      history.push({
+                        pathname: '/note',
+                        state: { from: location },
+                      });
+                    }}
+                  >
+                    <ListItemIcon className={classes.listItemIcon}>
+                      <ReportProblemOutlinedIcon />
+                    </ListItemIcon>
+                    <Typography variant='body2'>Lưu ý</Typography>
+                  </ListItem>
 
-                    <Popover
-                      {...bindPopover(popupState)}
-                      anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'right',
-                      }}
-                      transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right',
-                      }}
-                      transitionDuration={0}
-                    >
-                      <Box p={2}>
-                        <Box display='flex' gridColumnGap='16px'>
-                          <Avatar src={user?.imgUrl} alt='avatar'>
-                            {user && getLastWord(user.firstName).charAt(0)}
-                          </Avatar>
-                          <Box>
-                            <Typography
-                              variant='subtitle2'
-                              className={classes.name}
-                            >
-                              {user?.fullName}
-                            </Typography>
-                            <Typography variant='caption'>
-                              {user?.email}
-                            </Typography>
-                          </Box>
-                        </Box>
-                      </Box>
-                      <Divider />
-                      <List>
-                        <Link to='/note' className={classes.link}>
-                          <ListItem button>
-                            <ListItemIcon className={classes.listItemIcon}>
-                              <ReportProblemOutlinedIcon />
-                            </ListItemIcon>
-                            <Typography variant='body2'>Lưu ý</Typography>
-                          </ListItem>
-                        </Link>
-                        <Link
-                          to='/results?search_query=one+piece'
-                          className={classes.link}
-                        >
-                          <ListItem button>
-                            <ListItemIcon className={classes.listItemIcon}>
-                              <SearchIcon />
-                            </ListItemIcon>
-                            <Typography variant='body2'>
-                              Demo kết quả tìm kiếm
-                            </Typography>
-                          </ListItem>
-                        </Link>
-                        <ListItem button onClick={revokeAccess}>
-                          <ListItemIcon className={classes.listItemIcon}>
-                            <SyncDisabledIcon />
-                          </ListItemIcon>
-                          <Typography variant='body2'>
-                            Thu hồi quyền truy cập
-                          </Typography>
-                        </ListItem>
-                        <ListItem button onClick={signOut}>
-                          <ListItemIcon className={classes.listItemIcon}>
-                            <ExitToAppIcon />
-                          </ListItemIcon>
-                          <Typography variant='body2'>Đăng xuất</Typography>
-                        </ListItem>
-                      </List>
-                    </Popover>
-                  </>
-                ) : (
-                  <>
-                    <Button
-                      color='primary'
-                      variant='outlined'
-                      startIcon={<AccountCircleIcon />}
-                      onClick={() => {
-                        history.push({
-                          pathname: '/login',
-                          state: { from: location },
-                        });
-                      }}
-                    >
-                      Đăng nhập
-                    </Button>
-                  </>
-                )}
-              </>
-            )}
-          </PopupState>
+                  <ListItem
+                    button
+                    onClick={() => {
+                      history.push({
+                        pathname: '/results',
+                        search: '?search_query=one+piece',
+                        state: { from: location },
+                      });
+                      handleClose();
+                    }}
+                  >
+                    <ListItemIcon className={classes.listItemIcon}>
+                      <SearchIcon />
+                    </ListItemIcon>
+                    <Typography variant='body2'>
+                      Demo kết quả tìm kiếm
+                    </Typography>
+                  </ListItem>
+
+                  <ListItem button onClick={revokeAccess}>
+                    <ListItemIcon className={classes.listItemIcon}>
+                      <SyncDisabledIcon />
+                    </ListItemIcon>
+                    <Typography variant='body2'>
+                      Thu hồi quyền truy cập
+                    </Typography>
+                  </ListItem>
+
+                  <ListItem button onClick={signOut}>
+                    <ListItemIcon className={classes.listItemIcon}>
+                      <ExitToAppIcon />
+                    </ListItemIcon>
+                    <Typography variant='body2'>Đăng xuất</Typography>
+                  </ListItem>
+                </List>
+              </MyPopover>
+            </>
+          ) : (
+            <>
+              <Button
+                color='primary'
+                variant='outlined'
+                startIcon={<AccountCircleIcon />}
+                onClick={() => {
+                  history.push({
+                    pathname: '/login',
+                    state: { from: location },
+                  });
+                }}
+              >
+                Đăng nhập
+              </Button>
+            </>
+          )}
         </Box>
       </div>
     </header>

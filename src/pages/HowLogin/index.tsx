@@ -22,7 +22,7 @@ export default function HowLogin() {
         <img src='/tur3.jpg' width={400} alt='tur 3' />
 
         <Box mt='15px'>
-          <Link to='/'>Đăng nhập</Link>
+          <Link to='/login'>Đăng nhập</Link>
         </Box>
       </Box>
     </>
