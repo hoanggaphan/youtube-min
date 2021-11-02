@@ -3,11 +3,10 @@ import Divider from '@material-ui/core/Divider';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import Popover from '@material-ui/core/Popover';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import PopupState, { bindPopover, bindTrigger } from 'material-ui-popup-state';
 import React from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
+import MyPopover from './MyPopover';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -32,55 +31,65 @@ export default function WithLoginPopup({ children, title, content }: Props) {
   const location = useLocation();
   const history = useHistory();
 
-  return (
-    <PopupState variant='popover' popupId='subscribe-popup-popover'>
-      {(popupState) => (
-        <div>
-          <div {...bindTrigger(popupState)}>{children}</div>
+  const [anchorEl, setAnchorEl] = React.useState<HTMLDivElement | null>(null);
 
-          <Popover
-            {...bindPopover(popupState)}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'right',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            transitionDuration={0} // Fix break layout
-          >
-            <List component='nav' aria-label='subscription box'>
-              <ListItem>
-                <ListItemText primary={title} />
-              </ListItem>
-              <ListItem>
-                <ListItemText secondary={content} />
-              </ListItem>
-            </List>
-            <Divider />
-            <List component='nav' aria-label='secondary mailbox'>
-              <ListItem>
-                <Button
-                  className={classes.loginBtn}
-                  color='primary'
-                  disableRipple
-                  disableFocusRipple
-                  disableElevation
-                  onClick={() => {
-                    history.push({
-                      pathname: '/login',
-                      state: { from: location },
-                    });
-                  }}
-                >
-                  Đăng nhập
-                </Button>
-              </ListItem>
-            </List>
-          </Popover>
-        </div>
-      )}
-    </PopupState>
+  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+
+  return (
+    <div>
+      <div onClick={handleClick}>{children}</div>
+
+      <MyPopover
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        transitionDuration={0} // Fix break layout
+      >
+        <List component='nav' aria-label='subscription box'>
+          <ListItem>
+            <ListItemText primary={title} />
+          </ListItem>
+          <ListItem>
+            <ListItemText secondary={content} />
+          </ListItem>
+        </List>
+        <Divider />
+        <List component='nav' aria-label='secondary mailbox'>
+          <ListItem>
+            <Button
+              className={classes.loginBtn}
+              color='primary'
+              disableRipple
+              disableFocusRipple
+              disableElevation
+              onClick={() => {
+                history.push({
+                  pathname: '/login',
+                  state: { from: location },
+                });
+              }}
+            >
+              Đăng nhập
+            </Button>
+          </ListItem>
+        </List>
+      </MyPopover>
+    </div>
   );
 }

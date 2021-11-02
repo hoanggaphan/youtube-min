@@ -4,15 +4,15 @@ import Button from '@material-ui/core/Button';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import Popover from '@material-ui/core/Popover';
 import Typography from '@material-ui/core/Typography';
 import SortIcon from '@material-ui/icons/Sort';
+import * as commentAPI from 'api/commentAPI';
 import useVideo from 'app/useVideo';
+import MyPopover from 'components/MyPopover';
 import { formatNumberWithDots } from 'helpers/format';
 import useQuery from 'hooks/useQuery';
 import { useSnackbar } from 'notistack';
 import React from 'react';
-import * as commentAPI from 'api/commentAPI';
 import { CommentContext } from './Comments';
 
 const useStyles = makeStyles((theme: Theme) => {
@@ -77,7 +77,7 @@ export default function CommentHeader() {
     }
   };
 
-  const open = Boolean(anchorEl);
+  const open = !!anchorEl;
 
   return (
     <Box mb='24px'>
@@ -90,7 +90,7 @@ export default function CommentHeader() {
         </Button>
       </Box>
 
-      <Popover
+      <MyPopover
         open={open}
         anchorEl={anchorEl}
         onClose={handleClose}
@@ -121,7 +121,7 @@ export default function CommentHeader() {
             <ListItemText primary='Mới nhất xếp trước' />
           </ListItem>
         </List>
-      </Popover>
+      </MyPopover>
     </Box>
   );
 }

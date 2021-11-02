@@ -21,7 +21,8 @@ const useStyles = makeStyles((theme: Theme) =>
     banner: {
       height: 'calc(100vw / 6.2 - 1px)', // height info got from youtube css
       width: '100%',
-      background: '#dedede no-repeat fixed center 56px ',
+      background: '#dedede no-repeat fixed',
+      backgroundPosition: 'center 56px',
       backgroundSize: 'contain',
 
       [theme.breakpoints.up('lg')]: {
@@ -106,7 +107,7 @@ export default function Channel(): JSX.Element {
   return (
     <>
       <div
-        className={classes.banner}
+        className={`background-position ${classes.banner}`}
         style={{
           backgroundImage: `url(${data?.brandingSettings?.image?.bannerExternalUrl}${urlImageCropped})`,
         }}
