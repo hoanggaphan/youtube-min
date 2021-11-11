@@ -82,8 +82,6 @@ export default function CommentCard({
   const classes = useStyles();
   const snippet = item.snippet.topLevelComment?.snippet || item.snippet; // use for comment or sub comment
 
-  console.log(snippet.authorChannelId.value);
-
   return (
     <Box display='flex'>
       <Box mr='16px' alignSelf='flex-start'>
