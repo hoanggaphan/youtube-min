@@ -3,7 +3,7 @@ import Box from '@material-ui/core/Box';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Skeleton from '@material-ui/lab/Skeleton';
-import { videosState } from 'app/useVideos';
+import useVideos from 'app/useVideos';
 import StyledTooltip from 'components/StyledTooltip';
 import { formatDateView, formatVideoViews } from 'helpers/format';
 import { getLastWord } from 'helpers/string';
@@ -126,14 +126,16 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export default function List({
-  result,
+  title,
+  request,
   skeletons,
 }: {
-  result: videosState;
+  title: String;
+  request: () => gapi.client.Request<gapi.client.youtube.VideoListResponse>;
   skeletons: number;
 }): JSX.Element {
   const classes = useStyles();
-  const { data, error } = result;
+  const { data, error } = useVideos(`popular=${title}`, request);
   const history = useHistory();
 
   if (error) {
