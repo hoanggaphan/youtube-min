@@ -4,7 +4,6 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
 import * as videoAPI from 'api/videoAPI';
-import useVideos from 'app/useVideos';
 import React from 'react';
 import List from './components/List';
 
@@ -50,6 +49,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const number = {
   popular: 48,
+  skeleton: 8,
   liked: 4,
   disLiked: 4,
 };
@@ -86,11 +86,6 @@ const TabPanel = (props: {
 
 export default function Home(): JSX.Element {
   const classes = useStyles();
-
-  /**
-   * Keep tabs when click begin fetch api
-   * avoid fetch all api when render
-   */
   const [value, setValue] = React.useState(0);
   const [mounted, setMounted] = React.useState([value]);
 
@@ -101,62 +96,21 @@ export default function Home(): JSX.Element {
     setValue(newValue);
   };
 
-  const resNews = useVideos(
-    mounted.includes(0) ? 'popular=news' : null,
-    fetchNews
+  const data = React.useMemo(
+    () => [
+      { label: 'Mới nhất', req: fetchNews },
+      { label: 'Âm nhạc', req: fetchMusics },
+      { label: 'Động vật', req: fetchPets },
+      { label: 'Thể thao', req: fetchSports },
+      { label: 'Trò chơi', req: fetchGames },
+      { label: 'Hài kịch', req: fetchComedy },
+      { label: 'Giải trí', req: fetchEntertainment },
+      { label: 'Chính trị', req: fetchPolitics },
+      { label: 'Giáo dục', req: fetchEducation },
+      { label: 'Công nghệ', req: fetchTechnology },
+    ],
+    []
   );
-
-  const resMusics = useVideos(
-    mounted.includes(1) ? 'popular=musics' : null,
-    fetchMusics
-  );
-
-  const resPets = useVideos(
-    mounted.includes(2) ? 'popular=pets' : null,
-    fetchPets
-  );
-
-  const resSports = useVideos(
-    mounted.includes(3) ? 'popular=sports' : null,
-    fetchSports
-  );
-  const resGames = useVideos(
-    mounted.includes(4) ? 'popular=games' : null,
-    fetchGames
-  );
-  const resComedy = useVideos(
-    mounted.includes(5) ? 'popular=sports' : null,
-    fetchComedy
-  );
-  const resEntertaiment = useVideos(
-    mounted.includes(6) ? 'popular=sports' : null,
-    fetchEntertainment
-  );
-  const resPolitics = useVideos(
-    mounted.includes(7) ? 'popular=sports' : null,
-    fetchPolitics
-  );
-  const resEducation = useVideos(
-    mounted.includes(8) ? 'popular=sports' : null,
-    fetchEducation
-  );
-  const resTechnology = useVideos(
-    mounted.includes(9) ? 'popular=sports' : null,
-    fetchTechnology
-  );
-
-  const data = [
-    { label: 'Mới nhất', res: resNews },
-    { label: 'Âm nhạc', res: resMusics },
-    { label: 'Động vật', res: resPets },
-    { label: 'Thể thao', res: resSports },
-    { label: 'Trò chơi', res: resGames },
-    { label: 'Hài kịch', res: resComedy },
-    { label: 'Giải trí', res: resEntertaiment },
-    { label: 'Chính trị', res: resPolitics },
-    { label: 'Giáo dục', res: resEducation },
-    { label: 'Công nghệ', res: resTechnology },
-  ];
 
   // const resLiked = useVideos(
   //   user ? `myRating=like&id=${user.id}` : null,
@@ -211,7 +165,11 @@ export default function Home(): JSX.Element {
       {data.map((item, index) => (
         <TabPanel key={index} value={value} index={index}>
           {mounted.includes(index) && (
-            <List result={item.res} skeletons={number.popular} />
+            <List
+              title={item.label}
+              request={item.req}
+              skeletons={number.skeleton}
+            />
           )}
         </TabPanel>
       ))}
