@@ -6,14 +6,11 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Typography from '@material-ui/core/Typography';
 import SortIcon from '@material-ui/icons/Sort';
-import * as commentAPI from 'api/commentAPI';
 import useVideo from 'app/useVideo';
 import MyPopover from 'components/MyPopover';
 import { formatNumberWithDots } from 'helpers/format';
 import useQuery from 'hooks/useQuery';
-import { useSnackbar } from 'notistack';
 import React from 'react';
-import { CommentContext } from './Comments';
 
 const useStyles = makeStyles((theme: Theme) => {
   return createStyles({
@@ -24,21 +21,21 @@ const useStyles = makeStyles((theme: Theme) => {
   });
 });
 
-export default function CommentHeader() {
+export default function CommentHeader({
+  order,
+  onSort,
+}: {
+  order: string;
+  onSort: (order: string) => void;
+}) {
   const classes = useStyles();
-
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
     null
   );
-
   const query = useQuery();
   const videoId = query.get('v') || '';
-
   const { data } = useVideo(videoId);
   const commentCount = data?.statistics?.commentCount;
-
-  const { state, dispatch } = React.useContext(CommentContext);
-  const { enqueueSnackbar } = useSnackbar();
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -48,33 +45,9 @@ export default function CommentHeader() {
     setAnchorEl(null);
   };
 
-  const handleListItemClick = async (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    index: number
-  ) => {
-    try {
-      setAnchorEl(null);
-      dispatch({ type: 'SORT_PENDING' });
-      dispatch({ type: 'SET_INDEX', index });
-
-      if (index === 0) {
-        const res = await commentAPI.fetchListByVideoId(videoId);
-        dispatch({ type: 'SORT_FULFILLED', payload: res.result });
-      } else if (index === 1) {
-        const res = await commentAPI.fetchListByVideoId(
-          videoId,
-          '',
-          50,
-          'time'
-        );
-        dispatch({ type: 'SORT_FULFILLED', payload: res.result });
-      }
-    } catch (err) {
-      enqueueSnackbar('An error occurred while fetching comment', {
-        variant: 'error',
-      });
-      dispatch({ type: 'SORT_REJECTED' });
-    }
+  const handleItemClick = (order: string) => {
+    onSort(order);
+    handleClose();
   };
 
   const open = !!anchorEl;
@@ -105,16 +78,16 @@ export default function CommentHeader() {
       >
         <List component='nav'>
           <ListItem
-            onClick={(event) => handleListItemClick(event, 0)}
-            selected={state.index === 0}
+            onClick={() => handleItemClick("relevance")}
+            selected={order === 'relevance'}
             button
             disableTouchRipple
           >
             <ListItemText primary='Bình luận hàng đầu' />
           </ListItem>
           <ListItem
-            onClick={(event) => handleListItemClick(event, 1)}
-            selected={state.index === 1}
+            onClick={() => handleItemClick("time")}
+            selected={order === 'time'}
             button
             disableTouchRipple
           >
