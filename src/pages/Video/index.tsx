@@ -18,7 +18,7 @@ import React from 'react';
 import { Redirect } from 'react-router';
 import { Link } from 'react-router-dom';
 import Collapsed from './components/Collapsed';
-import Comments from './components/Comments';
+import Comment from './components/Comment';
 import LikeDisLike from './components/LikeDisLike';
 import ViewDate from './components/ViewDate';
 
@@ -245,7 +245,13 @@ export default function Video(): JSX.Element {
                     }
                     placement='top'
                   >
-                    <Box width='100%' pt='6px' pb="24px" position='absolute' left='0'>
+                    <Box
+                      width='100%'
+                      pt='6px'
+                      pb='24px'
+                      position='absolute'
+                      left='0'
+                    >
                       <Box height='2px' bgcolor='#737373'>
                         <Box
                           height='2px'
@@ -272,11 +278,13 @@ export default function Video(): JSX.Element {
               alignItems='center'
             >
               <Box display='flex' flex='1' alignItems='center'>
-                <Skeleton
-                  animation={false}
-                  variant='circle'
-                  className={classes.avatar}
-                />
+                <Box mr='16px'>
+                  <Skeleton
+                    animation={false}
+                    variant='circle'
+                    className={classes.avatar}
+                  />
+                </Box>
 
                 <Box width='100%'>
                   <Skeleton animation={false} width='50%' />
@@ -351,9 +359,7 @@ export default function Video(): JSX.Element {
           </div>
         )}
 
-        {channelData && (
-          <Comments videoId={videoId} channelId={channelId!} player={player} />
-        )}
+        <Comment videoId={videoId} player={player} />
       </div>
     </Box>
   );

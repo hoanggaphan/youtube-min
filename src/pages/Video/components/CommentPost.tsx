@@ -4,6 +4,7 @@ import Button from '@material-ui/core/Button';
 import Input from '@material-ui/core/Input';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import * as commentAPI from 'api/commentAPI';
+import useComments from 'app/useComments';
 import Spinner from 'components/Spinner';
 import { getLastWord } from 'helpers/string';
 import { useAuth } from 'hooks/useAuth';
@@ -11,7 +12,6 @@ import { useSnackbar } from 'notistack';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { useHistory, useLocation } from 'react-router';
-import { CommentContext } from './Comments';
 
 const useStyles = makeStyles((theme: Theme) => {
   return createStyles({
@@ -65,10 +65,10 @@ const useStyles = makeStyles((theme: Theme) => {
 
 export default function CommentPost({
   videoId,
-  channelId,
+  order,
 }: {
   videoId: string;
-  channelId: string;
+  order: string;
 }) {
   const classes = useStyles();
   const { user } = useAuth();
@@ -76,10 +76,9 @@ export default function CommentPost({
   const [value, setValue] = React.useState('');
   const [adding, setAdding] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
-  const { state, dispatch } = React.useContext(CommentContext);
-
   const history = useHistory();
   const location = useLocation();
+  const { mutate } = useComments(videoId, order);
 
   const handleChange = (
     e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -90,24 +89,8 @@ export default function CommentPost({
   const handleClick = async () => {
     try {
       setAdding(true);
-      const res = await commentAPI.insertByVideoId(videoId, value);
-      const newComment = res.result;
-
-      const newData = [...state.data!];
-      const first = newData[0];
-      const firstComment = first.items![0];
-
-      if (
-        firstComment?.snippet?.topLevelComment?.snippet?.authorChannelId
-          ?.value === channelId
-      ) {
-        first.items?.splice(1, 0, newComment);
-      } else {
-        first.items?.unshift(newComment);
-      }
-
-      newData.splice(0, 1, first);
-      dispatch({ type: 'ADD_FULFILLED', payload: newData });
+      await commentAPI.insertByVideoId(videoId, value);
+      await mutate();
     } catch (error) {
       enqueueSnackbar('An error occurred while inserting comment', {
         variant: 'error',
