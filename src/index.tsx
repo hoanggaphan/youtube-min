@@ -1,4 +1,3 @@
-import SWRDevtools from '@jjordy/swr-devtools';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import {
   ThemeProvider,
@@ -7,7 +6,8 @@ import {
 import ProvideGlobal from 'hooks/useGlobal';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { cache, mutate, SWRConfig } from 'swr';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { SWRConfig } from 'swr';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
@@ -63,14 +63,24 @@ const swrConfigs = {
   shouldRetryOnError: false,
 };
 
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
 ReactDOM.render(
   <React.StrictMode>
     <ProvideGlobal>
       <SWRConfig value={swrConfigs}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <SWRDevtools cache={cache} mutate={mutate} />
-          <App />
+          <QueryClientProvider client={queryClient}>
+            <App />
+          </QueryClientProvider>
         </ThemeProvider>
       </SWRConfig>
     </ProvideGlobal>

@@ -1,8 +1,7 @@
 import * as commentAPI from 'api/commentAPI';
-import { useSWRInfinite } from 'swr';
+import { useInfiniteQuery } from 'react-query';
 
 const fetchComments = async (
-  url: string,
   videoId: string,
   order: string,
   nextPageToken?: string
@@ -29,34 +28,30 @@ const fetchComments = async (
 };
 
 function useComments(videoId: string, order: string) {
-  const { data, error, isValidating, setSize, mutate } = useSWRInfinite(
-    (pageIndex, previousPageData) => {
-      // reached the end
-      if (previousPageData && !previousPageData.nextPageToken) return null;
-
-      // first page, we don't have `previousPageData`
-      if (pageIndex === 0)
-        return videoId ? [`/api/comments?vid=`, videoId, order] : null;
-
-      // add the cursor to the API endpoint
-      return videoId
-        ? [
-            `/api/comments?vid=`,
-            videoId,
-            order,
-            previousPageData?.nextPageToken,
-          ]
-        : null;
-    },
-    fetchComments
+  const {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    status,
+  } = useInfiniteQuery(
+    [`/api/comments?vid=`, videoId, order],
+    ({ pageParam }) => fetchComments(videoId, order, pageParam),
+    {
+      getNextPageParam: (lastPage, pages) => lastPage.nextPageToken,
+    }
   );
 
   return {
     data,
     error,
-    isLoading: isValidating,
-    setSize,
-    mutate
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    status,
   };
 }
 
