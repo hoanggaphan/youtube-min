@@ -93,10 +93,8 @@ const calculatePercent = (likeNum: number, disLikeNum: number) => {
 
 export default function Video(): JSX.Element {
   const classes = useStyles();
-  const { player } = useIframeAPI('ytb-player');
   const query = useQuery();
-
-  const videoId = query.get('v') || '';
+  const videoId = React.useMemo(() => query.get('v') || '', []);
   const start = query.get('t') || '';
 
   const {
@@ -109,7 +107,7 @@ export default function Video(): JSX.Element {
   const likeCount = videoData?.statistics?.likeCount;
   const dislikeCount = videoData?.statistics?.dislikeCount;
   const channelId = videoData?.snippet?.channelId;
-
+  console.log('video');
   const {
     data: channelData,
     error: channelError,
@@ -352,14 +350,14 @@ export default function Video(): JSX.Element {
             {description && (
               <Box ml='64px' mt='12px' maxWidth='615px'>
                 <Collapsed height={60} showBtnCol>
-                  <FormattedString str={description} player={player} />
+                  <FormattedString str={description} />
                 </Collapsed>
               </Box>
             )}
           </div>
         )}
 
-        <Comment videoId={videoId} player={player} />
+        <Comment videoId={videoId} />
       </div>
     </Box>
   );
