@@ -92,7 +92,7 @@ export default function CommentCard({
         >
           <Link
             className={classes.avatar}
-            to={`/channel/${snippet.authorChannelId.value}`}
+            to={`/channel/${snippet.authorChannelId?.value}`}
           >
             <Avatar
               component={Box}
@@ -112,7 +112,7 @@ export default function CommentCard({
             className={classes.link}
             variant='subtitle2'
             component={Link}
-            to={`/channel/${snippet.authorChannelId.value}`}
+            to={`/channel/${snippet.authorChannelId?.value}`}
           >
             {snippet.authorDisplayName}
           </Typography>
