@@ -1,5 +1,6 @@
 import hoistStatics from 'hoist-non-react-statics';
 import React from 'react';
+import TopBarProgress from 'react-topbar-progress-indicator';
 
 type MyProps = any;
 type MyState = {
@@ -28,7 +29,7 @@ export default function deferComponentRender(WrappedComponent: any) {
     render() {
       return this.state.shouldRender ? (
         <WrappedComponent {...this.props} />
-      ) : "Loading...";
+      ) : null;
     }
   }
 

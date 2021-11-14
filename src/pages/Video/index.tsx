@@ -12,7 +12,6 @@ import StyledTooltip from 'components/StyledTooltip';
 import SubscribeButton from 'components/SubscribeButton';
 import { formatNumberWithDots, formatSubscriptionCount } from 'helpers/format';
 import { getLastWord } from 'helpers/string';
-import useIframeAPI from 'hooks/useIframeAPI';
 import useQuery from 'hooks/useQuery';
 import React from 'react';
 import { Redirect } from 'react-router';
