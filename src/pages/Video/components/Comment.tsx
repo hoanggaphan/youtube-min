@@ -11,15 +11,6 @@ import CommentPost from './CommentPost';
 
 const useStyles = makeStyles((theme: Theme) => {
   return createStyles({
-    sortingLoader: {
-      position: 'absolute',
-      left: '50%',
-      top: '250px',
-      transform: 'translateX(-50%)',
-    },
-    opacity: {
-      opacity: '.25',
-    },
     link: {
       textDecoration: 'none',
       color: 'rgb(6, 95, 212)',
@@ -47,7 +38,7 @@ export default React.memo(function Comments({
 }) {
   const classes = useStyles();
   const [order, setOrder] = React.useState('relevance');
-  const { data, error, setSize, isLoading } = useComments(videoId, order);
+  const { data, error, setSize } = useComments(videoId, order);
 
   if (error) {
     if (
@@ -82,7 +73,6 @@ export default React.memo(function Comments({
 
   return (
     <Box position='relative'>
-      {/* <div className={`${data && isLoading ? classes.opacity : ''}`}> */}
       <CommentHeader order={order} onSort={handleSort} />
 
       <CommentPost videoId={videoId} order={order} />
@@ -125,13 +115,6 @@ export default React.memo(function Comments({
           ))}
         </InfiniteScroll>
       )}
-      {/* </div> */}
-
-      {/* {sorting && (
-          <div className={classes.sortingLoader}>
-            <Spinner />
-          </div>
-        )} */}
     </Box>
   );
 });
