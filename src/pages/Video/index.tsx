@@ -107,7 +107,7 @@ export default function Video(): JSX.Element {
   const likeCount = videoData?.statistics?.likeCount;
   const dislikeCount = videoData?.statistics?.dislikeCount;
   const channelId = videoData?.snippet?.channelId;
-  console.log('video');
+
   const {
     data: channelData,
     error: channelError,

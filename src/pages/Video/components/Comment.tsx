@@ -47,19 +47,16 @@ export default React.memo(function Comments({
 }) {
   const classes = useStyles();
   const [order, setOrder] = React.useState('relevance');
-  const { data, error, hasNextPage, fetchNextPage } = useComments(
-    videoId,
-    order
-  );
-  
+  const { data, error, setSize, isLoading } = useComments(videoId, order);
+
   if (error) {
     if (
-      (error as any).info.code === 403 &&
-      (error as any).info.errors[0].reason === 'commentsDisabled'
+      error.info.code === 403 &&
+      error.info.errors[0].reason === 'commentsDisabled'
     ) {
       return (
         <Box mt='24px' textAlign='center'>
-          {(error as any).message}
+          {error.message}
           <a
             className={classes.link}
             href='https://support.google.com/youtube/answer/9706180?hl=vi'
@@ -72,11 +69,11 @@ export default React.memo(function Comments({
       );
     }
 
-    return <>{(error as any).message}</>;
+    return <>{error.message}</>;
   }
 
   const fetchMoreData = async () => {
-    await fetchNextPage();
+    await setSize((size) => size + 1);
   };
 
   const handleSort = (order: string) => {
@@ -112,14 +109,14 @@ export default React.memo(function Comments({
       ) : (
         <InfiniteScroll
           next={fetchMoreData}
-          hasMore={!!hasNextPage}
+          hasMore={!!data[data.length - 1].nextPageToken}
           loader={
             <div className={classes.loader}>
               <Spinner />
             </div>
           }
         >
-          {data.pages.map((comment, index) => (
+          {data?.map((comment, index) => (
             <div key={index}>
               {comment.items?.map((item: gapi.client.youtube.CommentThread) => (
                 <CommentItem key={item.id} item={item} player={player} />

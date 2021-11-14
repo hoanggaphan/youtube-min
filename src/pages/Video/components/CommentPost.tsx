@@ -78,7 +78,7 @@ export default function CommentPost({
   const { enqueueSnackbar } = useSnackbar();
   const history = useHistory();
   const location = useLocation();
-  // const { mutate } = useComments(videoId, order);
+  const { mutate } = useComments(videoId, order);
 
   const handleChange = (
     e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -90,7 +90,7 @@ export default function CommentPost({
     try {
       setAdding(true);
       await commentAPI.insertByVideoId(videoId, value);
-      // await mutate();
+      await mutate();
     } catch (error) {
       enqueueSnackbar('An error occurred while inserting comment', {
         variant: 'error',
