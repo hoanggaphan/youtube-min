@@ -11,7 +11,7 @@ import { globalContext } from 'hooks/useGlobal';
 import useQuery from 'hooks/useQuery';
 import React from 'react';
 import { Link, Redirect } from 'react-router-dom';
-import { useSWRInfinite } from 'swr';
+import useSWRInfinite from 'swr/infinite';
 import VideoItem from './components/VideoItem';
 import VideosSkeleton from './components/VideosSkeleton';
 
@@ -111,8 +111,8 @@ export default function Results(): JSX.Element {
         >
           <AlertTitle>Lưu ý</AlertTitle>
           <Typography variant='caption'>
-            Đây chỉ là trang Demo sử dụng dữ liệu tĩnh làm kết quả tìm kiếm để tránh vượt mức hạn ngạch -
-            Vui lòng đọc thêm{' '}
+            Đây chỉ là trang Demo sử dụng dữ liệu tĩnh làm kết quả tìm kiếm để
+            tránh vượt mức hạn ngạch - Vui lòng đọc thêm{' '}
             <Link className={classes.link} to='/note'>
               ở đây
             </Link>

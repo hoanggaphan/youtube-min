@@ -9,6 +9,7 @@ import ReactDOM from 'react-dom';
 import { SWRConfig } from 'swr';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import { SWRDevTools } from 'swr-devtools';
 
 const theme = createMuiTheme({
   overrides: {
@@ -68,7 +69,9 @@ ReactDOM.render(
       <SWRConfig value={swrConfigs}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <App />
+          <SWRDevTools>
+            <App />
+          </SWRDevTools>
         </ThemeProvider>
       </SWRConfig>
     </ProvideGlobal>
@@ -79,4 +82,4 @@ ReactDOM.render(
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+serviceWorker.register();

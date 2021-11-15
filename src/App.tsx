@@ -1,4 +1,3 @@
-import deferComponentRender from 'components/deferComponentRender';
 import Snackbar from 'components/Snackbar';
 import { createBrowserHistory } from 'history';
 import { ProvideAuth, useInitClient } from 'hooks/useAuth';

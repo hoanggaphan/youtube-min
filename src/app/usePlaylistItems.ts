@@ -1,6 +1,6 @@
 import * as playlistItemsAPI from 'api/playListItemsAPI';
 import * as videoAPI from 'api/videoAPI';
-import { useSWRInfinite } from 'swr';
+import useSWRInfinite from 'swr/infinite';
 
 const fetchPlaylistItems = async (
   url: string,
@@ -41,7 +41,7 @@ const fetchPlaylistItems = async (
     return resPlaylistItems.result;
   } catch (err) {
     const result = (err as any).result.error;
-    
+
     if (result.code === 404 && result.errors[0].reason === 'playlistNotFound') {
       throw new Error('Kênh này không có video nào.');
     }

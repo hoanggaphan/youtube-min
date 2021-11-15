@@ -93,7 +93,7 @@ const calculatePercent = (likeNum: number, disLikeNum: number) => {
 export default function Video(): JSX.Element {
   const classes = useStyles();
   const query = useQuery();
-  const videoId = React.useMemo(() => query.get('v') || '', []);
+  const videoId = query.get('v') || '';
   const start = query.get('t') || '';
 
   const {
