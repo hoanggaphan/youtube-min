@@ -1,9 +1,10 @@
 import Box from '@material-ui/core/Box';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Skeleton from '@material-ui/lab/Skeleton';
-import useComments from 'app/useComments';
+import * as commentAPI from 'api/commentAPI';
 import InfiniteScroll from 'components/InfiniteScroll';
 import Spinner from 'components/Spinner';
+import useIsMounted from 'hooks/useIsMounted';
 import React from 'react';
 import CommentHeader from './CommentHeader';
 import CommentItem from './CommentItem';
@@ -29,16 +30,22 @@ const useStyles = makeStyles((theme: Theme) => {
   });
 });
 
-export default React.memo(function Comments({
-  videoId,
-  player,
-}: {
-  videoId: string;
-  player?: any;
-}) {
+export default React.memo(function Comments({ videoId }: { videoId: string }) {
   const classes = useStyles();
   const [order, setOrder] = React.useState('relevance');
-  const { data, error, setSize } = useComments(videoId, order);
+  const isMounted = useIsMounted();
+  const [data, setData] = React.useState<
+    gapi.client.youtube.CommentThreadListResponse[] | undefined
+  >();
+  const [error, setError] = React.useState<any>();
+
+  React.useEffect(() => {
+    commentAPI
+      .fetchListByVideoId(videoId, order)
+      .then((res) => isMounted() && setData([res.result]))
+      .catch((err) => isMounted() && setError(err.result.error));
+    // eslint-disable-next-line
+  }, [order]);
 
   if (error) {
     if (
@@ -64,18 +71,38 @@ export default React.memo(function Comments({
   }
 
   const fetchMoreData = async () => {
-    await setSize((size) => size + 1);
+    if (!data) return;
+    try {
+      const res = await commentAPI.fetchListByVideoId(
+        videoId,
+        order,
+        50,
+        data[data?.length - 1].nextPageToken
+      );
+      setData([...data, res.result]);
+    } catch (err) {
+      setError((err as any).result.error);
+    }
   };
 
   const handleSort = (order: string) => {
     setOrder(order);
   };
 
+  const handleAddComment = (
+    res: gapi.client.Response<gapi.client.youtube.CommentThread>
+  ) => {
+    const newComment = res.result;
+    const newData = [...data!];
+    newData[0].items?.unshift(newComment);
+    setData(newData);
+  };
+
   return (
     <Box position='relative'>
       <CommentHeader order={order} onSort={handleSort} />
 
-      <CommentPost videoId={videoId} order={order} />
+      <CommentPost videoId={videoId} addComment={handleAddComment} />
 
       {!data ? (
         <>
@@ -109,7 +136,7 @@ export default React.memo(function Comments({
           {data?.map((comment, index) => (
             <div key={index}>
               {comment.items?.map((item: gapi.client.youtube.CommentThread) => (
-                <CommentItem key={item.id} item={item} player={player} />
+                <CommentItem key={item.id} item={item} />
               ))}
             </div>
           ))}

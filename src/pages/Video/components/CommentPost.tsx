@@ -4,7 +4,6 @@ import Button from '@material-ui/core/Button';
 import Input from '@material-ui/core/Input';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import * as commentAPI from 'api/commentAPI';
-import useComments from 'app/useComments';
 import Spinner from 'components/Spinner';
 import { getLastWord } from 'helpers/string';
 import { useAuth } from 'hooks/useAuth';
@@ -65,10 +64,12 @@ const useStyles = makeStyles((theme: Theme) => {
 
 export default function CommentPost({
   videoId,
-  order,
+  addComment,
 }: {
   videoId: string;
-  order: string;
+  addComment: (
+    data: gapi.client.Response<gapi.client.youtube.CommentThread>
+  ) => void;
 }) {
   const classes = useStyles();
   const { user } = useAuth();
@@ -78,7 +79,6 @@ export default function CommentPost({
   const { enqueueSnackbar } = useSnackbar();
   const history = useHistory();
   const location = useLocation();
-  const { mutate } = useComments(videoId, order);
 
   const handleChange = (
     e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -89,8 +89,8 @@ export default function CommentPost({
   const handleClick = async () => {
     try {
       setAdding(true);
-      await commentAPI.insertByVideoId(videoId, value);
-      await mutate();
+      const res = await commentAPI.insertByVideoId(videoId, value);
+      addComment(res);
     } catch (error) {
       enqueueSnackbar('An error occurred while inserting comment', {
         variant: 'error',

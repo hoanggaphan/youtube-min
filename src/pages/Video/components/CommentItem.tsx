@@ -37,10 +37,8 @@ const useStyles = makeStyles((theme: Theme) => {
 
 export default function CommentItem({
   item,
-  player,
 }: {
   item: gapi.client.youtube.CommentThread;
-  player?: any;
 }): JSX.Element {
   const classes = useStyles();
   const isFirstReqSucceed = React.useRef(false);
@@ -50,8 +48,9 @@ export default function CommentItem({
   const [replies, setReplies] = React.useState<gapi.client.youtube.Comment[]>(
     []
   );
-  const [nextPageToken, setNextPageToken] =
-    React.useState<string | undefined>();
+  const [nextPageToken, setNextPageToken] = React.useState<
+    string | undefined
+  >();
   const { enqueueSnackbar } = useSnackbar();
 
   const handleShow = async () => {
@@ -103,7 +102,7 @@ export default function CommentItem({
 
   return (
     <Box mb='16px'>
-      <CommentCard item={item} player={player} />
+      <CommentCard item={item} />
       {item.replies && (
         <Box ml='56px'>
           {!show ? (
@@ -145,12 +144,7 @@ export default function CommentItem({
           <div className={`${!show && classes.none}`}>
             <div>
               {replies.map((rep: gapi.client.youtube.Comment) => (
-                <CommentCard
-                  key={rep.id}
-                  item={rep}
-                  player={player}
-                  size={24}
-                />
+                <CommentCard key={rep.id} item={rep} size={24} />
               ))}
             </div>
 
