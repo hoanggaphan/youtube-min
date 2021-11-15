@@ -48,13 +48,10 @@ export default React.memo(function Comments({ videoId }: { videoId: string }) {
   }, [order]);
 
   if (error) {
-    if (
-      error.info.code === 403 &&
-      error.info.errors[0].reason === 'commentsDisabled'
-    ) {
+    if (error.code === 403 && error.errors[0].reason === 'commentsDisabled') {
       return (
         <Box mt='24px' textAlign='center'>
-          {error.message}
+          Tính năng bình luận đã bị tắt.
           <a
             className={classes.link}
             href='https://support.google.com/youtube/answer/9706180?hl=vi'
