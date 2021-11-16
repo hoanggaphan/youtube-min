@@ -20,6 +20,8 @@ import Collapsed from './components/Collapsed';
 import Comment from './components/Comment';
 import LikeDisLike from './components/LikeDisLike';
 import ViewDate from './components/ViewDate';
+import ReactPlayer from 'react-player/youtube';
+import YouTubePlayer from 'react-player/youtube';
 
 const useStyles = makeStyles((theme: Theme) => {
   return createStyles({
@@ -47,8 +49,8 @@ const useStyles = makeStyles((theme: Theme) => {
       position: 'absolute',
       top: 0,
       left: 0,
-      width: '100%',
-      height: '100%',
+      width: '100%!important',
+      height: '100%!important',
     },
     likeDislikeContainer: {
       marginTop: '5px',
@@ -85,6 +87,8 @@ const useStyles = makeStyles((theme: Theme) => {
   });
 });
 
+export const PlayerContext = React.createContext<YouTubePlayer | null>(null);
+
 const calculatePercent = (likeNum: number, disLikeNum: number) => {
   if (likeNum === 0 && disLikeNum === 0) return 50;
   return (likeNum / (likeNum + disLikeNum)) * 100;
@@ -95,6 +99,7 @@ export default function Video(): JSX.Element {
   const query = useQuery();
   const videoId = query.get('v') || '';
   const start = query.get('t') || '';
+  const player = React.useRef<YouTubePlayer | null>(null);
 
   const {
     data: videoData,
@@ -156,16 +161,12 @@ export default function Video(): JSX.Element {
     <Box mb='50px'>
       <div className={classes.iframeWrapperPadding}>
         <div className={classes.iframeContainer}>
-          <iframe
-            id='ytb-player'
+          <ReactPlayer
+            ref={player}
+            url={`https://www.youtube.com/watch?v=${videoId}`}
             className={classes.iframe}
-            title='Youtube video player'
-            src={`https://www.youtube.com/embed/${videoId}${
-              start && '&start=' + start
-            }`}
-            allow='autoplay'
-            frameBorder='0'
-            allowFullScreen
+            controls
+            // pip
           />
         </div>
       </div>
@@ -356,7 +357,9 @@ export default function Video(): JSX.Element {
           </div>
         )}
 
-        <Comment videoId={videoId} />
+        <PlayerContext.Provider value={player.current}>
+          <Comment videoId={videoId} />
+        </PlayerContext.Provider>
       </div>
     </Box>
   );

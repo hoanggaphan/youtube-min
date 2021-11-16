@@ -1,11 +1,13 @@
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { convertHHMMSSToSeconds } from 'helpers/convert';
+import { PlayerContext } from 'pages/Video';
 import React from 'react';
+import YouTubePlayer from 'react-player/youtube';
 import reactStringReplace from 'react-string-replace';
 import XRegExp from 'xregexp';
 
-const playTimeControl = (player: any, time: number) => {
+const handleSeekChange = (time: number, player: YouTubePlayer) => {
   if (!player) return;
   player.seekTo(time);
   window.scrollTo({
@@ -19,7 +21,7 @@ const regexUrl = /(https?:\/\/\S+)/g;
 const regexTime =
   /(?<!:|\d)((?:\d?\d):(?:[0-5]?\d):(?:[0-5]\d)|(?:[0-5]?\d):(?:[0-5]\d))(?!\d)/g;
 
-function stringToReact(text: string, player?: any) {
+function stringToReact(text: string, player?: YouTubePlayer | null) {
   let replacedText;
 
   // Match Hashtags
@@ -60,7 +62,9 @@ function stringToReact(text: string, player?: any) {
         <span
           key={match + i}
           className='link'
-          onClick={() => playTimeControl(player, convertHHMMSSToSeconds(match))}
+          onClick={() =>
+            handleSeekChange(convertHHMMSSToSeconds(match), player)
+          }
         >
           {match}
         </span>
@@ -88,12 +92,11 @@ const useStyles = makeStyles((theme: Theme) => {
 
 export default React.memo(function FormattedString({
   str,
-  player,
 }: {
   str: string;
-  player?: any;
 }): JSX.Element {
   const classes = useStyles();
+  const player = React.useContext(PlayerContext);
 
   return (
     <Typography variant='body2' className={classes.description}>
