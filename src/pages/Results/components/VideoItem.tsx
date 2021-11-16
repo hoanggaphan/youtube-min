@@ -1,5 +1,5 @@
-import Avatar from '@material-ui/core/Avatar';
 import { createStyles, makeStyles, Theme } from '@material-ui/core';
+import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import {
@@ -9,9 +9,8 @@ import {
 } from 'helpers/format';
 import { getLastWord } from 'helpers/string';
 import React from 'react';
-import { lineClamp } from 'styles/utilities';
-import LazyLoad from 'react-lazyload';
 import { Link } from 'react-router-dom';
+import { lineClamp } from 'styles/utilities';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -140,14 +139,12 @@ export default function VideoItem({
     <Link className={classes.link} to={`/video?v=${item.id?.videoId}`}>
       <div className={classes.container}>
         <div className={classes.videoImgContainer}>
-          <LazyLoad offset={400} once>
-            <img
-              src={item.snippet?.thumbnails?.medium?.url}
-              alt=''
-              width='360'
-              className={classes.videoImg}
-            />
-          </LazyLoad>
+          <img
+            src={item.snippet?.thumbnails?.medium?.url}
+            alt=''
+            width='360'
+            className={classes.videoImg}
+          />
           <div className={classes.videoDuration}>
             {/* MOCK START */}
             {/* {formatDuration(item.snippet.duration)} */}

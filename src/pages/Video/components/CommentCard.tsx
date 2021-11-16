@@ -6,12 +6,10 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
-import Skeleton from '@material-ui/lab/Skeleton';
 import FormattedString from 'components/FormattedString';
 import { formatDateView, formatLikeCount } from 'helpers/format';
 import { getLastWord } from 'helpers/string';
 import React from 'react';
-import LazyLoad from 'react-lazyload';
 import { Link } from 'react-router-dom';
 import Collapsed from './Collapsed';
 
@@ -83,25 +81,19 @@ export default function CommentCard({
   return (
     <Box display='flex'>
       <Box mr='16px' alignSelf='flex-start'>
-        <LazyLoad
-          placeholder={<Skeleton variant='circle' width={size} height={size} />}
-          once
-          offset={400}
+        <Link
+          className={classes.avatar}
+          to={`/channel/${snippet.authorChannelId?.value}`}
         >
-          <Link
-            className={classes.avatar}
-            to={`/channel/${snippet.authorChannelId?.value}`}
+          <Avatar
+            component={Box}
+            width={size}
+            height={size}
+            src={snippet.authorProfileImageUrl}
           >
-            <Avatar
-              component={Box}
-              width={size}
-              height={size}
-              src={snippet.authorProfileImageUrl}
-            >
-              {getLastWord(snippet.authorDisplayName).charAt(0)}
-            </Avatar>
-          </Link>
-        </LazyLoad>
+            {getLastWord(snippet.authorDisplayName).charAt(0)}
+          </Avatar>
+        </Link>
       </Box>
 
       <Box>

@@ -6,7 +6,6 @@ import {
   formatVideoViews,
 } from 'helpers/format';
 import React from 'react';
-import LazyLoad from 'react-lazyload';
 import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -23,7 +22,7 @@ const useStyles = makeStyles((theme: Theme) =>
         bottom: 0,
         left: 0,
 
-        pointerEvents: "none",
+        pointerEvents: 'none',
         margin: '-4px',
         borderRadius: '4px',
       },
@@ -117,13 +116,11 @@ export default function VideoItem({ item }: { item: any }): JSX.Element {
       className={classes.link}
     >
       <div className={classes.gridItem}>
-        <LazyLoad offset={400} once>
-          <img
-            className={classes.img}
-            src={item.snippet.thumbnails.medium?.url}
-            alt=''
-          />
-        </LazyLoad>
+        <img
+          className={classes.img}
+          src={item.snippet.thumbnails.medium?.url}
+          alt=''
+        />
         <div className={classes.duration}>
           {formatDuration(item.snippet.duration)}
         </div>
