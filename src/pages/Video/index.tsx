@@ -98,7 +98,6 @@ export default function Video(): JSX.Element {
   const classes = useStyles();
   const query = useQuery();
   const videoId = query.get('v') || '';
-  const start = query.get('t') || '';
   const player = React.useRef<YouTubePlayer | null>(null);
 
   const {
@@ -166,7 +165,6 @@ export default function Video(): JSX.Element {
             url={`https://www.youtube.com/watch?v=${videoId}`}
             className={classes.iframe}
             controls
-            // pip
           />
         </div>
       </div>

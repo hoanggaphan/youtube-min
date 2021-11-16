@@ -8,7 +8,6 @@ import StyledTooltip from 'components/StyledTooltip';
 import { formatDateView, formatVideoViews } from 'helpers/format';
 import { getLastWord } from 'helpers/string';
 import React from 'react';
-import LazyLoad from 'react-lazyload';
 import { Link, useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -184,9 +183,7 @@ export default function List({
           className={`${classes.item} `}
         >
           <div className={classes.gridImgContainer}>
-            <LazyLoad offset={400} once>
-              <img src={item.snippet?.thumbnails?.medium?.url} alt='' />
-            </LazyLoad>
+            <img src={item.snippet?.thumbnails?.medium?.url} alt='' />
           </div>
           <Box mt='12px'>
             <Box display='flex' gridColumnGap='12px'>
@@ -199,26 +196,13 @@ export default function List({
                 title={item.snippet?.channelTitle}
                 className={classes.link}
               >
-                <LazyLoad
-                  placeholder={
-                    <Skeleton
-                      variant='circle'
-                      width={36}
-                      height={36}
-                      animation={false}
-                    />
-                  }
-                  once
-                  offset={400}
+                <Avatar
+                  src={item?.snippet?.channelAvatar}
+                  className={classes.channelAvatar}
                 >
-                  <Avatar
-                    src={item?.snippet?.channelAvatar}
-                    className={classes.channelAvatar}
-                  >
-                    {item?.snippet?.channelTitle &&
-                      getLastWord(item.snippet.channelTitle).charAt(0)}
-                  </Avatar>
-                </LazyLoad>
+                  {item?.snippet?.channelTitle &&
+                    getLastWord(item.snippet.channelTitle).charAt(0)}
+                </Avatar>
               </Link>
 
               <div>
