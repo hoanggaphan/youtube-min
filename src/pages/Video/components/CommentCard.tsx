@@ -72,11 +72,9 @@ const StyledBtn = ({ text }: { text: string }) => {
 
 export default function CommentCard({
   item,
-  player,
   size = 40,
 }: {
   item: any;
-  player?: any;
   size?: number;
 }): JSX.Element {
   const classes = useStyles();
@@ -129,7 +127,7 @@ export default function CommentCard({
           BtnCol={<StyledBtn text='Ản bớt' />}
           showBtnCol
         >
-          <FormattedString str={snippet.textOriginal} player={player} />
+          <FormattedString str={snippet.textOriginal} />
         </Collapsed>
 
         <Box mt='4px' display='flex' alignItems='center'>
