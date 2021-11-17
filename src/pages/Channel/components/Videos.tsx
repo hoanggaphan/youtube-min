@@ -1,11 +1,10 @@
 import Box from '@material-ui/core/Box';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { Skeleton } from '@material-ui/lab';
 import usePlaylistItems from 'app/usePlaylistItems';
-import InfiniteScroll from 'components/InfiniteScroll';
-import Spinner from 'components/Spinner';
 import React from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import VideoItem from './VideoItem';
-import VideosSkeleton from './VideosSkeleton';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -14,6 +13,7 @@ const useStyles = makeStyles((theme: Theme) =>
       gap: '24px 4px',
       justifyContent: 'center',
       gridTemplateColumns: '250px',
+      overflow: 'hidden',
 
       '@media (min-width: 400px)': {
         gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
@@ -37,6 +37,9 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: '24px auto',
       width: 'fit-content',
     },
+    pt: {
+      paddingTop: '56.25%',
+    },
   })
 );
 
@@ -47,7 +50,7 @@ export default React.memo(function Videos({
 }): JSX.Element {
   const classes = useStyles();
   const playlistId = channelData?.contentDetails?.relatedPlaylists?.uploads;
-  const { data, error, setSize } = usePlaylistItems(
+  const { data, error, setSize, isLoading } = usePlaylistItems(
     channelData?.contentDetails?.relatedPlaylists?.uploads
   );
 
@@ -72,7 +75,19 @@ export default React.memo(function Videos({
     return (
       <Box mb='24px'>
         <div className={classes.grid}>
-          <VideosSkeleton num={10} />
+          {[...new Array(10)].map((item, index) => (
+            <div key={index}>
+              <Skeleton
+                className={classes.pt}
+                animation={false}
+                variant='rect'
+              />
+              <Box pt={1} pr='24px'>
+                <Skeleton animation={false} />
+                <Skeleton animation={false} width='60%' />
+              </Box>
+            </div>
+          ))}
         </div>
       </Box>
     );
@@ -81,22 +96,34 @@ export default React.memo(function Videos({
   return (
     <Box mb='24px'>
       <InfiniteScroll
+        dataLength={data.reduce((prev, curr) => prev + curr.items!.length, 0)} //This is important field to render the next data
         next={fetchMoreData}
         hasMore={!!nextPageToken}
-        loader={
-          <div className={classes.loader}>
-            <Spinner />
+        loader={<></>}
+      >
+        {
+          <div className={classes.grid}>
+            {data?.map((playlist) =>
+              playlist.items?.map((item: any) => (
+                <VideoItem key={item.id} item={item} />
+              ))
+            )}
+            {isLoading &&
+              [...new Array(10)].map((item, index) => (
+                <div key={index}>
+                  <Skeleton
+                    className={classes.pt}
+                    animation={false}
+                    variant='rect'
+                  />
+                  <Box pt={1} pr='24px'>
+                    <Skeleton animation={false} />
+                    <Skeleton animation={false} width='60%' />
+                  </Box>
+                </div>
+              ))}
           </div>
         }
-        options={{ rootMargin: '0px 0px 400px 0px' }}
-      >
-        <div className={classes.grid}>
-          {data?.map((playlist) =>
-            playlist.items?.map((item: any) => (
-              <VideoItem key={item.id} item={item} />
-            ))
-          )}
-        </div>
       </InfiniteScroll>
     </Box>
   );
