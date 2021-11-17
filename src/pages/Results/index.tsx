@@ -4,12 +4,11 @@ import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import CloseIcon from '@material-ui/icons/Close';
 import { Alert, AlertTitle } from '@material-ui/lab';
-import InfiniteScroll from 'components/InfiniteScroll';
 import MyContainer from 'components/MyContainer';
-import Spinner from 'components/Spinner';
 import { globalContext } from 'hooks/useGlobal';
 import useQuery from 'hooks/useQuery';
 import React from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import { Link, Redirect } from 'react-router-dom';
 import useSWRInfinite from 'swr/infinite';
 import VideoItem from './components/VideoItem';
@@ -122,16 +121,10 @@ export default function Results(): JSX.Element {
 
       {data ? (
         <InfiniteScroll
+          dataLength={data.reduce((prev, curr) => prev + curr.items!.length, 0)} //This is important field to render the next data
           next={fetchMoreData}
           hasMore={!!data[data.length - 1].nextPageToken}
-          loader={
-            <div className={classes.loader}>
-              <Spinner />
-            </div>
-          }
-          options={{
-            rootMargin: '0px 0px 430px 0px',
-          }}
+          loader={<VideosSkeleton num={10} />}
         >
           {data?.map((video, index) => (
             <div key={index}>

@@ -2,10 +2,9 @@ import Box from '@material-ui/core/Box';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Skeleton from '@material-ui/lab/Skeleton';
 import * as commentAPI from 'api/commentAPI';
-import InfiniteScroll from 'components/InfiniteScroll';
-import Spinner from 'components/Spinner';
 import useIsMounted from 'hooks/useIsMounted';
 import React from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import CommentHeader from './CommentHeader';
 import CommentItem from './CommentItem';
 import CommentPost from './CommentPost';
@@ -29,6 +28,31 @@ const useStyles = makeStyles((theme: Theme) => {
     },
   });
 });
+
+const CommentSkeleton = ({ num }: { num: number }) => {
+  const classes = useStyles();
+
+  return (
+    <>
+      {[...new Array(num)].map((item, index) => (
+        <Box key={index} mb='24px' display='flex' alignItems='center'>
+          <Box mr='16px'>
+            <Skeleton
+              animation={false}
+              variant='circle'
+              className={classes.avatar}
+            />
+          </Box>
+
+          <Box width='100%'>
+            <Skeleton animation={false} width='50%' />
+            <Skeleton animation={false} width='30%' />
+          </Box>
+        </Box>
+      ))}
+    </>
+  );
+};
 
 export default React.memo(function Comments({ videoId }: { videoId: string }) {
   const classes = useStyles();
@@ -76,9 +100,9 @@ export default React.memo(function Comments({ videoId }: { videoId: string }) {
         50,
         data[data?.length - 1].nextPageToken
       );
-      setData([...data, res.result]);
+      isMounted() && setData([...data, res.result]);
     } catch (err) {
-      setError((err as any).result.error);
+      isMounted() && setError((err as any).result.error);
     }
   };
 
@@ -92,7 +116,7 @@ export default React.memo(function Comments({ videoId }: { videoId: string }) {
     const newComment = res.result;
     const newData = [...data!];
     newData[0].items?.unshift(newComment);
-    setData(newData);
+    isMounted() && setData(newData);
   };
 
   return (
@@ -102,33 +126,13 @@ export default React.memo(function Comments({ videoId }: { videoId: string }) {
       <CommentPost videoId={videoId} addComment={handleAddComment} />
 
       {!data ? (
-        <>
-          {[...new Array(3)].map((item, index) => (
-            <Box key={index} mb='16px' display='flex' alignItems='center'>
-              <Box mr='16px'>
-                <Skeleton
-                  animation={false}
-                  variant='circle'
-                  className={classes.avatar}
-                />
-              </Box>
-
-              <Box width='100%'>
-                <Skeleton animation={false} width='50%' />
-                <Skeleton animation={false} width='30%' />
-              </Box>
-            </Box>
-          ))}
-        </>
+        <CommentSkeleton num={3} />
       ) : (
         <InfiniteScroll
+          dataLength={data.reduce((prev, curr) => prev + curr.items!.length, 0)} //This is important field to render the next data
           next={fetchMoreData}
           hasMore={!!data[data.length - 1].nextPageToken}
-          loader={
-            <div className={classes.loader}>
-              <Spinner />
-            </div>
-          }
+          loader={<CommentSkeleton num={3} />}
         >
           {data?.map((comment, index) => (
             <div key={index}>
