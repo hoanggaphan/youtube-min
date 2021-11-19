@@ -1,4 +1,4 @@
-import { Typography } from '@material-ui/core';
+import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Tab from '@material-ui/core/Tab';
@@ -65,11 +65,6 @@ const fetchPolitics = () => videoAPI.fetchPopularVideos(number.popular, '25');
 const fetchEducation = () => videoAPI.fetchPopularVideos(number.popular, '27');
 const fetchTechnology = () => videoAPI.fetchPopularVideos(number.popular, '28');
 
-// const fetchLiked = () => videoAPI.fetchMyRatingVideos('like', number.liked);
-// Because API returns wrong result, (num + 1) will fix the under error
-// const fetchDisliked = () =>
-//   videoAPI.fetchMyRatingVideos('dislike', number.disLiked + 1);
-
 const TabPanel = (props: {
   children: React.ReactNode;
   value: number;
@@ -111,15 +106,6 @@ export default function Home(): JSX.Element {
     ],
     []
   );
-
-  // const resLiked = useVideos(
-  //   user ? `myRating=like&id=${user.id}` : null,
-  //   fetchLiked
-  // );
-  // const resDisliked = useVideos(
-  //   user ? `myRating=dislike&id=${user.id}` : null,
-  //   fetchDisliked
-  // );
 
   React.useEffect(() => {
     document.title = 'Mini YouTube';

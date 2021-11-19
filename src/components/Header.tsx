@@ -12,6 +12,8 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import ReportProblemOutlinedIcon from '@material-ui/icons/ReportProblemOutlined';
 import SearchIcon from '@material-ui/icons/Search';
 import SyncDisabledIcon from '@material-ui/icons/SyncDisabled';
+import ThumbDownAltOutlined from '@material-ui/icons/ThumbDownAltOutlined';
+import ThumbUpAltOutlinedIcon from '@material-ui/icons/ThumbUpAltOutlined';
 import { getLastWord } from 'helpers/string';
 import { useAuth } from 'hooks/useAuth';
 import React from 'react';
@@ -161,6 +163,38 @@ export default function Header(): JSX.Element {
                     <Typography variant='body2'>
                       Demo kết quả tìm kiếm
                     </Typography>
+                  </ListItem>
+
+                  <ListItem
+                    button
+                    onClick={() => {
+                      history.push({
+                        pathname: '/like',
+                        state: { from: location },
+                      });
+                      handleClose();
+                    }}
+                  >
+                    <ListItemIcon className={classes.listItemIcon}>
+                      <ThumbUpAltOutlinedIcon />
+                    </ListItemIcon>
+                    <Typography variant='body2'>Video đã like</Typography>
+                  </ListItem>
+
+                  <ListItem
+                    button
+                    onClick={() => {
+                      history.push({
+                        pathname: '/dislike',
+                        state: { from: location },
+                      });
+                      handleClose();
+                    }}
+                  >
+                    <ListItemIcon className={classes.listItemIcon}>
+                      <ThumbDownAltOutlined />
+                    </ListItemIcon>
+                    <Typography variant='body2'>Video đã dislike</Typography>
                   </ListItem>
 
                   <ListItem button onClick={revokeAccess}>

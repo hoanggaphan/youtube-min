@@ -24,6 +24,7 @@ const Note = React.lazy(() => import('pages/Note'));
 const PageNotFound = React.lazy(() => import('pages/NotFound'));
 const Results = React.lazy(() => import('pages/Results'));
 const Video = React.lazy(() => import('pages/Video'));
+const LikeDislike = React.lazy(() => import('pages/LikeDislike'));
 
 export const history = createBrowserHistory();
 
@@ -86,11 +87,20 @@ function App() {
                             , so i don't use code splitting for this page.  
                         */}
                         <PublicRoute path='/trending' component={Trending} />
-
                         <PublicRoute path='/channel/:id' component={Channel} />
                         <Redirect from='/channel' to='/' />
                         <PublicRoute path='/video' component={Video} />
                         <PublicRoute path='/results' component={Results} />
+
+                        <PublicRoute
+                          path='/like'
+                          component={() => <LikeDislike rating='like' />}
+                        />
+                        <PublicRoute
+                          path='/dislike'
+                          component={() => <LikeDislike rating='dislike' />}
+                        />
+
                         <PublicRoute path='*' component={PageNotFound} />
                       </Switch>
                     </Suspense>

@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme: Theme) =>
       gap: '24px 4px',
       justifyContent: 'center',
       gridTemplateColumns: '250px',
-      overflow: 'hidden',
+      overflow: 'hidden!important',
 
       '@media (min-width: 400px)': {
         gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
@@ -50,7 +50,7 @@ export default React.memo(function Videos({
 }): JSX.Element {
   const classes = useStyles();
   const playlistId = channelData?.contentDetails?.relatedPlaylists?.uploads;
-  const { data, error, setSize, isLoading } = usePlaylistItems(
+  const { data, error, setSize } = usePlaylistItems(
     channelData?.contentDetails?.relatedPlaylists?.uploads
   );
 
@@ -75,19 +75,7 @@ export default React.memo(function Videos({
     return (
       <Box mb='24px'>
         <div className={classes.grid}>
-          {[...new Array(10)].map((item, index) => (
-            <div key={index}>
-              <Skeleton
-                className={classes.pt}
-                animation={false}
-                variant='rect'
-              />
-              <Box pt={1} pr='24px'>
-                <Skeleton animation={false} />
-                <Skeleton animation={false} width='60%' />
-              </Box>
-            </div>
-          ))}
+          <VideoSkeleton num={10} />
         </div>
       </Box>
     );
@@ -99,32 +87,47 @@ export default React.memo(function Videos({
         dataLength={data.reduce((prev, curr) => prev + curr.items!.length, 0)} //This is important field to render the next data
         next={fetchMoreData}
         hasMore={!!nextPageToken}
-        loader={<></>}
+        loader={<VideoSkeleton num={10} />}
+        className={classes.grid}
       >
-        {
-          <div className={classes.grid}>
-            {data?.map((playlist) =>
-              playlist.items?.map((item: any) => (
-                <VideoItem key={item.id} item={item} />
-              ))
-            )}
-            {isLoading &&
-              [...new Array(10)].map((item, index) => (
-                <div key={index}>
-                  <Skeleton
-                    className={classes.pt}
-                    animation={false}
-                    variant='rect'
-                  />
-                  <Box pt={1} pr='24px'>
-                    <Skeleton animation={false} />
-                    <Skeleton animation={false} width='60%' />
-                  </Box>
-                </div>
-              ))}
-          </div>
-        }
+        <VideoList data={data} />
       </InfiniteScroll>
     </Box>
+  );
+});
+
+const VideoList = React.memo(
+  ({
+    data,
+  }: {
+    data: gapi.client.youtube.PlaylistItemListResponse[];
+  }): JSX.Element => {
+    return (
+      <>
+        {data?.map((playlist) =>
+          playlist.items?.map((item: any) => (
+            <VideoItem key={item.id} item={item} />
+          ))
+        )}
+      </>
+    );
+  }
+);
+
+const VideoSkeleton = React.memo(({ num }: { num: number }): JSX.Element => {
+  const classes = useStyles();
+
+  return (
+    <>
+      {[...new Array(num)].map((item, index) => (
+        <div key={index}>
+          <Skeleton className={classes.pt} animation={false} variant='rect' />
+          <Box pt={1} pr='24px'>
+            <Skeleton animation={false} />
+            <Skeleton animation={false} width='60%' />
+          </Box>
+        </div>
+      ))}
+    </>
   );
 });

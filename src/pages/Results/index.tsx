@@ -46,7 +46,7 @@ export default function Results(): JSX.Element {
   const q = query.get('search_query');
   const { state, dispatch } = React.useContext(globalContext);
 
-  const { data, error, setSize } = useSWRInfinite(
+  const { data, error, setSize, size } = useSWRInfinite(
     (pageIndex, previousPageData) => {
       // reached the end
       if (previousPageData && !previousPageData.nextPageToken) return null;
@@ -87,8 +87,8 @@ export default function Results(): JSX.Element {
     return <MyContainer>{error.message}</MyContainer>;
   }
 
-  const fetchMoreData = async () => {
-    await setSize((size) => size + 1);
+  const fetchMoreData = () => {
+    setSize(() => size + 1);
   };
 
   return (
@@ -120,23 +120,36 @@ export default function Results(): JSX.Element {
       </Collapse>
 
       {data ? (
-        <InfiniteScroll
-          dataLength={data.reduce((prev, curr) => prev + curr.items!.length, 0)} //This is important field to render the next data
-          next={fetchMoreData}
-          hasMore={!!data[data.length - 1].nextPageToken}
-          loader={<VideosSkeleton num={10} />}
-        >
-          {data?.map((video, index) => (
-            <div key={index}>
-              {video.items?.map((item: any) => (
-                <VideoItem key={item.id?.videoId} item={item} />
-              ))}
-            </div>
-          ))}
-        </InfiniteScroll>
+        <>
+          <InfiniteScroll
+            dataLength={data.reduce(
+              (prev, curr) => prev + curr.items!.length,
+              0
+            )} //This is important field to render the next data
+            next={fetchMoreData}
+            hasMore={!!data[data.length - 1].nextPageToken}
+            loader={<VideosSkeleton num={10} />}
+          >
+            <VideoList data={data} />
+          </InfiniteScroll>
+        </>
       ) : (
         <VideosSkeleton num={10} />
       )}
     </>
   );
 }
+
+const VideoList = React.memo(({ data }: { data: any[] }): JSX.Element => {
+  return (
+    <>
+      {data?.map((video, index) => (
+        <div key={index}>
+          {video.items?.map((item: any) => (
+            <VideoItem key={item.id?.videoId} item={item} />
+          ))}
+        </div>
+      ))}
+    </>
+  );
+});

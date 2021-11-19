@@ -20,12 +20,14 @@ export function fetchPopularVideos(
 
 export function fetchMyRatingVideos(
   myRating: string = 'like',
-  maxResults: number = 4
+  maxResults: number = 4,
+  pageToken?: string
 ) {
   return gapi.client.youtube.videos.list({
     part: ['snippet, contentDetails, statistics'],
     myRating,
     maxResults,
+    pageToken,
   });
 }
 
