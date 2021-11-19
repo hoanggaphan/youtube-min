@@ -134,15 +134,29 @@ export default React.memo(function Comments({ videoId }: { videoId: string }) {
           hasMore={!!data[data.length - 1].nextPageToken}
           loader={<CommentSkeleton num={3} />}
         >
-          {data?.map((comment, index) => (
-            <div key={index}>
-              {comment.items?.map((item: gapi.client.youtube.CommentThread) => (
-                <CommentItem key={item.id} item={item} />
-              ))}
-            </div>
-          ))}
+          <CommentList data={data} />
         </InfiniteScroll>
       )}
     </Box>
   );
 });
+
+const CommentList = React.memo(
+  ({
+    data,
+  }: {
+    data: gapi.client.youtube.CommentThreadListResponse[];
+  }): JSX.Element => {
+    return (
+      <>
+        {data?.map((comment, index) => (
+          <div key={index}>
+            {comment.items?.map((item: gapi.client.youtube.CommentThread) => (
+              <CommentItem key={item.id} item={item} />
+            ))}
+          </div>
+        ))}
+      </>
+    );
+  }
+);

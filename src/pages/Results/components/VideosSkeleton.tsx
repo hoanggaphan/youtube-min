@@ -20,9 +20,13 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export default function VideosSkeleton({ num }: { num: number }): JSX.Element {
+export default React.memo(function VideosSkeleton({
+  num,
+}: {
+  num: number;
+}): JSX.Element {
   const classes = useStyles();
-
+  
   return (
     <>
       {[...new Array(num)].map((item, index) => (
@@ -54,4 +58,4 @@ export default function VideosSkeleton({ num }: { num: number }): JSX.Element {
       ))}
     </>
   );
-}
+});
