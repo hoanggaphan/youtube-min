@@ -106,12 +106,18 @@ export default function Channel(): JSX.Element {
 
   return (
     <>
-      <div
-        className={`background-position ${classes.banner}`}
-        style={{
-          backgroundImage: `url(${data?.brandingSettings?.image?.bannerExternalUrl}${urlImageCropped})`,
-        }}
-      />
+      {data === undefined && (
+        <div className={`background-position ${classes.banner}`} />
+      )}
+
+      {data?.brandingSettings?.image?.bannerExternalUrl && (
+        <div
+          className={`background-position ${classes.banner}`}
+          style={{
+            backgroundImage: `url(${data?.brandingSettings?.image?.bannerExternalUrl}${urlImageCropped})`,
+          }}
+        />
+      )}
 
       <Box className={classes.channelHeader}>
         <Box display='flex' alignItems='center'>
