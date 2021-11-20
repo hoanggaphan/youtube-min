@@ -50,9 +50,7 @@ export default React.memo(function Videos({
 }): JSX.Element {
   const classes = useStyles();
   const playlistId = channelData?.contentDetails?.relatedPlaylists?.uploads;
-  const { data, error, setSize } = usePlaylistItems(
-    channelData?.contentDetails?.relatedPlaylists?.uploads
-  );
+  const { data, error, setSize } = usePlaylistItems(playlistId);
 
   let nextPageToken: string | undefined;
   if (data) {
@@ -67,6 +65,14 @@ export default React.memo(function Videos({
     return (
       <Box mb='24px'>
         <Box textAlign='center'>{error.message}</Box>
+      </Box>
+    );
+  }
+
+  if (data?.length === 1 && data[0].items?.length === 0) {
+    return (
+      <Box mb='24px'>
+        <Box textAlign='center'>Kênh này không có video nào.</Box>
       </Box>
     );
   }

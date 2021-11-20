@@ -14,6 +14,9 @@ const fetchPlaylistItems = async (
       nextPageToken
     );
 
+    if (resPlaylistItems.result.items?.length === 0)
+      return resPlaylistItems.result;
+
     // ids for call api to get videos views
     const ids = resPlaylistItems.result.items?.map(
       (item: gapi.client.youtube.PlaylistItem) =>
@@ -47,8 +50,6 @@ const fetchPlaylistItems = async (
     }
 
     throw new Error('An error occurred while fetching playlistItems');
-    // err.result.error.message = 'An error occurred while fetching playlistItems';
-    // throw err.result.error;
   }
 };
 
