@@ -4,11 +4,11 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import * as channelAPI from 'api/channelAPI';
 import * as videoAPI from 'api/videoAPI';
-import { isLogin, useAuth } from 'hooks/useAuth';
+import { isLogin } from 'hooks/useAuth';
+import useIsMounted from 'hooks/useIsMounted';
 import React from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useHistory, useLocation } from 'react-router';
-import useSWRInfinite from 'swr/infinite';
 import List from './components/List';
 import ListSkeleton from './components/ListSkeleton';
 
@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const fetcher = async (url: string, rating: string, nextPageToken?: string) => {
+const fetcher = async (rating: string, nextPageToken?: string) => {
   try {
     const resVideo = await videoAPI.fetchMyRatingVideos(
       rating,
@@ -83,27 +83,20 @@ const fetcher = async (url: string, rating: string, nextPageToken?: string) => {
 
 export default function Like({ rating }: { rating: string }) {
   const classes = useStyles();
-  const { user } = useAuth();
   const history = useHistory();
   const location = useLocation();
-  const { data, error, setSize } = useSWRInfinite(
-    (pageIndex, previousPageData) => {
-      // reached the end
-      if (previousPageData && !previousPageData.nextPageToken) return null;
+  const isMounted = useIsMounted();
+  const [data, setData] = React.useState<
+    gapi.client.youtube.VideoListResponse[] | undefined
+  >();
+  const [error, setError] = React.useState<any>();
 
-      // first page, we don't have `previousPageData`
-      if (pageIndex === 0)
-        return [`/api/videos?${user?.id}rating=${rating}`, rating];
-
-      // add the cursor to the API endpoint
-      return [
-        `/api/videos?${user?.id}rating=${rating}`,
-        rating,
-        previousPageData?.nextPageToken,
-      ];
-    },
-    fetcher
-  );
+  React.useEffect(() => {
+    fetcher(rating)
+      .then((res) => isMounted() && setData([res]))
+      .catch((err) => isMounted() && setError(err));
+    // eslint-disable-next-line
+  }, []);
 
   if (!isLogin()) {
     return (
@@ -151,7 +144,10 @@ export default function Like({ rating }: { rating: string }) {
   }
 
   const fetchMoreData = () => {
-    setSize((size) => size + 1);
+    if (!data) return;
+    fetcher(rating, data[data?.length - 1].nextPageToken)
+      .then((res) => isMounted() && setData([...data, res]))
+      .catch((err) => isMounted() && setError(err));
   };
 
   return (
