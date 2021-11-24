@@ -47,7 +47,6 @@ function App() {
             <Router history={history}>
               <Switch>
                 <Route path={['/note', '/how-login', '/login']}>
-                  {/* Use separate suspense for each layout */}
                   {/* <Layout1> */}
                   <Suspense fallback={<TopBarProgress />}>
                     <Switch>
@@ -72,6 +71,8 @@ function App() {
                     '/channel',
                     '/video',
                     '/results',
+                    '/like',
+                    '/dislike',
                   ]}
                 >
                   <BasicLayout>
@@ -82,10 +83,6 @@ function App() {
                         {/* If you use homepage, remove redirect */}
                         {/* <PublicRoute exact path='/' component={Home} /> */}
 
-                        {/* Because the home page is not used, 
-                            the Trending Page is usually the first to load,
-                            , so i don't use code splitting for this page.  
-                        */}
                         <PublicRoute path='/trending' component={Trending} />
                         <PublicRoute path='/channel/:id' component={Channel} />
                         <Redirect from='/channel' to='/' />

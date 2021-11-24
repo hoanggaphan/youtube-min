@@ -135,6 +135,7 @@ export default function Like({ rating }: { rating: string }) {
         <div className={classes.grid}>
           <ListSkeleton num={12} />
         </div>
+        <Box py='16px'></Box>
       </div>
     );
   }
