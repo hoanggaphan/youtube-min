@@ -1,4 +1,4 @@
-import { createStyles, makeStyles, Theme } from '@material-ui/core';
+import { Box, createStyles, makeStyles, Theme } from '@material-ui/core';
 import Collapse from '@material-ui/core/Collapse';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
@@ -8,11 +8,12 @@ import MyContainer from 'components/MyContainer';
 import { globalContext } from 'hooks/useGlobal';
 import useQuery from 'hooks/useQuery';
 import React from 'react';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import { Link, Redirect } from 'react-router-dom';
 import useSWRInfinite from 'swr/infinite';
 import VideoItem from './components/VideoItem';
 import VideosSkeleton from './components/VideosSkeleton';
+import InfiniteScroll from 'components/InfiniteScroll';
+import Anime from 'lotties/Anime';
 
 const mockData = async () => {
   const res = await fetch(
@@ -87,8 +88,8 @@ export default function Results(): JSX.Element {
     return <MyContainer>{error.message}</MyContainer>;
   }
 
-  const fetchMoreData = () => {
-    setSize(() => size + 1);
+  const fetchMoreData = async () => {
+    await setSize(() => size + 1);
   };
 
   return (
@@ -122,20 +123,22 @@ export default function Results(): JSX.Element {
       {data ? (
         <>
           <InfiniteScroll
-            dataLength={data.reduce(
-              (prev, curr) => prev + curr.items!.length,
-              0
-            )} //This is important field to render the next data
             next={fetchMoreData}
             hasMore={!!data[data.length - 1].nextPageToken}
-            loader={<VideosSkeleton num={10} />}
+            loader={
+              <Box mt='40px'>
+                <Anime />
+              </Box>
+            }
+            options={{ rootMargin: '400px' }} // Cách loader 400px sẽ gọi function next()
           >
             <VideoList data={data} />
           </InfiniteScroll>
         </>
       ) : (
-        <VideosSkeleton num={10} />
+        <VideosSkeleton num={4} />
       )}
+
     </>
   );
 }

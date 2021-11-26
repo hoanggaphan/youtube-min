@@ -2,8 +2,9 @@ import Box from '@material-ui/core/Box';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { Skeleton } from '@material-ui/lab';
 import usePlaylistItems from 'app/usePlaylistItems';
+import InfiniteScroll from 'components/InfiniteScroll';
+import Anime from 'lotties/Anime';
 import React from 'react';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import VideoItem from './VideoItem';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -90,13 +91,18 @@ export default React.memo(function Videos({
   return (
     <Box mb='24px'>
       <InfiniteScroll
-        dataLength={data.reduce((prev, curr) => prev + curr.items!.length, 0)} //This is important field to render the next data
         next={fetchMoreData}
         hasMore={!!nextPageToken}
-        loader={<VideoSkeleton num={10} />}
-        className={classes.grid}
+        loader={
+          <Box mt='40px'>
+            <Anime />
+          </Box>
+        }
+        options={{ rootMargin: '400px' }}
       >
-        <VideoList data={data} />
+        <div className={classes.grid}>
+          <VideoList data={data} />
+        </div>
       </InfiniteScroll>
     </Box>
   );
@@ -125,15 +131,17 @@ const VideoSkeleton = React.memo(({ num }: { num: number }): JSX.Element => {
 
   return (
     <>
-      {[...new Array(num)].map((item, index) => (
-        <div key={index}>
-          <Skeleton className={classes.pt} animation={false} variant='rect' />
-          <Box pt={1} pr='24px'>
-            <Skeleton animation={false} />
-            <Skeleton animation={false} width='60%' />
-          </Box>
-        </div>
-      ))}
+      {[...new Array(num)].map((item, index) => {
+        return (
+          <div key={index}>
+            <Skeleton className={classes.pt} animation={false} variant='rect' />
+            <Box pt={1} pr='24px'>
+              <Skeleton animation={false} />
+              <Skeleton animation={false} width='60%' />
+            </Box>
+          </div>
+        );
+      })}
     </>
   );
 });

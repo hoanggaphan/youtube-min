@@ -2,9 +2,9 @@ import Box from '@material-ui/core/Box';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Skeleton from '@material-ui/lab/Skeleton';
 import * as commentAPI from 'api/commentAPI';
+import InfiniteScroll from 'components/InfiniteScroll';
 import useIsMounted from 'hooks/useIsMounted';
 import React from 'react';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import CommentHeader from './CommentHeader';
 import CommentItem from './CommentItem';
 import CommentPost from './CommentPost';
@@ -65,7 +65,7 @@ export default React.memo(function Comments({ videoId }: { videoId: string }) {
 
   React.useEffect(() => {
     commentAPI
-      .fetchListByVideoId(videoId, order)
+      .fetchListByVideoId(videoId, order, 20)
       .then((res) => isMounted() && setData([res.result]))
       .catch((err) => isMounted() && setError(err.result.error));
     // eslint-disable-next-line
@@ -97,7 +97,7 @@ export default React.memo(function Comments({ videoId }: { videoId: string }) {
       const res = await commentAPI.fetchListByVideoId(
         videoId,
         order,
-        50,
+        20,
         data[data?.length - 1].nextPageToken
       );
       isMounted() && setData([...data, res.result]);
@@ -126,13 +126,13 @@ export default React.memo(function Comments({ videoId }: { videoId: string }) {
       <CommentPost videoId={videoId} addComment={handleAddComment} />
 
       {!data ? (
-        <CommentSkeleton num={3} />
+        <CommentSkeleton num={4} />
       ) : (
         <InfiniteScroll
-          dataLength={data.reduce((prev, curr) => prev + curr.items!.length, 0)} //This is important field to render the next data
           next={fetchMoreData}
           hasMore={!!data[data.length - 1].nextPageToken}
-          loader={<CommentSkeleton num={3} />}
+          loader={<CommentSkeleton num={4} />}
+          options={{ rootMargin: '400px' }}
         >
           <CommentList data={data} />
         </InfiniteScroll>
