@@ -4,15 +4,14 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import * as channelAPI from 'api/channelAPI';
 import * as videoAPI from 'api/videoAPI';
-import { isLogin } from 'hooks/useAuth';
+import InfiniteScroll from 'components/InfiniteScroll';
+import { useAuth } from 'hooks/useAuth';
 import useIsMounted from 'hooks/useIsMounted';
+import Anime from 'lotties/Anime';
 import React from 'react';
-// import InfiniteScroll from 'react-infinite-scroll-component';
 import { useHistory, useLocation } from 'react-router';
 import List from './components/List';
 import ListSkeleton from './components/ListSkeleton';
-import InfiniteScroll from 'components/InfiniteScroll';
-import Anime from 'lotties/Anime';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -92,6 +91,7 @@ export default function Like({ rating }: { rating: string }) {
     gapi.client.youtube.VideoListResponse[] | undefined
   >();
   const [error, setError] = React.useState<any>();
+  const { user } = useAuth();
 
   React.useEffect(() => {
     fetcher(rating)
@@ -100,7 +100,7 @@ export default function Like({ rating }: { rating: string }) {
     // eslint-disable-next-line
   }, []);
 
-  if (!isLogin()) {
+  if (!user) {
     return (
       <Box py='16px'>
         <Typography align='center' variant='h6'>
