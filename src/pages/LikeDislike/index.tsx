@@ -7,10 +7,12 @@ import * as videoAPI from 'api/videoAPI';
 import { isLogin } from 'hooks/useAuth';
 import useIsMounted from 'hooks/useIsMounted';
 import React from 'react';
-import InfiniteScroll from 'react-infinite-scroll-component';
+// import InfiniteScroll from 'react-infinite-scroll-component';
 import { useHistory, useLocation } from 'react-router';
 import List from './components/List';
 import ListSkeleton from './components/ListSkeleton';
+import InfiniteScroll from 'components/InfiniteScroll';
+import Anime from 'lotties/Anime';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -46,7 +48,7 @@ const fetcher = async (rating: string, nextPageToken?: string) => {
   try {
     const resVideo = await videoAPI.fetchMyRatingVideos(
       rating,
-      49,
+      32,
       nextPageToken
     );
 
@@ -159,13 +161,18 @@ export default function Like({ rating }: { rating: string }) {
         </Typography>
       </Box>
       <InfiniteScroll
-        dataLength={data.reduce((prev, curr) => prev + curr.items!.length, 0)} //This is important field to render the next data
         next={fetchMoreData}
         hasMore={!!data[data?.length - 1].nextPageToken}
-        loader={<ListSkeleton num={8} />}
-        className={classes.grid}
+        loader={
+          <Box mt='40px'>
+            <Anime />
+          </Box>
+        }
+        options={{ rootMargin: '400px' }}
       >
-        <List data={data} />
+        <div className={classes.grid}>
+          <List data={data} />
+        </div>
       </InfiniteScroll>
       <Box py='16px'></Box>
     </div>
