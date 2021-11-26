@@ -74,16 +74,18 @@ function useProvideAuth() {
    */
   React.useEffect(() => {
     updateSignInStatus();
+    //eslint-disable-next-line
   }, []);
 
   /**
    * Listen for sign-in states changes.
    */
   const updateSignInStatus = () => {
-    const user = GoogleAuth.current.currentUser.get();
+    const userG = GoogleAuth.current.currentUser.get();
+    const isAuthorized = userG.hasGrantedScopes(SCOPE);
 
-    if (isLogin()) {
-      const userProfile = user.getBasicProfile();
+    if (isAuthorized) {
+      const userProfile = userG.getBasicProfile();
       const newUser = {
         imgUrl: userProfile.getImageUrl(),
         id: userProfile.getId(),
@@ -98,10 +100,24 @@ function useProvideAuth() {
     }
   };
 
-  const signIn = () => GoogleAuth.current.signIn().then(updateSignInStatus);
-  const signOut = () => GoogleAuth.current.signOut().then(updateSignInStatus);
+  const signIn = () =>
+    GoogleAuth.current.signIn().then(() => {
+      /**
+       * Check after login, 
+       * if user does not grant all permissions
+       * then clear memory saved in cache of browser
+       */
+      const userG = GoogleAuth.current.currentUser.get();
+      const isAuthorized = userG.hasGrantedScopes(SCOPE);
+      if (!isAuthorized) return GoogleAuth.current.disconnect();
+
+      updateSignInStatus();
+    });
+
+  const signOut = () => GoogleAuth.current.signOut().then(() => setUser(null));
+
   const revokeAccess = () =>
-    GoogleAuth.current.disconnect().then(updateSignInStatus);
+    GoogleAuth.current.disconnect().then(() => setUser(null));
 
   return {
     user,
