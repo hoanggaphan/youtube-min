@@ -1,6 +1,5 @@
 import hoistStatics from 'hoist-non-react-statics';
 import React from 'react';
-import TopBarProgress from 'react-topbar-progress-indicator';
 
 type MyProps = any;
 type MyState = {
