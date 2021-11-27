@@ -1,5 +1,53 @@
-import moment from 'moment';
-import 'moment-duration-format';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import updateLocale from 'dayjs/plugin/updateLocale';
+
+import 'dayjs/locale/vi';
+dayjs.locale('vi');
+
+const config = {
+  thresholds: [
+    { l: 's', r: 1 },
+    { l: 'ss', r: 59, d: 'second' },
+    { l: 'm', r: 1 },
+    { l: 'mm', r: 59, d: 'minute' },
+    { l: 'h', r: 1 },
+    { l: 'hh', r: 23, d: 'hour' },
+    { l: 'd', r: 1 },
+    { l: 'dd', r: 6, d: 'day' },
+    { l: 'w', r: 1 },
+    { l: 'ww', r: 4, d: 'week' },
+    { l: 'M', r: 1 },
+    { l: 'MM', r: 11, d: 'month' },
+    { l: 'y', r: 1 },
+    { l: 'yy', d: 'year' },
+  ],
+};
+dayjs.extend(duration);
+dayjs.extend(relativeTime, config);
+dayjs.extend(updateLocale);
+
+dayjs.updateLocale('vi', {
+  relativeTime: {
+    future: '%s tới',
+    past: '%s trước',
+    s: 'vài giây',
+    ss: '%d giây',
+    m: '%d phút',
+    mm: '%d phút',
+    h: '%d giờ',
+    hh: '%d giờ',
+    d: '%d ngày',
+    dd: '%d ngày',
+    w: '%d tuần',
+    ww: '%d tuần',
+    M: '%d tháng',
+    MM: '%d tháng',
+    y: '%d năm',
+    yy: '%d năm',
+  },
+});
 
 const types = [
   { value: 1e9, unit: 'T' },
@@ -70,56 +118,53 @@ export function formatLikeCount(num: number | string) {
   return Math.trunc(decimalNum) + ' ' + types[index].unit;
 }
 
-moment.updateLocale('vi', {
-  relativeTime: {
-    future: '%s tới',
-    past: '%s trước',
-    s: 'vài giây',
-    ss: '%d giây',
-    m: '%d phút',
-    mm: '%d phút',
-    h: '%d giờ',
-    hh: '%d giờ',
-    d: '%d ngày',
-    dd: '%d ngày',
-    w: '%d tuần',
-    ww: '%d tuần',
-    M: '%d tháng',
-    MM: '%d tháng',
-    y: '%d năm',
-    yy: '%d năm',
-  },
-});
-
-// Set new thresholds
-moment.relativeTimeThreshold('s', 60);
-moment.relativeTimeThreshold('m', 60);
-moment.relativeTimeThreshold('h', 24);
-moment.relativeTimeThreshold('d', 7);
-moment.relativeTimeThreshold('w', 5); // enables weeks
-moment.relativeTimeThreshold('M', 12);
-
 export function formatDateView(date: string) {
-  return moment(date).fromNow();
-}
-
-function customTemplate(this: any) {
-  if (this.duration.asSeconds() >= 3600) {
-    return 'h:mm:ss';
-  }
-
-  return 'm:ss';
+  return dayjs(date).fromNow();
 }
 
 export function formatDuration(duration: string) {
-  return moment.duration(duration).format(customTemplate, { trim: false });
+  if (dayjs.duration(duration).asSeconds() >= 3600) {
+    return dayjs.duration(duration).format('H:mm:ss');
+  }
+
+  return dayjs.duration(duration).format('m:ss');
 }
 
 export function formatPublishAt(date: string) {
   const format = 'D [thg] M, YYYY';
-  return moment(date).format(format);
+  return dayjs(date).format(format);
 }
 
 export function formatNumberWithDots(num: number | string) {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
+
+// User for moment npm
+// moment.updateLocale('vi', {
+//   relativeTime: {
+//     future: '%s tới',
+//     past: '%s trước',
+//     s: 'vài giây',
+//     ss: '%d giây',
+//     m: '%d phút',
+//     mm: '%d phút',
+//     h: '%d giờ',
+//     hh: '%d giờ',
+//     d: '%d ngày',
+//     dd: '%d ngày',
+//     w: '%d tuần',
+//     ww: '%d tuần',
+//     M: '%d tháng',
+//     MM: '%d tháng',
+//     y: '%d năm',
+//     yy: '%d năm',
+//   },
+// });
+
+// // Set new thresholds
+// moment.relativeTimeThreshold('s', 60);
+// moment.relativeTimeThreshold('m', 60);
+// moment.relativeTimeThreshold('h', 24);
+// moment.relativeTimeThreshold('d', 7);
+// moment.relativeTimeThreshold('w', 5); // enables weeks
+// moment.relativeTimeThreshold('M', 12);
